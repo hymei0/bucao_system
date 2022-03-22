@@ -8,9 +8,9 @@ import lombok.Data;
 @TableName("bucao_info")
 @Data
 public class Bucao_info {
-    @TableId(value = "RFID", type = IdType.AUTO)
-    private String RFNO;
-    private String RFID;
+    @TableId(value = "rfno,rfid", type = IdType.AUTO)
+    private String rfno;
+    private String rfid;
     private String state;
     private int wash_times;
 }

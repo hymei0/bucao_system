@@ -5,6 +5,7 @@
     <el-menu
         style="width: 200px;min-height:calc(100vh - 50px)"
         default-active="system_data"
+        router
         class="el-menu-vertical-demo"
         background-color="#334157" text-color="#fff" active-text-color="#ffd04b"
     >
@@ -28,13 +29,20 @@
               </li>
             </ul>
           </el-menu-item>
-          <el-menu-item index="usr_info" style="padding-left: 60px; font-size:small">
+          <el-menu-item index="user_info" style="padding-left: 60px; font-size:small">
             <ul>
               <li>
                 用户信息管理
               </li>
             </ul>
           </el-menu-item>
+        <el-menu-item index="room_info" style="padding-left: 60px; font-size:small">
+          <ul>
+            <li>
+              病房信息管理
+            </li>
+          </ul>
+        </el-menu-item>
       </el-sub-menu>
 
       <el-sub-menu index="chart">

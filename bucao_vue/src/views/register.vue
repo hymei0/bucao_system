@@ -26,8 +26,8 @@
           <el-input prefix-icon="el-icon-lock" v-model="form.telephone" autocomplete="off" placeholder="请输入手机号" />
         </el-form-item>
 
-        <el-form-item label="性别" prop="sex">
-          <el-radio-group v-model="form.sex">
+        <el-form-item label="性 别" prop="sex">
+          <el-radio-group v-model="form.sex" autocomplete="off">
             <el-radio label="男" style="position: absolute;left: 10px"/>
             <el-radio label="女" style="position: absolute;right: 10px"/>
           </el-radio-group>

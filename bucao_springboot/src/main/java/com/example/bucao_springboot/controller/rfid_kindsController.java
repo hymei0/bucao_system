@@ -21,17 +21,36 @@ public class rfid_kindsController {
     @PostMapping
     public Result<?> save(@RequestBody RFid_kinds rfid_kinds)
     {
-        rfid_kindsMapper.insert(rfid_kinds);
-        System.out.println(rfid_kinds.getRFNO());
-        return Result.success();
+        try{
+            RFid_kinds result=rfid_kindsMapper.selectOne(Wrappers.<RFid_kinds>lambdaQuery().eq(RFid_kinds::getRFNO,rfid_kinds.getRFNO()));
+            if(result==null) {
+                rfid_kindsMapper.insert(rfid_kinds);
+                return Result.success();
+            }
+            else{
+                return Result.error("-1","该类布草已经存在");
+            }
+        }catch (Exception e){
+            return Result.error("-1","系统错误，请稍后重试");
+        }
+
     }
     //更新接口
     @PutMapping
     public Result<?> update(@RequestBody RFid_kinds rfid_kinds)
     {
-        rfid_kindsMapper.updateById(rfid_kinds);
-        System.out.println(rfid_kinds.getRFNO());
-        return Result.success();
+        try{
+            RFid_kinds result=rfid_kindsMapper.selectOne(Wrappers.<RFid_kinds>lambdaQuery().eq(RFid_kinds::getRFNO,rfid_kinds.getRFNO()));
+            if(result==null) {
+                rfid_kindsMapper.updateById(rfid_kinds);
+                return Result.success();
+            }
+            else{
+                return Result.error("-1","该类布草已经存在");
+            }
+        }catch (Exception e){
+            return Result.error("-1","系统错误，请稍后重试");
+        }
     }
 
     //删除接口

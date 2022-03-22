@@ -95,7 +95,7 @@ const background = ref(true)
 const disabled = ref(false)
 
 export default {
-  name: 'HomeView',
+  name: 'RFIDkindsView',
   components: {
 
   },
@@ -185,7 +185,7 @@ export default {
             else {
               this.$message({
                 type: "warning",
-                message: res.data.message
+                message: res.msg
               })
             }
         this.load()
@@ -245,7 +245,7 @@ export default {
           else
           {
             this.$message({
-              type:"Error",
+              type:"error",
               message:res.msg
             })
             this.form={}

@@ -7,13 +7,23 @@ const routes = [
     name: 'Layout',
     component: Layout,
     // 重定向
-    redirect:"/home",
+    redirect:"/RFID_kinds",
     //嵌套路由
     children:[
       {
-        path: 'home',
-        name: 'Home',
-        component: ()=>import("@/views/HomeView"),
+        path: 'RFID_kinds',
+        name: 'RFID_kinds',
+        component: ()=>import("@/views/RFIDkindsView"),
+      },
+      {
+        path:'person',
+        name:'person',
+        component:()=>import("@/views/Person")
+      },
+      {
+        path: 'bucao_info',
+        name: 'Bucao_info',
+        component: ()=>import("@/views/Bucao_info"),
       }
     ]
 
