@@ -30,6 +30,24 @@ public class User_infoController {
         }
         return Result.success();
     }
+    //注册接口
+    @PostMapping("/register")
+    public Result<?> register(@RequestBody User_info user_info)
+    {
+        System.out.println(user_info.getID());
+        try{
+            User_info user=user_infoMapper.selectOne(Wrappers.<User_info>lambdaQuery().eq(User_info::getID,user_info.getID()).or().eq(User_info::getTelephone,user_info.getTelephone()));
+            if(user==null) {
+                user_infoMapper.insert(user_info);
+                return Result.success();
+            }
+            else{
+                return Result.error("-1","该账号/或该电话已存在");
+            }
+        }catch (Exception e){
+            return Result.error("-1","系统错误，请稍后重试");
+        }
+    }
     //新增接口
     @PostMapping
     public Result<?> save(@RequestBody User_info user_info)
@@ -63,9 +81,9 @@ public class User_infoController {
                               @RequestParam(defaultValue = "") String search)
     //参数：pageNum：当前页，pageSize:每页多少条 search:查询关键字
     {
-        //Page<Object> page= new Page<>(pageNum,pageSize);//分页对象
+        // Page<Object> page= new Page<>(pageNum,pageSize);//分页对象
 
-        //LambdaQueryWrapper<RFid_kinds> qw = Wrappers.<User>lambdaQuery().like(User::getName, "张").and(u -> u.lt(User::getAge, 40).or().isNotNull(User::getEmail));
+        // LambdaQueryWrapper<RFid_kinds> qw = Wrappers.<User>lambdaQuery().like(User::getName, "张").and(u -> u.lt(User::getAge, 40).or().isNotNull(User::getEmail));
 
         LambdaQueryWrapper<User_info> wrapper = Wrappers.<User_info>lambdaQuery();
         if(StrUtil.isNotBlank(search))//不为null,则进行模糊匹配

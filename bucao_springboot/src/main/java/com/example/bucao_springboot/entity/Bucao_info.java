@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 public class Bucao_info {
     @TableId(value = "RFID", type = IdType.AUTO)
+    private String RFNO;
     private String RFID;
     private String state;
     private int wash_times;

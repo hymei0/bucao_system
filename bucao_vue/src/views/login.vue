@@ -1,26 +1,26 @@
 <template>
 <div style="width: 100%; height: 100vh;overflow: hidden">
-    <div style="width: 400px;margin: 150px auto">
-      <div style="color: black;font-size: 30px;text-align: center;padding: 30px 0">欢迎登录</div>
+    <div style="width: 400px;margin: 90px 50px 40px 900px">
+      <div style="font-weight: bold;font-size: 30px;text-align: center;padding: 50px 20px">登 录</div>
       <el-form
           :model="form"
           status-icon
           :rules="rules"
           label-width="120px"
           class="demo-ruleForm"
-      >
-        <el-form-item label="账号" prop="id">
+          style="padding-top: 20px">
+        <el-form-item label="账 号" prop="id">
           <el-input prefix-icon="el-icon-user-solid" v-model.number="form.id" placeholder="身份证/手机号" />
         </el-form-item>
 
-        <el-form-item label="密码" prop="psd">
+        <el-form-item label="密 码" prop="psd">
           <el-input prefix-icon="el-icon-lock" v-model="form.psd" type="password" autocomplete="off" placeholder="请输入密码" show-password/>
         </el-form-item>
 
 
         <el-form-item>
-          <el-button type="primary" @click="submitForm">登录</el-button>
-          <el-button style="" @click="resetForm">重置</el-button>
+          <el-button type="primary" @click="submitForm" style="position: absolute;width: 100px;top:1px">注册</el-button>
+          <el-button  @click="resetForm" style="position: absolute;right:0px;top:1px;width:100px">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -43,7 +43,15 @@ export default {
   },
   methods:{
    submitForm(){
-      console.log(this.form)
+     // this.$refs['form'].validate((valid)=>{
+     //   if(!valid)
+     //   {
+     //     this.$message({
+     //       type:"error",
+     //       message:"输入有误"
+     //     })
+     //   }
+     // })
       request.post("/api/User_info/login",this.form).then(res=>
           {
             if(res.code==='1')

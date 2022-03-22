@@ -17,6 +17,8 @@
       <el-table-column prop="rfno" label="序列号" sortable /> <!--prop:属性名  label:表头的名字-->
       <el-table-column prop="kind" label="布草类型" />
       <el-table-column prop="stock" label="库存" />
+      <el-table-column prop="section" label="所属部门" />
+      <el-table-column prop="note" label="备注" />
       <el-table-column fix="right" label="操作" >
 <!--        内容修改区-->
         <template #default="scope">
@@ -50,13 +52,26 @@
     <el-dialog v-model="dialogVisible" title="RFID标签类型" width="30%" :before-close="handleClose">
       <el-form :model="form" label-width="120px">
         <el-form-item label="序 列 号">
-          <el-input v-model="form.rfno" style="width:70%"/>
+          <el-input v-model="form.rfno" autocomplete="off"  style="width:70%"/>
         </el-form-item>
         <el-form-item label="布草类型">
           <el-input v-model="form.kind" style="width:70%"/>
         </el-form-item>
         <el-form-item label="库   存">
           <el-input v-model="form.stock" style="width:70%"/>
+        </el-form-item>
+        <el-form-item label="所属部门">
+          <el-select v-model="form.section" class="m-2" placeholder="Select" size="large">
+            <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="备  注">
+          <el-input v-model="form.note" style="width:70%"/>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -94,10 +109,33 @@ export default {
       total: 0,
       dialogVisible:false,
       form:{},
+
       tag:'',   //1表示编辑修改数据，0表示新增数据
 //对象区
       //RFID标签类别信息表
-      RFIDtable:[]
+      RFIDtable:[],
+      options:[
+        {
+          value: '住院部',
+          label: '住院部',
+        },
+        {
+          value: '急诊',
+          label: '急诊',
+        },
+        {
+          value: 'Option3',
+          label: 'Option3',
+        },
+        {
+          value: 'Option4',
+          label: 'Option4',
+        },
+        {
+          value: 'Option5',
+          label: 'Option5',
+        },
+      ]
     }
   },
   created() {

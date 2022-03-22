@@ -5,14 +5,10 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-@TableName("rfid_kinds")
-
+@TableName("Bucao_user")
 @Data
-public class RFid_kinds {
-    @TableId(value = "RFNO", type = IdType.AUTO)
-    private String RFNO;
-    private String kind;
-    private int stock;
-    private String section;
-    private String note;
+public class Bucao_user {
+    @TableId(value = "RFID", type = IdType.AUTO)
+    private String RFID;
+    private String user_id;
 }
