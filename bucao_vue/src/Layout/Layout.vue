@@ -2,7 +2,7 @@
   <!--头部-->
   <Header/>
   <!--主体-->
-  <div style="display: flex">
+  <div style="display: flex;margin-top: 0px" >
     <!--侧边栏-->
     <Aside/>
     <!--内容区-->

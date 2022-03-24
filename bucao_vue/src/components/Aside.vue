@@ -1,6 +1,6 @@
  <!-- 侧边栏组件 -->
-<template>
-  <div>
+<template style="background-color: #334157;margin-top: 0px">
+  <div >
 
     <el-menu
         style="width: 200px;min-height:calc(100vh - 50px)"

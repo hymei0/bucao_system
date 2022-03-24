@@ -19,7 +19,7 @@
 
 
         <el-form-item>
-          <el-button type="primary" @click="submitForm" style="position: absolute;width: 100px;top:1px">注册</el-button>
+          <el-button type="primary" @click="submitForm" style="position: absolute;width: 100px;top:1px">登录</el-button>
           <el-button  @click="resetForm" style="position: absolute;right:0px;top:1px;width:100px">重置</el-button>
         </el-form-item>
       </el-form>

@@ -52,7 +52,7 @@
     <el-dialog v-model="dialogVisible" title="RFID标签类型" width="30%" :before-close="handleClose">
       <el-form :model="form" label-width="120px">
         <el-form-item label="序 列 号">
-          <el-input v-model="form.rfno" autocomplete="off"  style="width:70%"/>
+          <el-input v-model="form.rfno" autocomplete="off"  style="width:70%"  v-bind:disabled="edi"/>
         </el-form-item>
         <el-form-item label="布草类型">
           <el-input v-model="form.kind" style="width:70%"/>
@@ -64,9 +64,9 @@
           <el-select v-model="form.section" class="m-2" placeholder="Select" size="large">
             <el-option
                 v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
+                :key="item.sectionid"
+                :label="item.sectionna"
+                :value="item.sectionna"
             />
           </el-select>
         </el-form-item>
@@ -109,32 +109,13 @@ export default {
       total: 0,
       dialogVisible:false,
       form:{},
-
+      edi:false,
       tag:'',   //1表示编辑修改数据，0表示新增数据
 //对象区
       //RFID标签类别信息表
       RFIDtable:[],
       options:[
-        {
-          value: '住院部',
-          label: '住院部',
-        },
-        {
-          value: '急诊',
-          label: '急诊',
-        },
-        {
-          value: 'Option3',
-          label: 'Option3',
-        },
-        {
-          value: 'Option4',
-          label: 'Option4',
-        },
-        {
-          value: 'Option5',
-          label: 'Option5',
-        },
+
       ]
     }
   },
@@ -147,12 +128,17 @@ export default {
     //添加按钮事件处理
     add()
     {
+      request.get("/api/section/rfid_kinds").then(re=>{
+        this.options=re
+      })
       this.tag='0'
+      this.edi=false
       this.dialogVisible=true
       this.form={} //清空表单
     },
     //查询
     load(){
+
       request.get("/api/rfid_kinds",  {
         params:{
           pageNum: this.currentPage,
@@ -168,6 +154,7 @@ export default {
     //编辑按钮事件处理
     handleEdit(row){
       this.tag='1'
+      this.edi=true
       this.form=JSON.parse(JSON.stringify(row))//对表单的数据进行深拷贝
       this.dialogVisible=true   //打开弹窗
     },

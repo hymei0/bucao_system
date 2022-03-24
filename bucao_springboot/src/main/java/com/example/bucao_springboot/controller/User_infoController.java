@@ -52,17 +52,38 @@ public class User_infoController {
     @PostMapping
     public Result<?> save(@RequestBody User_info user_info)
     {
-        user_infoMapper.insert(user_info);
-        System.out.println(user_info.getID());
-        return Result.success();
+        try {
+            User_info user=user_infoMapper.selectOne(Wrappers.<User_info>lambdaQuery().eq(User_info::getID,user_info.getID()).or().eq(User_info::getTelephone,user_info.getTelephone()));
+            if(user==null) {
+                user_infoMapper.insert(user_info);
+                System.out.println(user_info.getID());
+                return Result.success();
+            }
+            else
+            {
+                return Result.error("-1","该用户已存在");
+            }
+        }catch (Exception e)
+        {
+            return Result.error("-1","系统后台出错啦，请联系工作人员");
+        }
     }
     //更新接口
     @PutMapping
     public Result<?> update(@RequestBody User_info user_info)
     {
-        user_infoMapper.updateById(user_info);
-        System.out.println(user_info.getID());
-        return Result.success();
+        try {
+            User_info user=user_infoMapper.selectOne(Wrappers.<User_info>lambdaQuery().eq(User_info::getID,user_info.getID()).or().eq(User_info::getTelephone,user_info.getTelephone()));
+            if(user==null) {
+                user_infoMapper.updateById(user_info);
+                System.out.println(user_info.getID());
+                return Result.success();
+            }else{
+                return Result.error("-1","该账号或电话号码已存在");
+            }
+        }catch (Exception e){
+            return Result.error("-1","系统后台出错，请联系管理员");
+        }
     }
 
     //删除接口

@@ -44,18 +44,10 @@ public class rfid_kindsController {
     @PutMapping
     public Result<?> update(@RequestBody RFid_kinds rfid_kinds)
     {
-        try{
-            RFid_kinds result=rfid_kindsMapper.selectOne(Wrappers.<RFid_kinds>lambdaQuery().eq(RFid_kinds::getRFNO,rfid_kinds.getRFNO()));
-            if(result==null) {
-                rfid_kindsMapper.updateById(rfid_kinds);
-                return Result.success();
-            }
-            else{
-                return Result.error("-1","该类布草已经存在");
-            }
-        }catch (Exception e){
-            return Result.error("-1","系统错误，请稍后重试");
-        }
+
+        rfid_kindsMapper.updateById(rfid_kinds);
+        return Result.success();
+
     }
 
     //删除接口
@@ -93,7 +85,6 @@ public class rfid_kindsController {
     {
         QueryWrapper<RFid_kinds> queryWrapper = new QueryWrapper<>();
         List<Map<String, Object>> list=rfid_kindsMapper.selectMaps(queryWrapper);
-
         return list;
     }
 
