@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.bucao_springboot.mapper.BucaoInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.bucao_springboot.entity.BucaoInfo">
+            <id property="rfno" column="RFNO" jdbcType="VARCHAR"/>
+            <id property="rfid" column="RFID" jdbcType="VARCHAR"/>
+            <result property="state" column="state" jdbcType="VARCHAR"/>
+            <result property="washTimes" column="wash_times" jdbcType="INTEGER"/>
+    </resultMap>
+
+    
+
+    <sql id="Base_Column_List">
+        RFNO,RFID,state,
+        wash_times
+    </sql>
+</mapper>

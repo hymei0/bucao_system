@@ -21,12 +21,12 @@
       <el-table-column prop="rfno" label="布草类型" sortable /> <!--prop:属性名  label:表头的名字-->
       <el-table-column prop="rfid" label="RFID编号" sortable />
       <el-table-column prop="state" label="布草状态" />
-      <el-table-column prop="wash_times" label=洗涤次数 />
+      <el-table-column prop="washtimes" label=洗涤次数 />
       <el-table-column fix="right" label="操作" >
         <!--        内容修改区-->
         <template #default="scope">
           <el-button  type="text"  @click="handleEdit(scope.row)">编辑</el-button>
-          <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.rfno,scope.row.rfid,scope.row.state,scope.row.wash_times)">
+          <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.rfno,scope.row.rfid)">
             <template #reference>
               <el-button  type="danger" >删除</el-button>
             </template>
@@ -55,12 +55,12 @@
     <el-dialog v-model="dialogVisible" title="布草信息管理" width="30%" :before-close="handleClose">
       <el-form :model="form" label-width="120px">
         <el-form-item label="布草类型">
-          <el-select v-model="form.RFNO" class="m-2" placeholder="Select" size="large">
+          <el-select v-model="form.rfno" class="m-2" placeholder="Select" size="large">
             <el-option
                 v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
+                :key="item.kind+item.note"
+                :label="item.kind+item.note"
+                :value="item.RFNO"
             />
           </el-select>
         </el-form-item>
@@ -71,7 +71,7 @@
           <el-input v-model="form.state" style="width:70%"/>
         </el-form-item>
         <el-form-item label="洗涤次数">
-          <el-input v-model="form.wash_times" autocomplete="off"  style="width:70%"/>
+          <el-input v-model="form.washtimes" autocomplete="off"  style="width:70%"/>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -114,22 +114,6 @@ export default {
       //RFID标签类别信息表
       Bucao_infotable:[],
       options:[
-        {
-          value: 'Aclothes',
-          label: '病号服(衣服类）',
-        },
-        {
-          value: 'Atrousers',
-          label: '病号服(裤子类）',
-        },
-        {
-          value: 'Bsheet',
-          label: '床上用品（床单）',
-        },
-        {
-          value: 'Bcover',
-          label: '床上用品（被罩）',
-        }
       ]
     }
   },
@@ -148,6 +132,9 @@ export default {
     },
     //查询
     load(){
+      request.get("/api/rfid_kinds/bucaoinfo" ).then(re =>{
+        this.options=re
+      })
       request.get("/api/Bucao_info",  {
         params:{
           pageNum: this.currentPage,
@@ -167,15 +154,14 @@ export default {
       this.dialogVisible=true   //打开弹窗
     },
     //删除按钮事件处理
-    handleDelete(rfno1,rfid1,state1,wash_time1){
-      this.form={
-        rfno:rfno1,
-        rfid:rfid1,
-        state:state1,
-        wash_time:wash_time1
-      }
+    handleDelete(rfno1,rfid1){
 
-      request.delete("/api/Bucao_info",this.form).then(res=>{
+      request.delete("/api/Bucao_info",{
+        params:{
+          rfno:rfno1,
+          rfid:rfid1
+        }
+      }).then(res=>{
         if(res.code==='1')
         {
           this.$message({
@@ -232,6 +218,8 @@ export default {
       }
       else  //新增
       {
+        console.log(this.options)
+
         request.post("/api/Bucao_info",this.form).then(res=>{
           console.log(res)
           if(res.code==='1')
