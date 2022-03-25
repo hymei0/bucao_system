@@ -49,21 +49,13 @@ public class bucao_infoController {
     public Result<?> update(@RequestBody Bucao_info bucao_info)
     {
         try {
-            QueryWrapper<Bucao_info> wrapper=new QueryWrapper<>();
-            wrapper.eq("rfno", bucao_info.getRfno()).eq("rfid", bucao_info.getRfid());
-            Bucao_info result=bucao_infoMapper.selectOne(wrapper);
-            if(result==null) {// Bucao_info bucao=bucao_infoMapper.lambdaUpdate().eq(Entity::getId, value).update(entity);
-                bucao_infoMapper.update(bucao_info, Wrappers.<Bucao_info>lambdaUpdate().eq(Bucao_info::getRfno, bucao_info.getRfno()).eq(Bucao_info::getRfid, bucao_info.getRfid()));
-                System.out.println(bucao_info.getRfno());
-                return Result.success();
-            }
-            else
-            {
-                return Result.error("-1","修改失败,该布草已存在");
-            }
+            bucao_infoMapper.update(bucao_info, Wrappers.<Bucao_info>lambdaUpdate().eq(Bucao_info::getRfno, bucao_info.getRfno()).eq(Bucao_info::getRfid, bucao_info.getRfid()));
+            System.out.println(bucao_info.getRfno());
+            return Result.success();
         }catch (Exception e){
-        return Result.error("-1",e.toString());
-    }
+            return Result.error("-1","更新错误");
+        }
+
     }
 
     //删除接口

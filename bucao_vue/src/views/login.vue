@@ -10,11 +10,11 @@
           class="demo-ruleForm"
           style="padding-top: 20px">
         <el-form-item label="账 号" prop="id">
-          <el-input prefix-icon="el-icon-user-solid" v-model.number="form.id" placeholder="身份证/手机号" />
+          <el-input prefix-icon="avatar" v-model="form.id" placeholder="身份证/手机号" />
         </el-form-item>
 
         <el-form-item label="密 码" prop="psd">
-          <el-input prefix-icon="el-icon-lock" v-model="form.psd" type="password" autocomplete="off" placeholder="请输入密码" show-password/>
+          <el-input prefix-icon="Lock" v-model="form.psd" type="password" autocomplete="off" placeholder="请输入密码" show-password/>
         </el-form-item>
 
 

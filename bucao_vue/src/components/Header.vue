@@ -3,18 +3,18 @@
   <div  style="height: 60px;border-bottom: 1px solid #2c3e50; display: flex;background-color: #334157" >
     <div style="width:300px;padding-left: 20px;padding-top:5px;font-weight: bold;color:cadetblue;font-size: x-large" >布草智能柜管理系统</div>
     <div style="flex:1"></div>
-    <div style="width:100px;padding-top:20px">
+    <div style="width:100px;padding-top:0px">
       <el-dropdown>
+        <el-avatar :size="50" :src="circleUrl" />
        <span class="el-dropdown-link">
-          登录/注册
-         <el-icon class="el-icon--right">
+         <el-icon class="right">
            <arrow-down />
          </el-icon>
        </span>
         <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item @click="$router.push('/person')">个人信息</el-dropdown-item>
-            <el-dropdown-item @click="$router.push('/login')">退出</el-dropdown-item>
+          <el-dropdown-menu style="width: 100px">
+            <el-dropdown-item @click="$router.push(url1)">{{ info1 }}</el-dropdown-item>
+            <el-dropdown-item @click="$router.push(url2)">{{ info2 }}</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -24,7 +24,41 @@
 
 <script>
 export default {
-  name: "Header"
+  name: "Header",
+  data(){
+    return{
+      circleUrl: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
+      info1:"登录",
+      info2:"注册",
+      url1:'',
+      url2:''
+    }
+  },
+  created() {
+    this.load()
+  },
+  methods:{
+    load(){
+      console.log(this.info2)
+      console.log(this.$store.state.person_info)
+      console.log(this.info1)
+      if(this.$store.state.person_info.id==='')
+      {
+        this.info1="登录"
+        this.url1='/login'
+        this.info2="注册"
+        this.url2='/register'
+      }
+      else{
+        this.info1="个人信息"
+        this.url1='/person'
+        this.info2="退出登录"
+        this.url2='/login'
+
+      }
+    }
+  }
+
 }
 </script>
 

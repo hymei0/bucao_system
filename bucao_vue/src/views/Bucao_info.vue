@@ -5,15 +5,15 @@
 <template>
   <div class="Bucao_info" style="padding:10px">
     <!--    功能区域-->
-    <div style="margin: 10px 0">
-      <el-button @click="add" type="primary">新增</el-button>
-      <el-button type="primary">导入</el-button>
-      <el-button type="primary">导出</el-button>
-    </div>
-    <!--    搜索区域-->
-    <div style="margin: 10px 0"  align="right">
-      <el-input v-model="search" placeholder="请输入关键字" style="width:20%" clearable/>
-      <el-button type="primary" style="margin-left: 5px" @click="load">搜索</el-button>
+    <div style="display: flex; margin: 10px 0"  align="left">
+      <div style="width: 10%" align="left">
+        <el-button @click="add" type="primary">新增</el-button>
+      </div>
+      <!--    搜索区域-->
+      <div style="width: 100%" align="right">
+        <el-input prefix-icon="search" v-model="search"  placeholder="请输入关键字" style="width:15%" clearable/>
+        <el-button  type="primary"  style="margin-left: 5px;margin-bottom: 3px" @click="load">搜索</el-button>
+      </div>
     </div>
 
     <!--    数据展示区-->
@@ -35,8 +35,9 @@
       </el-table-column>
     </el-table>
     <!--    分页-->
-    <div class="demo-pagination-block">
-      <el-pagination
+    <div style="display: flex">
+      <div class="demo-pagination-block">
+        <el-pagination
           v-model:currentPage="currentPage"
           v-model:page-size="pageSize"
           :page-sizes="[40,30,20,10]"
@@ -50,12 +51,18 @@
       >
 
         <!--        添加的的对话框-->
-      </el-pagination>
+        </el-pagination>
+      </div>
+      <!--    导入导出-->
+      <div style="margin-top: 5px;margin-left: 10px">
+        <el-button  type="primary" size="small">导入</el-button>
+        <el-button  type="primary" size="small">导出</el-button>
+      </div>
     </div>
     <el-dialog v-model="dialogVisible" title="布草信息管理" width="30%" :before-close="handleClose">
       <el-form :model="form" label-width="120px">
         <el-form-item label="布草类型">
-          <el-select v-model="form.rfno" class="m-2" placeholder="Select" size="large">
+          <el-select v-model="form.rfno" class="m-2" placeholder="Select" size="large" v-bind:disabled="edi">
             <el-option
                 v-for="item in options"
                 :key="item.kind+item.note"
@@ -65,7 +72,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="RFID编号">
-          <el-input v-model="form.rfid" style="width:70%"/>
+          <el-input v-model="form.rfid" style="width:70%" v-bind:disabled="edi"/>
         </el-form-item>
         <el-form-item label="状  态">
           <el-input v-model="form.state" style="width:70%"/>
@@ -108,7 +115,7 @@ export default {
       total: 0,
       dialogVisible:false,
       form:{},
-
+      edi:false,
       tag:'',   //1表示编辑修改数据，0表示新增数据
 //对象区
       //RFID标签类别信息表
@@ -127,6 +134,7 @@ export default {
     add()
     {
       this.tag='0'
+      this.edi=false
       this.dialogVisible=true
       this.form={} //清空表单
     },
@@ -150,6 +158,7 @@ export default {
     //编辑按钮事件处理
     handleEdit(row){
       this.tag='1'
+      this.edi=true
       this.form=JSON.parse(JSON.stringify(row))//对表单的数据进行深拷贝
       this.dialogVisible=true   //打开弹窗
     },

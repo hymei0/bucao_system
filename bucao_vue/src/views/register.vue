@@ -10,20 +10,24 @@
           class="demo-ruleForm"
           style="padding-top: 0px"
           >
+        <el-form-item label="姓   名" prop="uname"  >
+          <el-input prefix-icon="document-checked" v-model="form.uname" placeholder="姓名" />
+        </el-form-item>
+
         <el-form-item label="账   号  " prop="id"  >
-          <el-input prefix-icon="el-icon-user-solid" v-model.number="form.id" placeholder="身份证号" />
+          <el-input prefix-icon="credit-card" v-model="form.id" placeholder="身份证号" />
         </el-form-item>
 
         <el-form-item label="密   码   " prop="psd">
-          <el-input prefix-icon="el-icon-lock" v-model="form.psd" type="password" autocomplete="off" placeholder="请输入密码" show-password/>
+          <el-input prefix-icon="lock" v-model="form.psd" type="password" autocomplete="off" placeholder="请输入密码" show-password/>
         </el-form-item>
 
         <el-form-item label="确认密码" prop="confirm"  >
-          <el-input prefix-icon="el-icon-lock" v-model="form.confirm" type="password" autocomplete="off" placeholder="再次输入密码" show-password/>
+          <el-input prefix-icon="lock" v-model="form.confirm" type="password" autocomplete="off" placeholder="再次输入密码" show-password/>
         </el-form-item>
 
         <el-form-item label="手 机 号" prop="telephone" >
-          <el-input prefix-icon="el-icon-lock" v-model="form.telephone" autocomplete="off" placeholder="请输入手机号" />
+          <el-input prefix-icon="cellphone" v-model="form.telephone" autocomplete="off" placeholder="请输入手机号" />
         </el-form-item>
 
         <el-form-item label="性 别" prop="sex">
@@ -53,6 +57,7 @@ export default {
       form:{},
 
       rules :{
+        uname:[{required:true,message:"请输入姓名",trigger:'blur'}],
         psd: [{ required: true, message: '请输入密码', trigger: 'blur' }],
         id: [{ required: true, message: '请输入身份证号或手机号', trigger: 'blur' }],
         telephone:[{required:true,message:"请输入电话号码",trigger:'blur'}],
@@ -71,14 +76,14 @@ export default {
         })
         return
       }
-       this.$refs['form'].validate((valid)=> {
-         if (!valid) {
-           this.$message({
-             type:"error",
-             message:"信息未完善"
-           })
-         }
-      })
+      //  this.$refs['form'].validate((valid)=> {
+      //    if (!valid) {
+      //      this.$message({
+      //        type:"error",
+      //        message:"信息未完善"
+      //      })
+      //    }
+      // })
       request.post("/api/User_info/register",this.form).then(res=>
           {
             if(res.code==='1')

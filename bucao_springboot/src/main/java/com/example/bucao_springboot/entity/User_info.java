@@ -10,6 +10,7 @@ import lombok.Data;
 public class User_info {
     @TableId(value = "ID", type = IdType.AUTO)
     private String ID;
+    private String uname;
     private String psd;
     private String telephone;
     private String address;

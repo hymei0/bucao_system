@@ -12,7 +12,7 @@
 
       <el-sub-menu index="system_data">
         <template #title>
-          <el-icon><location /></el-icon>
+          <el-icon><list /></el-icon>
           <span style="font-size: medium;font-weight: bold;" >系统数据管理</span>
         </template>
           <el-menu-item index="RFID_kinds" style="padding-left: 60px; font-size:small">
@@ -47,7 +47,7 @@
 
       <el-sub-menu index="chart">
         <template #title>
-          <el-icon><location /></el-icon>
+          <el-icon><trend-charts /></el-icon>
           <span style="font-size: medium;font-weight: bold;" >图表</span>
         </template>
 
