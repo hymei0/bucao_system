@@ -8,19 +8,19 @@
       </h4>
     </div>
     <div style="flex:1"></div>
-    <div style="width:150px;padding-top:10px;display: flex">
-      <h4 style="padding-top: 35px;color: aliceblue">{{user.uname}}</h4>
+    <div style="width:100px;padding-top:10px">
       <el-dropdown>
         <el-avatar :size="50" :src="circleUrl" />
         <span class="el-dropdown-link">
          <el-icon class="right">
            <arrow-down/>
          </el-icon>
+         {{user.uname}}
        </span>
         <template #dropdown>
           <el-dropdown-menu style="width: 100px">
-            <el-dropdown-item @click="$router.push('/person')">个人信息</el-dropdown-item>
-            <el-dropdown-item @click="$router.push('/login')" >退出系统</el-dropdown-item>
+            <el-dropdown-item @click="$router.push(url1), target='_blank'">{{ info1 }}</el-dropdown-item>
+            <el-dropdown-item @click="$router.push(url2)" >{{ info2 }}</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -34,16 +34,34 @@ export default {
   data(){
     return{
       circleUrl: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
+      info1:"登录",
+      info2:"注册",
+      url1:'',
+      url2:'',
       user: {}
     }
   },
   created() {
-    let str = sessionStorage.getItem("user_info") || "{}"
-    //类型转换
-    this.user = JSON.parse(str)
+    this.load()
   },
   methods:{
+    load(){
 
+      if(this.$store.state.person_info.id==='')
+      {
+        this.info1="登录"
+        this.url1='/login'
+        this.info2="注册"
+        this.url2='/register'
+      }
+      else{
+        this.info1="个人信息"
+        this.url1='/person'
+        this.info2="退出登录"
+        this.url2='/login'
+
+      }
+    }
   }
 
 }

@@ -21,14 +21,15 @@ public class User_infoController {
     @PostMapping("/login")
     public Result<?> login(@RequestBody User_info user_info)
     {
-        System.out.println(user_info.getID());
+
         User_info res=user_infoMapper.selectOne(Wrappers.<User_info>lambdaQuery().eq(User_info::getID,user_info.getID()).eq(User_info::getPsd,user_info.getPsd()));
 
         if(res == null)
         {
             return Result.error("-1","用户名或密码错误");
         }
-        return Result.success();
+
+        return Result.success(res);
     }
     //注册接口
     @PostMapping("/register")
@@ -116,5 +117,12 @@ public class User_infoController {
         return Result.success(user_info_page);
     }
 
+    //显示个人信息
+    @GetMapping("/{id}")
+    public Result<?> SelectPerson_Info(@PathVariable String id)
+    {
+        user_infoMapper.selectById(id);
+        return Result.success();
+    }
 }
 

@@ -7,8 +7,11 @@ export default createStore({
   state: {
     person_info:{
       id:'',
-      psd:''
-    }
+      psd:'',
+      rule:'' // ‘u’表示普通用户，‘m’表示管理员
+    },
+    currentPathName: ''
+
 
   },
   //
@@ -16,10 +19,13 @@ export default createStore({
   },
   //
   mutations: {
-    UpdataPersonInfo(person_info,msg)
+    UpdataPersonInfo(person_info,uform)
     {
-      state.person_info=msg
-    }
+      this.state.person_info=uform
+    },
+    setPath (state) {
+      state.currentPathName = localStorage.getItem("currentPathName")
+    },
   },
   //
   actions: {

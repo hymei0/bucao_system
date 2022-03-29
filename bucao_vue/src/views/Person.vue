@@ -2,17 +2,17 @@
   <div >
 
 
-    <el-card style="width:50%;margin: 120px 300px">
-      <h2 style="text-align: center;padding-bottom: 50px">个人信息</h2>
-      <el-form ref="form" :model="form" label-width="80px" :label-position="labelPosition" style="width: 60%;margin-left: 90px" align="center">
+    <el-card style="width:50%;margin: 80px 300px">
+      <h2 style="text-align: center;padding-bottom: 40px">个人信息</h2>
+      <el-form ref="form" :model="form" label-width="80px" :label-position="labelPosition" style="width: 65%;margin-left: 90px" align="center">
 <!--        <el-form-item label="头像" prop="photo">-->
 <!--          <el-input v-model="form.uname" autocomplete="off"></el-input>-->
 <!--        </el-form-item>-->
         <el-form-item label="姓 名" prop="uname">
           <el-input v-model="form.uname" autocomplete="off" disabled></el-input>
         </el-form-item>
-        <el-form-item label="账 号" prop="ID">
-          <el-input v-model="form.ID" disabled autocomplete="off"></el-input>
+        <el-form-item label="账 号" prop="id">
+          <el-input v-model="form.id" disabled autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="地 址" prop="address">
           <el-input v-model="form.address" autocomplete="off" ></el-input>
@@ -47,9 +47,6 @@ import {
   Edit,
 } from '@element-plus/icons-vue'
 
-import {ref} from "vue";
-
-
 export default {
   name: "Person",
   data(){
@@ -57,6 +54,26 @@ export default {
       form:{},
       ico:Edit,  // 编辑按钮的图标
       labelPosition:"left"
+    }
+  },
+  created() {
+    let str =sessionStorage.getItem("user_info")||"{}"
+    this.form=JSON.parse(str)
+    console.log(this.form)
+  },
+  methods:{
+    load(){
+      if(this.$store.state.person_info.rule==='u'){
+        console.log("/api/User_info/"+this.$store.state.person_info.id)
+        request.get("/api/User_info/"+this.$store.state.person_info.id).then(res =>{
+          console.log(res)
+          this.form=res.data.records[0]
+        })
+      }
+
+    },
+    save(){
+
     }
   }
 }

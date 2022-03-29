@@ -3,7 +3,7 @@
   <div >
 
     <el-menu
-        style="width: 200px;min-height:calc(100vh - 50px)"
+        style="width: 200px;min-height:calc(100vh + 10px)"
         default-active="system_data"
         router
         class="el-menu-vertical-demo"
