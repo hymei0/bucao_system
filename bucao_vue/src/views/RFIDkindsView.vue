@@ -137,7 +137,7 @@ export default {
     //添加按钮事件处理
     add()
     {
-      request.get("/api/section/rfid_kinds").then(re=>{
+      request.get("/section/rfid_kinds").then(re=>{
         this.options=re
       })
       this.tag='0'
@@ -148,7 +148,7 @@ export default {
     //查询
     load(){
 
-      request.get("/api/rfid_kinds",  {
+      request.get("/rfid_kinds",  {
         params:{
           pageNum: this.currentPage,
           pageSize: this.pageSize,
@@ -170,7 +170,7 @@ export default {
     //删除按钮事件处理
     handleDelete(id){
       console.log(id)
-      request.delete("/api/rfid_kinds/"+id).then(res=>{
+      request.delete("/rfid_kinds/"+id).then(res=>{
             if(res.code==='1')
             {
               this.$message({
@@ -203,7 +203,7 @@ export default {
     {
       if(this.tag==='1')//该项记录的主键存在，进行更新操作
       {
-        request.put("/api/rfid_kinds",this.form).then(res=>{
+        request.put("/rfid_kinds",this.form).then(res=>{
           if(res.code==='1')
           {
             this.$message({
@@ -227,8 +227,7 @@ export default {
       }
       else  //新增
       {
-        request.post("/api/rfid_kinds",this.form).then(res=>{
-          console.log(res)
+        request.post("/rfid_kinds",this.form).then(res=>{
           if(res.code==='1')
           {
             this.$message({

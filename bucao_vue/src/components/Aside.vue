@@ -4,13 +4,13 @@
 
     <el-menu
         style="width: 200px;min-height:calc(100vh + 10px)"
-        default-active="system_data"
+        default-active="RFID_kinds"
         router
         class="el-menu-vertical-demo"
         background-color="#334157" text-color="#fff" active-text-color="#ffd04b"
     >
 
-      <el-sub-menu index="system_data">
+      <el-sub-menu index="/system_data">
         <template #title>
           <el-icon><list /></el-icon>
           <span style="font-size: medium;font-weight: bold;" >系统数据管理</span>
@@ -81,7 +81,15 @@
 
 <script>
 export default {
-  name: "Aside"
+  name: "Aside",
+  data(){
+    return {
+
+    }
+  },
+  created() {
+
+  }
 }
 </script>
 

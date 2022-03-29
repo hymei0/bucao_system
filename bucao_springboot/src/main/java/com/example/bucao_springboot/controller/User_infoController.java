@@ -35,11 +35,11 @@ public class User_infoController {
     @PostMapping("/register")
     public Result<?> register(@RequestBody User_info user_info)
     {
-        System.out.println(user_info.getID());
         try{
             User_info user=user_infoMapper.selectOne(Wrappers.<User_info>lambdaQuery().eq(User_info::getID,user_info.getID()).or().eq(User_info::getTelephone,user_info.getTelephone()));
             if(user==null) {
                 user_infoMapper.insert(user_info);
+                System.out.println("User_info已注册用户"+user_info.getID()+"的信息：");
                 return Result.success();
             }
             else{
@@ -57,7 +57,7 @@ public class User_infoController {
             User_info user=user_infoMapper.selectOne(Wrappers.<User_info>lambdaQuery().eq(User_info::getID,user_info.getID()).or().eq(User_info::getTelephone,user_info.getTelephone()));
             if(user==null) {
                 user_infoMapper.insert(user_info);
-                System.out.println(user_info.getID());
+                System.out.println("User_info已添加用户"+user_info.getID()+"信息：");
                 return Result.success();
             }
             else
@@ -73,18 +73,9 @@ public class User_infoController {
     @PutMapping
     public Result<?> update(@RequestBody User_info user_info)
     {
-        try {
-            User_info user=user_infoMapper.selectOne(Wrappers.<User_info>lambdaQuery().eq(User_info::getID,user_info.getID()).or().eq(User_info::getTelephone,user_info.getTelephone()));
-            if(user==null) {
-                user_infoMapper.updateById(user_info);
-                System.out.println(user_info.getID());
-                return Result.success();
-            }else{
-                return Result.error("-1","该账号或电话号码已存在");
-            }
-        }catch (Exception e){
-            return Result.error("-1","系统后台出错，请联系管理员");
-        }
+         user_infoMapper.updateById(user_info);
+         System.out.println("User_info已更新用户"+user_info.getID()+"的信息：");
+         return Result.success();
     }
 
     //删除接口
@@ -92,7 +83,7 @@ public class User_infoController {
     public Result<?> delete(@PathVariable String id)
     {
         user_infoMapper.deleteById(id);
-        System.out.println(id);
+        System.out.println("User_info已删除用户"+id+"的信息：");
         return Result.success();
     }
 
@@ -122,6 +113,7 @@ public class User_infoController {
     public Result<?> SelectPerson_Info(@PathVariable String id)
     {
         user_infoMapper.selectById(id);
+        System.out.println("User_info已查询到用户"+id+"的信息：");
         return Result.success();
     }
 }

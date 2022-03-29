@@ -52,7 +52,7 @@
           </el-form-item>
 
           <el-form-item label="手 机 号" prop="telephone" >
-            <el-input style="width: 80%" prefix-icon="cellphone" v-model="form.telephone" autocomplete="off" placeholder="请输入手机号" />
+            <el-input type="digit" style="width: 80%" prefix-icon="cellphone" v-model="form.telephone" autocomplete="off" placeholder="请输入手机号" />
           </el-form-item>
 
           <el-form-item label="性 别" prop="sex">
@@ -65,6 +65,7 @@
           <el-form-item >
             <el-button type="primary" @click="submitForm" style="position: absolute;width: 100px;top:1px">注册</el-button>
             <el-button  @click="resetForm" style="position: absolute;right:80px;top:1px;width:100px">重置</el-button>
+            <el-button type="text" @click="$router.push('/login') " style="position: absolute;right:0px;top:5px;width:60px">返回登录</el-button>
           </el-form-item>
 
         </el-form>
@@ -99,13 +100,20 @@ export default {
       direction1:ArrowLeft,
       direction2:ArrowRight,
       index:0,
-      form:{},
+      form:{
+        uname:'',
+        psd:'',
+        id:'',
+        telephone: '',
+        confirm: ''
+      },
 
       rules :{
         uname:[{required:true,message:"请输入姓名",trigger:'blur'}],
         psd: [{ required: true, message: '请输入密码', trigger: 'blur' }],
         id: [{ required: true, message: '请输入身份证号或手机号', trigger: 'blur' }],
-        telephone:[{required:true,message:"请输入电话号码",trigger:'blur'}],
+        telephone:[{required:true,message:"请输入电话号码",trigger:'blur'},
+          {min: 11, max: 11, message: "请输入11位有效数字", trigger: 'blur'}],
         confirm:[{required: true, message: '请确认密码', trigger: 'blur'}]
       }
     }
@@ -113,6 +121,7 @@ export default {
 
   methods:{
     submitForm(){
+
       if(this.form.psd!==this.form.confirm)
       {
         this.$message({
@@ -121,15 +130,8 @@ export default {
         })
         return
       }
-      //  this.$refs['form'].validate((valid)=> {
-      //    if (!valid) {
-      //      this.$message({
-      //        type:"error",
-      //        message:"信息未完善"
-      //      })
-      //    }
-      // })
-      request.post("/api/User_info/register",this.form).then(res=>
+
+      request.post("/User_info/register",this.form).then(res=>
           {
             if(res.code==='1')
             {
@@ -154,7 +156,9 @@ export default {
 
     },
     resetForm(){
-      this.form={}
+      this.form={
+
+      }
     },
 
     //向左切换图片

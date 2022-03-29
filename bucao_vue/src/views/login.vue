@@ -46,7 +46,8 @@
 
           <el-form-item>
             <el-button type="primary" @click="submitForm" style="position: absolute;width: 100px;top:1px">登录</el-button>
-            <el-button  @click="resetForm" style="position: absolute;right:80px;top:1px;width:100px">重置</el-button>
+            <el-button  @click="resetForm" style="position: absolute;right:90px;top:1px;width:100px">重置</el-button>
+            <el-button type="text" @click="$router.push('/register') " style="position: absolute;right:0px;top:5px;width:60px">前往注册</el-button>
           </el-form-item>
         </el-form>
       </el-card>
@@ -104,7 +105,7 @@ export default {
      //     })
      //   }
      // })
-      request.post("/api/User_info/login",this.form).then(res=>
+      request.post("/User_info/login",this.form).then(res=>
           {
             if(res.code==='1')
             {

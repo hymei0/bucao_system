@@ -140,10 +140,10 @@ export default {
     },
     //查询
     load(){
-      request.get("/api/rfid_kinds/bucaoinfo" ).then(re =>{
+      request.get("/rfid_kinds/bucaoinfo" ).then(re =>{
         this.options=re
       })
-      request.get("/api/Bucao_info",  {
+      request.get("/Bucao_info",  {
         params:{
           pageNum: this.currentPage,
           pageSize: this.pageSize,
@@ -165,7 +165,7 @@ export default {
     //删除按钮事件处理
     handleDelete(rfno1,rfid1){
 
-      request.delete("/api/Bucao_info",{
+      request.delete("/Bucao_info",{
         params:{
           rfno:rfno1,
           rfid:rfid1
@@ -203,7 +203,7 @@ export default {
     {
       if(this.tag==='1')//该项记录的主键存在，进行更新操作
       {
-        request.put("/api/Bucao_info",this.form).then(res=>{
+        request.put("/Bucao_info",this.form).then(res=>{
           if(res.code==='1')
           {
             this.$message({
@@ -229,7 +229,7 @@ export default {
       {
         console.log(this.options)
 
-        request.post("/api/Bucao_info",this.form).then(res=>{
+        request.post("/Bucao_info",this.form).then(res=>{
           console.log(res)
           if(res.code==='1')
           {
