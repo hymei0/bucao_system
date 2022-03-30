@@ -8,10 +8,10 @@
       </h4>
     </div>
     <div style="flex:1"></div>
-    <div style="width:150px;padding-top:10px;display: flex">
+    <div style="width:150px;padding-top:5px;display: flex">
       <h4 style="padding-top: 35px;color: aliceblue">{{user.uname}}</h4>
       <el-dropdown>
-        <el-avatar :size="50" :src="circleUrl" />
+        <el-avatar :size="63" :src="user.portrait" style=" border-radius: 50%;" />
         <span class="el-dropdown-link">
          <el-icon class="right">
            <arrow-down/>
@@ -33,7 +33,6 @@ export default {
   name: "Header",
   data(){
     return{
-      circleUrl: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
       user: {}
     }
   },
@@ -41,6 +40,11 @@ export default {
     let str = sessionStorage.getItem("user_info") || "{}"
     //类型转换
     this.user = JSON.parse(str)
+    if(this.user.portrait===null)
+    //默认头像
+    {
+      this.user.portrait='https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+    }
   },
   methods:{
 

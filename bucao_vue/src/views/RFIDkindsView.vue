@@ -7,7 +7,7 @@
       </div>
 <!--    搜索区域-->
       <div style="width: 100%" align="right">
-        <el-input prefix-icon="search" v-model="search"  placeholder="请输入关键字" style="width:15%" clearable/>
+        <el-input prefix-icon="search" v-model="search"  placeholder="请输入关键字" style="width:15%" clearable select-when-unmatched/>
         <el-button  type="primary"  style="margin-left: 5px;margin-bottom: 3px" @click="load">搜索</el-button>
       </div>
 
