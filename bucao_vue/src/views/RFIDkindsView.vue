@@ -51,8 +51,8 @@
       </div>
       <!--    导入导出-->
       <div style="margin-top: 5px;margin-left: 10px">
-        <el-button  type="primary" size="small">导入</el-button>
-        <el-button  type="primary" size="small">导出</el-button>
+        <el-button  type="primary" size="small" style="width: 50px" ><el-icon><upload /></el-icon></el-button>
+        <el-button  type="primary" size="small" style="width: 50px" @click="handleDownload()"><el-icon><download /></el-icon></el-button>
       </div>
     </div>
 
@@ -99,9 +99,12 @@
 import { ref } from 'vue'
 import request from "@/utils/request";
 
+
 const samll = ref(false)
 const background = ref(true)
 const disabled = ref(false)
+
+
 
 export default {
   name: 'RFIDkindsView',
@@ -134,6 +137,10 @@ export default {
 
 //方法区
   methods:{
+    //数据导出
+    handleDownload() {
+      request.get("/rfid_kinds/exportdata").then()
+    },
     //添加按钮事件处理
     add()
     {

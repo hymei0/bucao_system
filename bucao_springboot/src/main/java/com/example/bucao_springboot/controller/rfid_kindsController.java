@@ -1,17 +1,23 @@
 package com.example.bucao_springboot.controller;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.poi.excel.ExcelUtil;
+import cn.hutool.poi.excel.ExcelWriter;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
-import com.example.bucao_springboot.entity.Bucao_info;
 import com.example.bucao_springboot.entity.RFid_kinds;
-import com.example.bucao_springboot.mapper.Bucao_infoMapper;
 import com.example.bucao_springboot.mapper.RFid_kindsMapper;
+
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 
@@ -87,5 +93,50 @@ public class rfid_kindsController {
         List<Map<String, Object>> list=rfid_kindsMapper.selectMaps(queryWrapper);
         return list;
     }
+
+
+    @GetMapping("/exportdata")
+    public void exportOrderXlsx(HttpServletResponse response) throws IOException {
+        // 先查询所有的数据
+        List<RFid_kinds> allrfid_kinds = rfid_kindsMapper.selectList(null);
+        System.out.println(allrfid_kinds);
+
+        //return Result.success(loopQuery(null, allCategories));
+        // 通过工具类创建writer，默认创建xls格式
+        ExcelWriter writer = ExcelUtil.getWriter();
+        //创建xlsx格式的
+        //ExcelWriter writer = ExcelUtil.getWriter(true);
+        //自定义标题别名
+        writer.addHeaderAlias("RFNO", "序列号");
+        writer.addHeaderAlias("kind", "布草类型");
+        writer.addHeaderAlias("stock", "库存");
+        writer.addHeaderAlias("section", "所属部门");
+        writer.addHeaderAlias("note", "备注");
+        //设置单元格宽度
+        int[] arr = {30, 30, 25, 10,30};
+        for (int i = 0; i < arr.length; i++) {
+            writer.setColumnWidth(i, arr[i]);
+        }
+        writer.write(allrfid_kinds, true);
+        // 合并单元格后的标题行，使用默认标题样式，从0开始
+        writer.merge(4, "RFID");
+        //只导出有别名的字段
+        writer.setOnlyAlias(true);
+        // 一次性写出内容，使用默认样式，强制输出标题
+        writer.write(allrfid_kinds, true);
+        String excelName = "RFID";
+        //response为HttpServletResponse对象
+        response.setContentType("application/vnd.ms-excel;charset=utf-8");
+        //test.xls是弹出下载对话框的文件名，不能为中文，中文请自行编码
+        response.setHeader("Content-Disposition", "attachment;filename=" + new String(excelName.getBytes("utf-8"), "ISO-8859-1") + ".xls");
+        ServletOutputStream out=response.getOutputStream();
+
+        writer.flush(out, true);
+        // 关闭writer，释放内存
+        writer.close();
+        //此处记得关闭输出Servlet流
+        IoUtil.close(out);
+    }
+
 
 }
