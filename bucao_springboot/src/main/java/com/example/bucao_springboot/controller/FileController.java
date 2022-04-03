@@ -3,15 +3,19 @@ package com.example.bucao_springboot.controller;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.poi.excel.ExcelUtil;
 import com.example.bucao_springboot.common.Result;
+import com.example.bucao_springboot.entity.RFid_kinds;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -67,5 +71,7 @@ public class FileController{
             System.out.println("文件下载失败");
         }
     }
+
+
 
 }

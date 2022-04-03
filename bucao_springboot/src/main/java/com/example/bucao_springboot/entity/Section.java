@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class Section {
     @TableId
-    private String sectionid;
-    private String sectionna;
+    private String id;
+    private String na;
 
 }

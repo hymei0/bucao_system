@@ -121,7 +121,7 @@ export default {
 
   methods:{
     submitForm(){
-
+      this.form.roles='user'
       if(this.form.psd!==this.form.confirm)
       {
         this.$message({

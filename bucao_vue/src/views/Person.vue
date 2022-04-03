@@ -41,10 +41,10 @@
         <el-form-item label="电 话" prop="telephone">
           <el-input v-model="form.telephone" v-bind:disabled='!edi'></el-input>
         </el-form-item>
-        <el-form-item label="住院天数" prop="days">
+        <el-form-item label="住院天数" prop="days" v-if="form.roles==='user'">
           <el-input v-model.number="form.days" v-bind:disabled='!edi'></el-input>
         </el-form-item>
-        <el-form-item label="应缴费用" prop="expenses" :precision="2">
+        <el-form-item label="应缴费用" prop="expenses" :precision="2" v-if="form.roles==='user'">
           <el-input v-model="form.expenses" type="digit" v-bind:disabled='!edi'></el-input>
         </el-form-item>
         <el-form-item style="display: flex" >
@@ -88,11 +88,11 @@ export default {
     this.load()
   },
   methods:{
+
     //文件上传成功回调函数
     filesUploadSuccess(res, uploadFile) {
-      console.log(res)
       this.form.portrait = res.data
-      this.form.portrait.value=URL.createObjectURL(uploadFile.raw)
+
     },
     beforeAvatarUpload(rawFile){
       if (rawFile.size / 1024 / 1024 > 2) {
@@ -101,6 +101,7 @@ export default {
       }
       return true
     },
+
     load()
     {
       let str =sessionStorage.getItem("user_info")||"{}"
