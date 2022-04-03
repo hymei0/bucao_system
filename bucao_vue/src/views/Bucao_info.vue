@@ -6,8 +6,13 @@
   <div class="Bucao_info" style="padding:10px">
     <!--    功能区域-->
     <div style="display: flex; margin: 10px 0"  align="left">
-      <div style="width: 10%" align="left">
+      <div style="width: 10%;display: flex" align="left">
         <el-button @click="add" type="primary">新增</el-button>
+        <el-popconfirm title="确定删除吗？" @confirm="deleteBatch">
+          <template #reference>
+            <el-button type="danger" >批量删除</el-button>
+          </template>
+        </el-popconfirm>
       </div>
       <!--    搜索区域-->
       <div style="width: 100%" align="right">
@@ -17,11 +22,14 @@
     </div>
 
     <!--    数据展示区-->
-    <el-table :data="Bucao_infotable" border stripe >style="width: 100%"> <!--显示表格边框和斑马纹-->
+    <el-table :data="Bucao_infotable" border stripe style="width: 100%" @selection-change="handleSelectionChange"> <!--显示表格边框和斑马纹-->
+      <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column prop="rfno" label="布草类型" sortable /> <!--prop:属性名  label:表头的名字-->
       <el-table-column prop="rfid" label="RFID编号" sortable />
       <el-table-column prop="state" label="布草状态" />
       <el-table-column prop="washtimes" label=洗涤次数 />
+      <el-table-column prop="indate" label=入库时间 />
+      <el-table-column prop="outdate" label=出库时间 />
       <el-table-column fix="right" label="操作" >
         <!--        内容修改区-->
         <template #default="scope">
@@ -41,9 +49,6 @@
           v-model:currentPage="currentPage"
           v-model:page-size="pageSize"
           :page-sizes="[40,30,20,10]"
-          :small="small"
-          :disabled="disabled"
-          :background="background"
           layout="total, sizes, prev, pager, next, jumper "
           :total="total"
           @size-change="handleSizeChange"
@@ -55,8 +60,19 @@
       </div>
       <!--    导入导出-->
       <div style="margin-top: 5px;margin-left: 10px">
-        <el-button  type="primary" size="small">导入</el-button>
-        <el-button  type="primary" size="small">导出</el-button>
+        <el-upload
+            :action=excelUploadUrl
+            :on-success="handleUploadSuccess"
+            :show-file-list=false
+            :limit="1"
+            accept='.xlsx'
+            style="display: inline-block; margin: 0 10px">
+          <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" >导入</el-button>
+
+        </el-upload>
+
+        <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" @click="exportdata">导出</el-button>
+
       </div>
     </div>
     <el-dialog v-model="dialogVisible" title="布草信息管理" width="30%" :before-close="handleClose">
@@ -72,20 +88,25 @@
           </el-select>
         </el-form-item>
         <el-form-item label="RFID编号">
-          <el-input v-model="form.rfid" style="width:70%" v-bind:disabled="edi"/>
+          <el-input v-model="form.rfid" style="width:70%" autocomplete="off" v-bind:disabled="edi"/>
         </el-form-item>
         <el-form-item label="状  态">
-          <el-input v-model="form.state" style="width:70%"/>
+          <el-input v-model="form.state" autocomplete="off" style="width:70%"/>
         </el-form-item>
         <el-form-item label="洗涤次数">
           <el-input v-model="form.washtimes" autocomplete="off"  style="width:70%"/>
+        </el-form-item>
+        <el-form-item label="入库时间">
+          <el-input v-model="form.indate" autocomplete="off"  style="width:70%"/>
+        </el-form-item>
+        <el-form-item label="出库时间" v-if="form.state=='回收'">
+          <el-input v-model="form.outdate" autocomplete="off"  style="width:70%"/>
         </el-form-item>
       </el-form>
       <template #footer>
       <span class="dialog-footer">
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="save">确定</el-button
-        >
+        <el-button type="primary" @click="save">确定</el-button>
       </span>
       </template>
     </el-dialog>
@@ -120,8 +141,9 @@ export default {
 //对象区
       //RFID标签类别信息表
       Bucao_infotable:[],
-      options:[
-      ]
+      options:[],
+      ids: [],
+      excelUploadUrl:'http://localhost:9090/Bucao_info/import'
     }
   },
   created() {
@@ -130,6 +152,35 @@ export default {
 
 //方法区
   methods:{
+    handleSelectionChange(val) {
+      this.ids = val.map(v => [v.rfno,v.rfid])   // [{id,name}, {id,name}] => [id,id]
+    },
+    deleteBatch() {
+      console.log(this.ids)
+      if (!this.ids.length) {
+        this.$message.warning("请选择数据！")
+        return
+      }
+      request.post("/Bucao_info/deleteBatch", this.ids).then(res => {
+        if (res.code === '1') {
+          this.$message.success("批量删除成功")
+          this.load()
+        } else {
+          this.$message.error(res.msg)
+        }
+      })
+    },
+    //excel表格的导入：直接导入到后端
+    handleUploadSuccess(res) {
+      if (res.code === "1") {
+        this.$message.success("导入成功")
+        this.load()
+      }
+    },
+    //数据导出：法一：从后端的数据库中导出
+    exportdata() {
+      location.href = "http://" + "localhost" + ":9090/Bucao_info/export";
+    },
     //添加按钮事件处理
     add()
     {

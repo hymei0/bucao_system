@@ -57,7 +57,7 @@
       <!--    导入导出-->
       <div style="margin-top: 5px;margin-left: 10px;display: flex">
         <el-upload
-            action="http://localhost:9090/rfid_kinds/import"
+            :action=excelUploadUrl
             :on-success="handleUploadSuccess"
             :show-file-list=false
             :limit="1"
@@ -167,9 +167,7 @@ export default {
       form:{},
       edi:false,
       tag:'',   //1表示编辑修改数据，0表示新增数据
-      excelUploadUrl: "http://" + "localhost" + ":9090/files/upload",//excel文件上传接口url
-
-//对象区
+      excelUploadUrl: "http://localhost:9090/rfid_kinds/import",//excel文件上传接口url
       //RFID标签类别信息表
       RFIDtable:[],
       options:[],
@@ -416,7 +414,7 @@ export default {
                   delete item[k];
                 }
               }
-              // item["date"] = _this.formatDate(item["date"], "-"); //如果有时间格式可加上这一句
+              item["date"] = _this.formatDate(item["date"], "-"); //如果有时间格式可加上这一句
             });
 
             if (outdata.length > 0) {

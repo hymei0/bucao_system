@@ -17,7 +17,7 @@ public class SectionController {
     @Resource
     SectionMapper sectionMapper;
 
-    //与rfid_kinds表交互的接口
+    //与Bucao_info表交互的接口
     @GetMapping("/rfid_kinds")
     public List<Map<String, Object>> SeletToRfidKinds()
     {
