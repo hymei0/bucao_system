@@ -4,7 +4,7 @@
 
     <el-menu
         style="width: 200px;min-height:calc(100vh + 10px)"
-        default-active="RFID_kinds"
+        default-active="home"
         router
         class="el-menu-vertical-demo"
         background-color="#334157" text-color="#fff" active-text-color="#ffd04b"
@@ -21,7 +21,7 @@
           <el-icon><trend-charts /></el-icon>
           <span style="font-size: medium;font-weight: bold;" >图表</span>
         </template>
-        <el-menu-item index="visual" style="padding-left: 60px; font-size:small">
+        <el-menu-item index="visual" >
           <template #title>
             <el-icon><pointer /></el-icon>
             <span style="font-size: small;font-weight: bold;" >数据可视化</span>
@@ -56,7 +56,7 @@
         <el-menu-item index="bucao_info" style="padding-left: 60px; font-size:small">
           <template #title>
             <el-icon><document /></el-icon>
-            <span style="font-size: small;font-weight: bold;" >布草信息管理</span>
+            <span style="font-size: small;font-weight: bold;" >布草基本信息</span>
           </template>
         </el-menu-item>
         <el-menu-item index="bucao_user" style="padding-left: 60px; font-size:small">
@@ -83,10 +83,10 @@
         <el-menu-item index="RFID_kinds" style="padding-left: 60px; font-size:small">
           <template #title>
             <el-icon><document /></el-icon>
-            <span style="font-size: small;font-weight: bold;" > RFID标签类型管理</span>
+            <span style="font-size: small;font-weight: bold;" > RFID标签分类</span>
           </template>
         </el-menu-item>
-        <el-menu-item index="room-info" style="padding-left: 60px; font-size:small">
+        <el-menu-item index="room_info" style="padding-left: 60px; font-size:small">
           <template #title>
             <el-icon><success-filled /></el-icon>
             <span style="font-size: small;font-weight: bold;" >病房信息管理</span>
@@ -99,6 +99,13 @@
           </template>
         </el-menu-item>
       </el-sub-menu>
+
+      <el-menu-item index="manager">
+        <template #title>
+          <el-icon><headset /></el-icon>
+          <span style="font-size: medium;font-weight: bold;" >联系管理员</span>
+        </template>
+      </el-menu-item>
 
     </el-menu>
   </div>

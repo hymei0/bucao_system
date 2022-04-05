@@ -46,16 +46,16 @@
     <div style="display: flex">
       <div class="demo-pagination-block">
         <el-pagination
-            v-model:currentPage="currentPage"
-            v-model:page-size="pageSize"
-            :page-sizes="[40,30,20,10]"
-            layout="total, sizes, prev, pager, next, jumper "
-            :total="total"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-        >
+          v-model:currentPage="currentPage"
+          v-model:page-size="pageSize"
+          :page-sizes="[40,30,20,10]"
+          layout="total, sizes, prev, pager, next, jumper "
+          :total="total"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+      >
 
-          <!--        添加的的对话框-->
+        <!--        添加的的对话框-->
         </el-pagination>
       </div>
       <!--    导入导出-->
@@ -96,7 +96,7 @@
                 v-for="item in options1"
                 :key="item.lable"
                 :label="item.lable"
-                :value="item.label"
+                :value="item.value"
             />
           </el-select>
         </el-form-item>
@@ -154,29 +154,31 @@ export default {
       //布草状态：
       options1:[
         {
-          label: '闲置中',
-        },
-        {
-          label: '运输中',
-        },
-
-        {
+          value: '使用中',
           label: '使用中',
         },
         {
-          label: '待回收',
-        },
-        {
-          label: '已回收',
-        },
-
-        {
+          value: '洗涤中',
           label: '洗涤中',
         },
         {
+          value: '待回收',
+          label: '待回收',
+        },
+        {
+          value: '闲置中',
+          label: '闲置中',
+        },
+        {
+          value: '已报废',
           label: '已报废',
         },
         {
+          value: '已回收',
+          label: '已回收',
+        },
+        {
+          value: '未知',
           label: '未知',
         }
       ],

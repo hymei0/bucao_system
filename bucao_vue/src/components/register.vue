@@ -113,7 +113,7 @@ export default {
         psd: [{ required: true, message: '请输入密码', trigger: 'blur' }],
         id: [{ required: true, message: '请输入身份证号或手机号', trigger: 'blur' }],
         telephone:[{required:true,message:"请输入电话号码",trigger:'blur'},
-          {min: 11, max: 11, message: "请输入11位有效数字", trigger: 'blur'}],
+          {min: 11, type:'number',max: 11, message: "请输入11位有效数字", trigger: 'blur'}],
         confirm:[{required: true, message: '请确认密码', trigger: 'blur'}]
       }
     }

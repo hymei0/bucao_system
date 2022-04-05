@@ -28,6 +28,12 @@
 
       <el-card style="width:85%;margin: 70px -100px">
         <h2 style="text-align: center;padding-bottom: 20px">登 录</h2>
+        <div align="center">
+          <el-radio-group v-model="form.role">
+            <el-radio label="user" style="font-size: large">普通用户</el-radio>
+            <el-radio label="manager" style="font-size: large">管 理 员</el-radio>
+          </el-radio-group>
+        </div>
         <el-form
             :model="form"
             status-icon
@@ -35,6 +41,7 @@
             label-width="100px"
             class="demo-ruleForm"
             style="padding-top: 20px">
+
           <el-form-item label="账 号" prop="id">
             <el-input prefix-icon="avatar" v-model="form.id" placeholder="身份证/手机号" style="width: 80%" />
           </el-form-item>
@@ -42,12 +49,17 @@
           <el-form-item label="密 码" prop="psd">
             <el-input style="width: 80%" prefix-icon="Lock" v-model="form.psd" type="password" autocomplete="off" placeholder="请输入密码" show-password/>
           </el-form-item>
-
+          <el-form-item label="验证码" prop="validCode">
+            <div style="display: flex" >
+              <el-input prefix-icon="key" v-model="form.validCode" style="width: 80%;" placeholder="请输入验证码" autocomplete="off"></el-input>
+              <ValidCode @input="createValidCode" />
+            </div>
+          </el-form-item>
 
           <el-form-item>
             <el-button type="primary" @click="submitForm" style="position: absolute;width: 100px;top:1px">登录</el-button>
             <el-button  @click="resetForm" style="position: absolute;right:90px;top:1px;width:100px">重置</el-button>
-            <el-button type="text" @click="$router.push('/register') " style="position: absolute;right:0px;top:5px;width:60px">前往注册</el-button>
+            <el-button type="text" @click="$router.push('/register') " style="position: absolute;right:0px;top:5px;width:60px" v-if="form.role==='user'">前往注册</el-button>
           </el-form-item>
         </el-form>
       </el-card>
@@ -58,12 +70,15 @@
 
 <script>
 import request from "@/utils/request";
-
+import ValidCode from "@/components/ValidCode"
 import {ArrowLeft, ArrowRight} from '@element-plus/icons-vue'
 
 
 export default {
   name: "login",
+  components: {
+    ValidCode,
+  },
   data(){
     return{
       imgArr:[
@@ -83,18 +98,53 @@ export default {
       direction1:ArrowLeft,
       direction2:ArrowRight,
       index:0,
-      form:{},
-      form1:{},
+      form:{role:'user'},
+      validCode:'',//存放自动生成的验证码
       rules :{
         psd: [{ required: true, message: '请输入密码', trigger: 'blur' }],
         id: [{ required: true, message: '请输入身份证号或手机号', trigger: 'blur' }],
+        validCode:[{required: true, message: '请输入验证码', trigger: 'blur' }]
       }
     }
   },
-  created() {
+  mounted() {
+    //在登入页删除用户信息
     sessionStorage.removeItem("user_info")
+    //跟据客户屏幕比例，自动适应
+    window.onresize = () => {
+      const windowWidth = document.body.clientWidth
+      const windowHeight = document.body.clientHeight
+      //屏幕高宽比
+      const windowAspectRatio = windowHeight / windowWidth
+      let videoWidth
+      let videoHeight
+      if (windowAspectRatio < 0.5625) {
+        videoWidth = windowWidth
+        videoHeight = videoWidth * 0.5625
+        this.fixStyle = {
+          height: windowWidth * 0.5625 + 'px',
+          width: windowWidth + 'px',
+          'margin-bottom': (windowHeight - videoHeight) / 2 + 'px',
+          'margin-left': 'initial'
+        }
+      } else {
+        videoHeight = windowHeight
+        videoWidth = videoHeight / 0.5625
+        this.fixStyle = {
+          height: windowHeight + 'px',
+          width: windowHeight / 0.5625 + 'px',
+          'margin-left': (windowWidth - videoWidth) / 2 + 'px',
+          'margin-bottom': 'initial'
+        }
+      }
+    }
+    window.onresize()
   },
   methods:{
+    // 接收验证码组件提交的 4位验证码
+    createValidCode(data) {
+      this.validCode = data
+    },
    submitForm(){
      // this.$refs['form'].validate((valid)=>{
      //   if(!valid)
@@ -105,6 +155,15 @@ export default {
      //     })
      //   }
      // })
+     if (!this.form.validCode) {
+       this.$message.error("请填写验证码")
+       return
+     }
+     if(this.form.validCode.toLowerCase() !== this.validCode.toLowerCase()) {
+       this.$message.error("验证码错误")
+       return
+     }
+
       request.post("/User_info/login",this.form).then(res=>
           {
             if(res.code==='1')

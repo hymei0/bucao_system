@@ -27,9 +27,9 @@
       <el-table-column prop="rfno" label="布草类型" sortable /> <!--prop:属性名  label:表头的名字-->
       <el-table-column prop="rfid" label="RFID编号" sortable />
       <el-table-column prop="state" label="布草状态" />
-      <el-table-column prop="washtimes" label=洗涤次数 />
-      <el-table-column prop="indate" label=入库时间 />
-      <el-table-column prop="outdate" label=出库时间 />
+      <el-table-column prop="washtimes" label="洗涤次数" />
+      <el-table-column prop="indate" label="入库时间" />
+      <el-table-column prop="outdate" label="出库时间" />
       <el-table-column fix="right" label="操作" >
         <!--        内容修改区-->
         <template #default="scope">
@@ -76,8 +76,8 @@
       </div>
     </div>
     <el-dialog v-model="dialogVisible" title="布草信息管理" width="30%" :before-close="handleClose">
-      <el-form :model="form" label-width="120px">
-        <el-form-item label="布草类型">
+      <el-form :model="form" label-width="120px" :rules="rules">
+        <el-form-item label="布草类型" prop="rfno">
           <el-select v-model="form.rfno" class="m-2" placeholder="Select" size="large" v-bind:disabled="edi">
             <el-option
                 v-for="item in options"
@@ -87,20 +87,27 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="RFID编号">
+        <el-form-item label="RFID编号" prop="rfid">
           <el-input v-model="form.rfid" style="width:70%" autocomplete="off" v-bind:disabled="edi"/>
         </el-form-item>
-        <el-form-item label="状  态">
-          <el-input v-model="form.state" autocomplete="off" style="width:70%"/>
+        <el-form-item label="状  态" prop="state">
+          <el-select v-model="form.state" class="m-2" placeholder="Select" size="large">
+            <el-option
+                v-for="item in options1"
+                :key="item.label"
+                :label="item.label"
+                :value="item.label"
+            />
+          </el-select>
         </el-form-item>
-        <el-form-item label="洗涤次数">
+        <el-form-item label="洗涤次数" prop="washtimes">
           <el-input v-model="form.washtimes" autocomplete="off"  style="width:70%"/>
         </el-form-item>
-        <el-form-item label="入库时间">
-          <el-input v-model="form.indate" autocomplete="off"  style="width:70%"/>
+        <el-form-item label="入库时间" prop="indate">
+          <el-date-picker v-model="form.indate" type="date" placeholder="选择日期" style="width:70%"/>
         </el-form-item>
-        <el-form-item label="出库时间" v-if="form.state=='回收'">
-          <el-input v-model="form.outdate" autocomplete="off"  style="width:70%"/>
+        <el-form-item label="出库时间" v-if="form.state=='已报废'" prop="outdate">
+          <el-date-picker v-model="form.outdate" type="date" placeholder="选择日期" style="width:70%"/>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -143,8 +150,47 @@ export default {
       Bucao_infotable:[],
       options:[],
       ids: [],
-      excelUploadUrl:'http://localhost:9090/Bucao_info/import'
+      excelUploadUrl:'http://localhost:9090/Bucao_info/import',
+      //布草状态：
+      options1:[
+        {
+          label: '闲置中',
+        },
+        {
+          label: '运输中',
+        },
+
+        {
+          label: '使用中',
+        },
+        {
+          label: '待回收',
+        },
+        {
+          label: '已回收',
+        },
+
+        {
+          label: '洗涤中',
+        },
+        {
+          label: '已报废',
+        },
+        {
+          label: '未知',
+        }
+      ],
+      //表单验证
+      rules :{
+        rfno: [{ required: true, message: '请选择布草类型', trigger: 'blur' }],
+        rfid: [{ required: true, message: '请输入RFID编码', trigger: 'blur' }],
+        state: [{ required: true, message: '请选择布草状态', trigger: 'blur' }],
+        washtimes: [{ required: true, message: '请输入洗涤次数', trigger: 'blur' }],
+        indate: [{required: true,  message: '请选择入库时间', trigger: 'blur' }],
+        outdate: [{required: true, message: '请选择报废时间', trigger: 'blur' }]
+      }
     }
+
   },
   created() {
     this.load()

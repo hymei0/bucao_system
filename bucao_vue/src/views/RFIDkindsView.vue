@@ -76,27 +76,26 @@
 
     <!--        添加的的对话框1-->
     <el-dialog v-model="dialogVisible" title="RFID标签类型" width="30%" :before-close="handleClose">
-      <el-form :model="form" label-width="120px">
-        <el-form-item label="序列号">
+      <el-form :model="form" label-width="120px" :rules="rules">
+        <el-form-item label="序列号" prop="rfno">
           <el-input v-model="form.rfno" autocomplete="off"  style="width:70%"  v-bind:disabled="edi"/>
         </el-form-item>
-        <el-form-item label="布草类型">
+        <el-form-item label="布草类型" prop="kind">
           <el-input v-model="form.kind" style="width:70%"/>
         </el-form-item>
-        <el-form-item label="库   存">
+        <el-form-item label="库   存" prop="stock">
           <el-input v-model="form.stock" style="width:70%"/>
         </el-form-item>
-        <el-form-item label="所属部门">
+        <el-form-item label="所属部门" prop="section">
           <el-select v-model="form.section" class="m-2" placeholder="Select" size="large">
             <el-option
                 v-for="item in options"
                 :key="item.id"
                 :label="item.na"
-                :value="item.na"
-            />
+                :value="item.na"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="备  注">
+        <el-form-item label="布草名称" prop="note" >
           <el-input v-model="form.note" style="width:70%"/>
         </el-form-item>
       </el-form>
@@ -175,7 +174,14 @@ export default {
       mes: "",
       cod: 0,
       excelFile:null,
-      ids: []
+      ids: [],
+      rules :{
+        rfno: [{ required: true, message: '请输入序列号', trigger: 'blur' }],
+        kind: [{ required: true, message: '请输入布草类型', trigger: 'blur' }],
+        stock: [{ required: true, message: '请输入库存', trigger: 'blur' }],
+        section: [{ required: true, message: '请选择所属部门', trigger: 'blur' }],
+        note: [{ required: true, message: '请输入布草名称', trigger: 'blur' }]
+      }
     }
   },
   created() {
@@ -249,7 +255,6 @@ export default {
     },
     //删除按钮事件处理
     handleDelete(id){
-      console.log(id)
       request.delete("/rfid_kinds/"+id).then(res=>{
             if(res.code==='1')
             {

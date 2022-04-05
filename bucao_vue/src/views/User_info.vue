@@ -3,7 +3,7 @@
 
 </style>
 <template>
-  <div class="Bucao_info" style="padding:10px">
+  <div class="User_info" style="padding:10px">
     <!--    功能区域-->
     <div style="display: flex; margin: 10px 0"  align="left">
       <div style="width: 10%;display: flex" align="left">
@@ -22,21 +22,30 @@
     </div>
 
     <!--    数据展示区-->
-    <el-table :data="Bucao_infotable" border stripe style="width: 100%" @selection-change="handleSelectionChange"> <!--显示表格边框和斑马纹-->
+    <el-table :data="User_infotable" border stripe style="width: 100%" @selection-change="handleSelectionChange"> <!--显示表格边框和斑马纹-->
       <el-table-column type="selection" width="55"></el-table-column>
-      <el-table-column prop="rfno" label="布草类型" sortable /> <!--prop:属性名  label:表头的名字-->
-      <el-table-column prop="rfid" label="RFID编号" sortable />
-      <el-table-column prop="state" label="布草状态" />
-      <el-table-column prop="washtimes" label=洗涤次数 />
-      <el-table-column prop="indate" label=入库时间 />
-      <el-table-column prop="outdate" label=出库时间 />
+      <el-table-column prop="id" label="证件号" sortable /> <!--prop:属性名  label:表头的名字-->
+      <el-table-column prop="uname" label="名字" />
+      <el-table-column prop="sex" label="性别" />
+      <el-table-column prop="portrait" label="头像">
+        <template #default="scope">
+          <el-image
+              style="width: 100px; height: auto"
+              :src="scope.row.portrait"
+              :preview-src-list="[scope.row.portrait]"/>
+        </template>
+      </el-table-column>
+      <el-table-column prop="telephone" label="联系电话" />
+      <el-table-column prop="address" label="地址" />
+      <el-table-column prop="days" label="住院天数" />
+      <el-table-column prop="expenses" label="欠费情况(￥)" />
       <el-table-column fix="right" label="操作" >
         <!--        内容修改区-->
         <template #default="scope">
           <el-button  type="text"  @click="handleEdit(scope.row)">编辑</el-button>
-          <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.rfno,scope.row.rfid)">
+          <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.id)">
             <template #reference>
-              <el-button  type="danger" >删除</el-button>
+              <el-button  type="text" style="color: red" >删除</el-button>
             </template>
           </el-popconfirm>
         </template>
@@ -46,16 +55,16 @@
     <div style="display: flex">
       <div class="demo-pagination-block">
         <el-pagination
-            v-model:currentPage="currentPage"
-            v-model:page-size="pageSize"
-            :page-sizes="[40,30,20,10]"
-            layout="total, sizes, prev, pager, next, jumper "
-            :total="total"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-        >
+          v-model:currentPage="currentPage"
+          v-model:page-size="pageSize"
+          :page-sizes="[40,30,20,10]"
+          layout="total, sizes, prev, pager, next, jumper "
+          :total="total"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+      >
 
-          <!--        添加的的对话框-->
+        <!--        添加的的对话框-->
         </el-pagination>
       </div>
       <!--    导入导出-->
@@ -75,39 +84,45 @@
 
       </div>
     </div>
-    <el-dialog v-model="dialogVisible" title="布草信息管理" width="30%" :before-close="handleClose">
+    <el-dialog v-model="dialogVisible" title="用户信息" width="30%" :before-close="handleClose">
       <el-form :model="form" label-width="120px" :rules="rules">
-        <el-form-item label="布草类型" prop="rfno">
-          <el-select v-model="form.rfno" class="m-2" placeholder="Select" size="large" v-bind:disabled="edi">
-            <el-option
-                v-for="item in options"
-                :key="item.kind+item.note"
-                :label="item.kind+item.note"
-                :value="item.RFNO"
-            />
-          </el-select>
+
+        <el-form-item label="账  号" prop="id">
+          <el-input v-model="form.id" style="width:70%" autocomplete="off" v-bind:disabled="edi"/>
         </el-form-item>
-        <el-form-item label="RFID编号" prop="rfid">
-          <el-input v-model="form.rfid" style="width:70%" autocomplete="off" v-bind:disabled="edi"/>
+        <el-form-item label="姓  名" prop="uname">
+          <el-input v-model="form.uname" autocomplete="off"  style="width:70%"/>
         </el-form-item>
-        <el-form-item label="状  态" prop="state">
-          <el-select v-model="form.state" class="m-2" placeholder="Select" size="large">
+        <el-form-item label="头 像" prop="portrait">
+          <el-upload
+              class="avatar-uploader"
+              :action="filesUploadUrl"
+              :show-file-list="false"
+              :on-success="filesUploadSuccess"
+              :before-upload="beforeAvatarUpload"
+              style="margin-left: 0px">
+            <img v-if="form.portrait" :src="form.portrait" style="width: 50%;height: auto;margin-left: -100px" align="left" class="avatar" />
+            <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+          </el-upload>
+        </el-form-item>
+        <el-form-item label="性  别" prop="sex">
+          <el-select v-model="form.sex" class="m-2" placeholder="Select" size="large">
             <el-option
                 v-for="item in options1"
-                :key="item.lable"
-                :label="item.lable"
+                :key="item.label"
+                :label="item.label"
                 :value="item.label"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="洗涤次数" prop="washtimes">
-          <el-input v-model="form.washtimes" autocomplete="off"  style="width:70%"/>
+        <el-form-item label="电 话" prop="telephone">
+          <el-input v-model.number="form.telephone"   style="width:70%"/>
         </el-form-item>
-        <el-form-item label="入库时间" prop="indate">
-          <el-date-picker v-model="form.indate" type="date" placeholder="选择日期" style="width:70%"/>
+        <el-form-item label="住院天数" prop="days">
+          <el-input v-model.number="form.days"   style="width:70%"/>
         </el-form-item>
-        <el-form-item label="出库时间" v-if="form.state=='已报废'" prop="outdate">
-          <el-date-picker v-model="form.outdate" type="date" placeholder="选择日期" style="width:70%"/>
+        <el-form-item label="欠费情况" prop="days">
+          <el-input v-model="form.expenses" type="digit"  style="width:70%"/>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -124,13 +139,14 @@
 
 import { ref } from 'vue'
 import request from "@/utils/request";
+import {ElMessage} from "element-plus";
 
 const samll = ref(false)
 const background = ref(true)
 const disabled = ref(false)
 
 export default {
-  name: "Bucao_info",
+  name: "User_info",
   components: {
   },
 
@@ -147,47 +163,27 @@ export default {
       tag:'',   //1表示编辑修改数据，0表示新增数据
 //对象区
       //RFID标签类别信息表
-      Bucao_infotable:[],
+      User_infotable:[],
       options:[],
       ids: [],
-      excelUploadUrl:'http://localhost:9090/Bucao_info/import',
+      filesUploadUrl: "http://" + "localhost" + ":9090/files/upload",   //头像图片上传地址
+      excelUploadUrl:'http://localhost:9090/User_info/import',
       //布草状态：
       options1:[
         {
-          label: '闲置中',
+          label: '男',
         },
         {
-          label: '运输中',
-        },
-
-        {
-          label: '使用中',
-        },
-        {
-          label: '待回收',
-        },
-        {
-          label: '已回收',
-        },
-
-        {
-          label: '洗涤中',
-        },
-        {
-          label: '已报废',
-        },
-        {
-          label: '未知',
+          label: '女',
         }
       ],
       //表单验证
       rules :{
-        rfno: [{ required: true, message: '请选择布草类型', trigger: 'blur' }],
-        rfid: [{ required: true, message: '请输入RFID编码', trigger: 'blur' }],
-        state: [{ required: true, message: '请选择布草状态', trigger: 'blur' }],
-        washtimes: [{ required: true, message: '请输入洗涤次数', trigger: 'blur' }],
-        indate: [{required: true, message: '请选择入库时间', trigger: 'blur' }],
-        outdate: [{required: true, message: '请选择报废时间', trigger: 'blur' }]
+        id: [{ required: true, message: '请输入证件号', trigger: 'blur' }],
+        uname: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+        sex: [{ required: true, message: '请选择性别', trigger: 'blur' }],
+        psd: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+        telephone: [{required: true, message: '请输入电话号码', trigger: 'blur' }]
       }
     }
 
@@ -198,8 +194,21 @@ export default {
 
 //方法区
   methods:{
+
+    //文件上传成功回调函数
+    filesUploadSuccess(res, uploadFile) {
+      this.form.portrait = res.data
+
+    },
+    beforeAvatarUpload(rawFile){
+      if (rawFile.size / 1024 / 1024 > 2) {
+        ElMessage.error('头像图片的大小不能超过2MB!')
+        return false
+      }
+      return true
+    },
     handleSelectionChange(val) {
-      this.ids = val.map(v => [v.rfno,v.rfid])   // [{id,name}, {id,name}] => [id,id]
+      this.ids = val.map(v => v.id)   // [{id,name}, {id,name}] => [id,id]
     },
     deleteBatch() {
       console.log(this.ids)
@@ -207,7 +216,7 @@ export default {
         this.$message.warning("请选择数据！")
         return
       }
-      request.post("/Bucao_info/deleteBatch", this.ids).then(res => {
+      request.post("/User_info/deleteBatch", this.ids).then(res => {
         if (res.code === '1') {
           this.$message.success("批量删除成功")
           this.load()
@@ -225,7 +234,7 @@ export default {
     },
     //数据导出：法一：从后端的数据库中导出
     exportdata() {
-      location.href = "http://" + "localhost" + ":9090/Bucao_info/export";
+      location.href = "http://" + "localhost" + ":9090/User_info/export";
     },
     //添加按钮事件处理
     add()
@@ -237,10 +246,8 @@ export default {
     },
     //查询
     load(){
-      request.get("/rfid_kinds/bucaoinfo" ).then(re =>{
-        this.options=re
-      })
-      request.get("/Bucao_info",  {
+
+      request.get("/User_info",  {
         params:{
           pageNum: this.currentPage,
           pageSize: this.pageSize,
@@ -248,7 +255,7 @@ export default {
         }
       }).then(res =>{
         console.log(res)
-        this.Bucao_infotable=res.data.records
+        this.User_infotable=res.data.records
         this.total=res.data.total
       })
     },
@@ -260,13 +267,9 @@ export default {
       this.dialogVisible=true   //打开弹窗
     },
     //删除按钮事件处理
-    handleDelete(rfno1,rfid1){
+    handleDelete(id){
 
-      request.delete("/Bucao_info",{
-        params:{
-          rfno:rfno1,
-          rfid:rfid1
-        }
+      request.delete("/User_info/"+id,{
       }).then(res=>{
         if(res.code==='1')
         {
@@ -300,7 +303,7 @@ export default {
     {
       if(this.tag==='1')//该项记录的主键存在，进行更新操作
       {
-        request.put("/Bucao_info",this.form).then(res=>{
+        request.put("/User_info",this.form).then(res=>{
           if(res.code==='1')
           {
             this.$message({
@@ -326,7 +329,7 @@ export default {
       {
         console.log(this.options)
 
-        request.post("/Bucao_info",this.form).then(res=>{
+        request.post("/User_info",this.form).then(res=>{
           console.log(res)
           if(res.code==='1')
           {

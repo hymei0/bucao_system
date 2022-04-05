@@ -126,7 +126,6 @@ public class bucao_infoController {
         for(List<String> id:ids)
         {
             QueryWrapper<Bucao_info> wrapper = new QueryWrapper<>();
-
             wrapper.eq("rfno", id.get(0)).eq("rfid", id.get(1));
             bucao_infoMapper.delete(wrapper);
         }

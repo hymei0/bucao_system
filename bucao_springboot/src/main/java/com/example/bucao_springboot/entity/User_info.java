@@ -18,5 +18,4 @@ public class User_info {
     private String sex;
     private int days;
     private double expenses;
-    private String roles;
 }

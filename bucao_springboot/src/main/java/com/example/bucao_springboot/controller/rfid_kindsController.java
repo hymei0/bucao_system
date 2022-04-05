@@ -67,7 +67,6 @@ public class rfid_kindsController {
     public Result<?> delete(@PathVariable String id)
     {
         rfid_kindsMapper.deleteById(id);
-        System.out.println(id);
         return Result.success();
     }
     //批量插入
