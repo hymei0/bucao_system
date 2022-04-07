@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="generator.mapper.BucaoRoomMapper">
+<mapper namespace="com.example.bucao_springboot.mapper.Bucao_roomMapper">
 
-    <resultMap id="BaseResultMap" type="generator.domain.BucaoRoom">
+    <resultMap id="BaseResultMap" type="com.example.bucao_springboot.entity.Bucao_room">
             <id property="rfno" column="rfno" jdbcType="VARCHAR"/>
             <id property="rfid" column="rfid" jdbcType="VARCHAR"/>
             <id property="roomId" column="room_id" jdbcType="VARCHAR"/>

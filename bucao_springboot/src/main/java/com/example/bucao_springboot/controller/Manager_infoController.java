@@ -45,7 +45,7 @@ public class Manager_infoController {
         {
             return Result.error("-1","用户名或密码错误");
         }
-
+        System.out.println("Manager_info已登录到"+manager_info.getId()+"的账户");
         return Result.success(res);
     }
     //新增接口

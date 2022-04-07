@@ -6,9 +6,11 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
+import com.example.bucao_springboot.entity.Bucao_info;
 import com.example.bucao_springboot.entity.Room_info;
 import com.example.bucao_springboot.entity.Room_info;
 import com.example.bucao_springboot.mapper.Room_infoMapper;
@@ -99,6 +101,13 @@ public class Room_InfoController {
         room_infoMapper.selectById(id);
         System.out.println("Room_info已查询到用户"+id+"的信息：");
         return Result.success();
+    }
+    //无条件查询
+    @GetMapping("/selectall")
+    public Result<?>  selectall(){
+        QueryWrapper<Room_info> queryWrapper = new QueryWrapper<>();
+        List<Map<String, Object>> list=room_infoMapper.selectMaps(queryWrapper);
+        return Result.success(list);
     }
 
 

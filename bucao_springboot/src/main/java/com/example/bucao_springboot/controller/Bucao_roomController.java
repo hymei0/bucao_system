@@ -1,7 +1,6 @@
 package com.example.bucao_springboot.controller;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.poi.excel.ExcelUtil;
@@ -10,7 +9,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
-import com.example.bucao_springboot.entity.Bucao_room;
 import com.example.bucao_springboot.entity.Bucao_room;
 import com.example.bucao_springboot.mapper.Bucao_roomMapper;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +38,6 @@ public class Bucao_roomController {
     @PostMapping  //post接口：前台把json数据传过来，通过此接口接收到  并转化成xxx类
     public Result<?> save(@RequestBody Bucao_room Bucao_room)
     {
-        System.out.println(Bucao_room.getRfid());
         try{
             QueryWrapper<Bucao_room> wrapper=new QueryWrapper<>();
             wrapper.eq("rfno", Bucao_room.getRfno()).eq("rfid", Bucao_room.getRfid()).eq("room_id",Bucao_room.getRoomId());
@@ -50,10 +47,10 @@ public class Bucao_roomController {
                 return Result.success();
             }
             else{
-                return Result.error("-1","该布草已经存在");
+                return Result.error("-1","该记录已存在，如有变更需求请进行修改操作！");
             }
         }catch (Exception e){
-            return Result.error("-1",e.toString());
+            return Result.error("-1","后台错啦，请联系开发人员");
         }
     }
 
@@ -63,7 +60,6 @@ public class Bucao_roomController {
     {
         try {
             bucao_roomMapper.update(bucao_room, Wrappers.<Bucao_room>lambdaUpdate().eq(Bucao_room::getRfno, bucao_room.getRfno()).eq(Bucao_room::getRfid, bucao_room.getRfid()).eq(Bucao_room::getRoomId, bucao_room.getRoomId()));
-            System.out.println(bucao_room.getRfno());
             return Result.success();
         }catch (Exception e){
             return Result.error("-1","更新错误");
@@ -73,18 +69,21 @@ public class Bucao_roomController {
 
     //删除接口
     @DeleteMapping
-    public Result<?> delete(@RequestParam String rfno,
+    public Result<?> delete(@RequestParam String roomId,
+                            @RequestParam String rfno,
                             @RequestParam String rfid)
     {
+
         try {
             // Bucao_room bucao=Bucao_roomMapper.selectOne(Wrappers.<Bucao_room>lambdaQuery().eq(Bucao_room::getRfno,Bucao_room.getRfno()).eq(Bucao_room::getRfid,Bucao_room.getRfid()));
             QueryWrapper<Bucao_room> wrapper = new QueryWrapper<>();
 
-            wrapper.eq("rfno", rfno).eq("rfid", rfid);
+            wrapper.eq("rfno", rfno).eq("rfid", rfid).eq("room_id",roomId);
             int rows = bucao_roomMapper.delete(wrapper);
+            System.out.println(roomId+","+rfid+rfno+"该记录删除成功");
             return Result.success();
         }catch (Exception e){
-            return Result.error("-1",e.toString());
+            return Result.error("-1","后台出错啦，请联系开发人员");
         }
     }
 
@@ -100,14 +99,14 @@ public class Bucao_roomController {
         //LambdaQueryWrapper<RFid_kinds> qw = Wrappers.<User>lambdaQuery().like(User::getName, "张").and(u -> u.lt(User::getAge, 40).or().isNotNull(User::getEmail));
 
         //LambdaQueryWrapper<Bucao_room> wrapper = Wrappers.<Bucao_room>lambdaQuery();
+
         QueryWrapper<Bucao_room> wrapper=new QueryWrapper<>();
         if(StrUtil.isNotBlank(search))//不为null,则进行模糊匹配
         {
 
-            wrapper.like("rfid",search).or().like("rfno",search).or().like("state",search);//eq(a,b)<=>a=b
+            wrapper.like("rfid",search).or().like("rfno",search).or().like("roomId",search);//eq(a,b)<=>a=b
         }
         Page<Bucao_room> Bucao_room_page=bucao_roomMapper.selectPage(new Page<>(pageNum,pageSize), wrapper);
-
         return Result.success(Bucao_room_page);
     }
     /**批量删除接口:复合主键
@@ -122,7 +121,7 @@ public class Bucao_roomController {
         for(List<String> id:ids)
         {
             QueryWrapper<Bucao_room> wrapper = new QueryWrapper<>();
-            wrapper.eq("rfno", id.get(0)).eq("rfid", id.get(1));
+            wrapper.eq("rfno", id.get(0)).eq("rfid", id.get(1)).eq("room_id",id.get(2));
             bucao_roomMapper.delete(wrapper);
         }
         return Result.success();
@@ -142,8 +141,9 @@ public class Bucao_roomController {
         List<Bucao_room> all = bucao_roomMapper.selectList(null);
         for (Bucao_room Bucao_room : all) {
             Map<String, Object> row1 = new LinkedHashMap<>();
-            row1.put("布草类型", Bucao_room.getRfno());
-            row1.put("RFID编码", Bucao_room.getRfid());
+            row1.put("病房号", Bucao_room.getRoomId());
+            row1.put("布草RFID编号", Bucao_room.getRFIDX());
+            row1.put("数量", Bucao_room.getNum());
 
             list.add(row1);
         }
@@ -152,7 +152,7 @@ public class Bucao_roomController {
         writer.write(list, true);
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
-        String fileName = URLEncoder.encode("布草信息数据表", "UTF-8");
+        String fileName = URLEncoder.encode("布草分布信息数据表", "UTF-8");
         response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
 
         ServletOutputStream out = response.getOutputStream();

@@ -24,16 +24,15 @@
     <!--    数据展示区-->
     <el-table :data="Bucao_roomtable" border stripe style="width: 100%" @selection-change="handleSelectionChange"> <!--显示表格边框和斑马纹-->
       <el-table-column type="selection" width="55"></el-table-column>
-      <el-table-column prop="room_id" label="病房号" />
-      <el-table-column prop="rfno" label="布草类型" sortable /> <!--prop:属性名  label:表头的名字-->
-      <el-table-column prop="rfid" label="RFID编号" sortable />
+      <el-table-column prop="roomId" label="病房号" />
+      <el-table-column prop="rfidx" label="布草RFID编号" sortable />
       <el-table-column prop="num" label=数量 />
       <el-table-column fix="right" label="操作" >
         <!--        内容修改区-->
         <template #default="scope">
-          <el-button  type="text"  @click="handleEdit(scope.row)">详情</el-button>
+          <el-button  type="text" style="color:greenyellow" @click="handledetail(scope.row.rfno,scope.row.rfid)">详情</el-button>
           <el-button  type="text"  @click="handleEdit(scope.row)">编辑</el-button>
-          <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.rfno,scope.row.rfid)">
+          <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.roomId,scope.row.rfno,scope.row.rfid)">
             <template #reference>
               <el-button  type="danger" >删除</el-button>
             </template>
@@ -54,65 +53,77 @@
           @current-change="handleCurrentChange"
       >
 
-        <!--        添加的的对话框-->
+
         </el-pagination>
       </div>
       <!--    导入导出-->
       <div style="margin-top: 5px;margin-left: 10px">
-        <el-upload
-            :action=excelUploadUrl
-            :on-success="handleUploadSuccess"
-            :show-file-list=false
-            :limit="1"
-            accept='.xlsx'
-            style="display: inline-block; margin: 0 10px">
-          <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" >导入</el-button>
-
-        </el-upload>
-
         <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" @click="exportdata">导出</el-button>
-
       </div>
     </div>
-    <el-dialog v-model="dialogVisible" title="布草信息管理" width="30%" :before-close="handleClose">
+    <!--        对话框-->
+    <el-dialog v-model="dialogVisible" title="布草分布管理" width="30%" :before-close="handleClose">
       <el-form :model="form" label-width="120px" :rules="rules">
-        <el-form-item label="布草类型" prop="rfno">
-          <el-select v-model="form.rfno" class="m-2" placeholder="Select" size="large" v-bind:disabled="edi">
+
+        <el-form-item label="病房号" prop="roomId">
+          <el-select v-model="form.roomId" class="m-2" placeholder="Select" size="large" v-bind:disabled="edi">
+            <el-option
+                v-for="item in options0"
+                :key="item.id"
+                :label="item.id"
+                :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="布草RFID编码" prop="rfidx">
+          <el-select v-model="form.rfidx" class="m-2" placeholder="Select" size="large" v-bind:disabled="edi">
             <el-option
                 v-for="item in options"
-                :key="item.kind+item.note"
-                :label="item.kind+item.note"
-                :value="item.RFNO"
+                :key="item.rfno+item.rfid"
+                :label="item.rfno+item.rfid"
+                :value="item.rfno+item.rfid"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="RFID编号" prop="rfid">
-          <el-input v-model="form.rfid" style="width:70%" autocomplete="off" v-bind:disabled="edi"/>
+        <el-form-item label="数量" prop="num">
+          <el-input v-model.number="form.num" style="width:70%" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="状  态" prop="state">
-          <el-select v-model="form.state" class="m-2" placeholder="Select" size="large">
-            <el-option
-                v-for="item in options1"
-                :key="item.lable"
-                :label="item.lable"
-                :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="洗涤次数" prop="washtimes">
-          <el-input v-model="form.washtimes" autocomplete="off"  style="width:70%"/>
-        </el-form-item>
-        <el-form-item label="入库时间" prop="indate">
-          <el-date-picker v-model="form.indate" type="date" placeholder="选择日期" style="width:70%"/>
-        </el-form-item>
-        <el-form-item label="出库时间" v-if="form.state=='已报废'" prop="outdate">
-          <el-date-picker v-model="form.outdate" type="date" placeholder="选择日期" style="width:70%"/>
-        </el-form-item>
+
       </el-form>
       <template #footer>
       <span class="dialog-footer">
         <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" @click="save">确定</el-button>
+      </span>
+      </template>
+    </el-dialog >
+
+<!--    详情页面的对话框-->
+    <el-dialog v-model="dialogVisible1" title="布草详细信息" width="30%" :before-close="handleClose">
+      <el-form :model="form1" label-width="120px" >
+        <el-form-item label="布草类型" prop="rfno">
+          <el-input v-model="form1.rfno" style="width:70%" autocomplete="off" disabled/>
+        </el-form-item>
+        <el-form-item label="编号" prop="rfid">
+          <el-input v-model="form1.rfid" style="width:70%" autocomplete="off" disabled/>
+        </el-form-item>
+        <el-form-item label="状  态" prop="state">
+          <el-input v-model="form1.state" style="width:70%" autocomplete="off" disabled/>
+        </el-form-item>
+        <el-form-item label="洗涤次数" prop="washtimes">
+          <el-input v-model="form1.washtimes" autocomplete="off"  style="width:70%" disabled/>
+        </el-form-item>
+        <el-form-item label="入库时间" prop="indate">
+          <el-date-picker v-model="form1.indate" type="date" placeholder="选择日期" style="width:70%" disabled/>
+        </el-form-item>
+        <el-form-item label="出库时间" v-if="form1.state=='已报废'" prop="outdate">
+          <el-date-picker v-model="form1.outdate" type="date" placeholder="选择日期" style="width:70%" disabled/>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="dialogVisible1 = false">关闭</el-button>
       </span>
       </template>
     </el-dialog>
@@ -141,52 +152,25 @@ export default {
       pageSize: 10,     // 每页的大小
       total: 0,
       dialogVisible:false,
+      dialogVisible1:false, //控制详细信息对话框的显示
       form:{},
+      form1:{},
       edi:false,
       tag:'',   //1表示编辑修改数据，0表示新增数据
 //对象区
       //RFID标签类别信息表
       Bucao_roomtable:[],
       options:[],
+      options0:[],
       ids: [],
       excelUploadUrl:'http://localhost:9090/Bucao_room/import',
-      //布草状态：
-      options1:[
-        {
-          value: '使用中',
-          label: '使用中',
-        },
-        {
-          value: '洗涤中',
-          label: '洗涤中',
-        },
-        {
-          value: '待回收',
-          label: '待回收',
-        },
-        {
-          value: '闲置中',
-          label: '闲置中',
-        },
-        {
-          value: '已报废',
-          label: '已报废',
-        },
-        {
-          value: '已回收',
-          label: '已回收',
-        },
-        {
-          value: '未知',
-          label: '未知',
-        }
-      ],
+
       //表单验证
       rules :{
         rfno: [{ required: true, message: '请选择布草类型', trigger: 'blur' }],
-        rfid: [{ required: true, message: '请选择布草编号', trigger: 'blur' }],
+        rfidx: [{ required: true, message: '请选择布草RFID编码', trigger: 'blur' }],
         num: [{ required: true, message: '请输入布草数量', trigger: 'blur' }],
-        room_id: [{required: true, message: '请选择房间号', trigger: 'blur' }]
+        roomId: [{required: true, message: '请选择房间号', trigger: 'blur' }]
       }
     }
 
@@ -198,7 +182,7 @@ export default {
 //方法区
   methods:{
     handleSelectionChange(val) {
-      this.ids = val.map(v => [v.rfno,v.rfid,v.room_id])   // [{id,name}, {id,name}] => [id,id]
+      this.ids = val.map(v => [v.rfno,v.rfid,v.roomId])   // [{id,name}, {id,name}] => [id,id]
     },
     deleteBatch() {
       console.log(this.ids)
@@ -215,13 +199,6 @@ export default {
         }
       })
     },
-    //excel表格的导入：直接导入到后端
-    handleUploadSuccess(res) {
-      if (res.code === "1") {
-        this.$message.success("导入成功")
-        this.load()
-      }
-    },
     //数据导出：法一：从后端的数据库中导出
     exportdata() {
       location.href = "http://" + "localhost" + ":9090/Bucao_room/export";
@@ -234,10 +211,37 @@ export default {
       this.dialogVisible=true
       this.form={} //清空表单
     },
+    //详情按钮事件处理
+    handledetail(id1,id2){
+      this.dialogVisible1=true
+
+      request.get("/Bucao_info/detail",{
+        params:{
+          rfno:id1,
+          rfid:id2
+        }
+      }).then(res=>{
+        if(res.code==='1')
+        {
+          this.form1=res.data
+          console.log(this.form1)
+        }
+        else {
+          this.$message({
+            type: "warning",
+            message: res.msg
+          })
+        }
+        this.load()
+      })
+    },
     //查询
     load(){
-      request.get("/rfid_kinds/bucaoinfo" ).then(re =>{
+      request.get("/Bucao_info/selectall" ).then(re =>{
         this.options=re
+      })
+      request.get("/Room_info/selectall" ).then(re =>{
+        this.options0=re.data
       })
       request.get("/Bucao_room",  {
         params:{
@@ -246,9 +250,11 @@ export default {
           search: this.search
         }
       }).then(res =>{
-        console.log(res)
         this.Bucao_roomtable=res.data.records
         this.total=res.data.total
+        for(var i = 0;i<this.total;i++){
+          this.Bucao_roomtable[i].rfidx=this.Bucao_roomtable[i].rfno+this.Bucao_roomtable[i].rfid
+        }
       })
     },
     //编辑按钮事件处理
@@ -259,10 +265,10 @@ export default {
       this.dialogVisible=true   //打开弹窗
     },
     //删除按钮事件处理
-    handleDelete(rfno1,rfid1){
-
+    handleDelete(roomid,rfno1,rfid1){
       request.delete("/Bucao_room",{
         params:{
+          roomId:roomid,
           rfno:rfno1,
           rfid:rfid1
         }
@@ -299,12 +305,13 @@ export default {
     {
       if(this.tag==='1')//该项记录的主键存在，进行更新操作
       {
+
         request.put("/Bucao_room",this.form).then(res=>{
           if(res.code==='1')
           {
             this.$message({
               type:"success",
-              message:"操作成功"
+              message:"修改成功"
             })
             this.load()
             this.dialogVisible=false
@@ -323,10 +330,10 @@ export default {
       }
       else  //新增
       {
-        console.log(this.options)
+        this.form.rfid=this.form.rfidx.match(/\d+/g).toString()
+        this.form.rfno=this.form.rfidx.match(/[a-zA-Z]/ig).join('')
 
         request.post("/Bucao_room",this.form).then(res=>{
-          console.log(res)
           if(res.code==='1')
           {
             this.$message({

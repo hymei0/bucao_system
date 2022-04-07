@@ -6,9 +6,11 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
+import com.example.bucao_springboot.entity.Room_info;
 import com.example.bucao_springboot.entity.User_info;
 import com.example.bucao_springboot.mapper.User_infoMapper;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +44,7 @@ public class User_infoController {
         {
             return Result.error("-1","用户名或密码错误");
         }
-
+        System.out.println("User_info已登录到"+user_info.getID()+"的账户");
         return Result.success(res);
     }
     //注册接口
@@ -62,6 +64,13 @@ public class User_infoController {
         }catch (Exception e){
             return Result.error("-1","系统错误，请稍后重试");
         }
+    }
+    //无条件查询
+    @GetMapping("/selectall")
+    public Result<?>  selectall(){
+        QueryWrapper<User_info> queryWrapper = new QueryWrapper<>();
+        List<Map<String, Object>> list=user_infoMapper.selectMaps(queryWrapper);
+        return Result.success(list);
     }
     //新增接口
     @PostMapping
@@ -127,7 +136,7 @@ public class User_infoController {
     public Result<?> SelectPerson_Info(@PathVariable String id)
     {
         user_infoMapper.selectById(id);
-        System.out.println("User_info已查询到用户"+id+"的信息：");
+        System.out.println("User_info已查询到用户"+id+"的信息");
         return Result.success();
     }
 

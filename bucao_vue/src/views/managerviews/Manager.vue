@@ -33,6 +33,7 @@
           <el-image
               style="width: 100px; height: auto"
               :src="scope.row.portrait"
+              preview-teleported
               :preview-src-list="[scope.row.portrait]"/>
         </template>
       </el-table-column>

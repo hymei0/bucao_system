@@ -7,14 +7,12 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
 import com.example.bucao_springboot.entity.Bucao_info;
 import com.example.bucao_springboot.entity.RFid_kinds;
-import com.example.bucao_springboot.entity.User_info;
 import com.example.bucao_springboot.mapper.Bucao_infoMapper;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.sql.Date;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -44,7 +41,7 @@ public class bucao_infoController {
     @PostMapping  //post接口：前台把json数据传过来，通过此接口接收到  并转化成Bucao_info类
     public Result<?> save(@RequestBody Bucao_info bucao_info)
     {
-        System.out.println(bucao_info.getRfid());
+
         try{
             QueryWrapper<Bucao_info> wrapper=new QueryWrapper<>();
             wrapper.eq("rfno", bucao_info.getRfno()).eq("rfid", bucao_info.getRfid());
@@ -92,6 +89,32 @@ public class bucao_infoController {
         }
     }
 
+    //无条件查询
+    @GetMapping("/selectall")
+    public List<Map<String, Object>>  selectall(){
+        QueryWrapper<Bucao_info> queryWrapper = new QueryWrapper<>();
+        List<Map<String, Object>> list=bucao_infoMapper.selectMaps(queryWrapper);
+        return list;
+    }
+
+    //查询一条信息接口
+    //删除接口
+    @GetMapping("/detail")
+    public Result<?> detail(@RequestParam String rfno,
+                            @RequestParam String rfid)
+    {
+        try {
+            // Bucao_info bucao=bucao_infoMapper.selectOne(Wrappers.<Bucao_info>lambdaQuery().eq(Bucao_info::getRfno,bucao_info.getRfno()).eq(Bucao_info::getRfid,bucao_info.getRfid()));
+            QueryWrapper<Bucao_info> wrapper = new QueryWrapper<>();
+
+            wrapper.eq("rfno", rfno).eq("rfid", rfid);
+            Bucao_info bucao_info = bucao_infoMapper.selectOne(wrapper);
+            return Result.success(bucao_info);
+        }catch (Exception e){
+            return Result.error("-1","后台出错了");
+        }
+    }
+
     //分页查询
     @GetMapping
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
@@ -99,7 +122,7 @@ public class bucao_infoController {
                               @RequestParam(defaultValue = "") String search)
     //参数：pageNum：当前页，pageSize:每页多少条 search:查询关键字
     {
-        System.out.println(bucao_infoMapper);
+
         //Page<Object> page= new Page<>(pageNum,pageSize);//分页对象
 
         //LambdaQueryWrapper<RFid_kinds> qw = Wrappers.<User>lambdaQuery().like(User::getName, "张").and(u -> u.lt(User::getAge, 40).or().isNotNull(User::getEmail));
