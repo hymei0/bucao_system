@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="generator.mapper.BucaoRoomMapper">
+
+    <resultMap id="BaseResultMap" type="generator.domain.BucaoRoom">
+            <id property="rfno" column="rfno" jdbcType="VARCHAR"/>
+            <id property="rfid" column="rfid" jdbcType="VARCHAR"/>
+            <id property="roomId" column="room_id" jdbcType="VARCHAR"/>
+            <result property="num" column="num" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        rfno,rfid,room_id,
+        num
+    </sql>
+</mapper>

@@ -99,6 +99,7 @@ public class bucao_infoController {
                               @RequestParam(defaultValue = "") String search)
     //参数：pageNum：当前页，pageSize:每页多少条 search:查询关键字
     {
+        System.out.println(bucao_infoMapper);
         //Page<Object> page= new Page<>(pageNum,pageSize);//分页对象
 
         //LambdaQueryWrapper<RFid_kinds> qw = Wrappers.<User>lambdaQuery().like(User::getName, "张").and(u -> u.lt(User::getAge, 40).or().isNotNull(User::getEmail));

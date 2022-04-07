@@ -211,7 +211,7 @@ export default {
     //添加按钮事件处理
     add()
     {
-      request.get("/section/rfid_kinds").then(re=>{
+      request.get("/Section/rfid_kinds").then(re=>{
         this.options=re
       })
       this.tag='0'

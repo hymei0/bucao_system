@@ -1,40 +1,41 @@
-package com.example.bucao_springboot.entity;
+package generator.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import generator.domain.BucaoRoom;
+import java.io.Serializable;
 import lombok.Data;
 
-@TableName("Bucao_room")
+/**
+ * 
+ * @TableName bucao_room
+ */
+@TableName(value ="bucao_room")
 @Data
-public class Bucao_room {
+public class BucaoRoom implements Serializable {
     /**
-     *
+     * 
      */
     @TableId
     private String rfno;
 
     /**
-     *
+     * 
      */
     @TableId
     private String rfid;
 
     /**
-     *
+     * 
      */
     @TableId
     private String roomId;
 
     /**
-     *
+     * 
      */
     private Integer num;
-
-    @TableField(exist = false)
-    private String RFIDX;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
@@ -52,9 +53,9 @@ public class Bucao_room {
         }
         BucaoRoom other = (BucaoRoom) that;
         return (this.getRfno() == null ? other.getRfno() == null : this.getRfno().equals(other.getRfno()))
-                && (this.getRfid() == null ? other.getRfid() == null : this.getRfid().equals(other.getRfid()))
-                && (this.getRoomId() == null ? other.getRoomId() == null : this.getRoomId().equals(other.getRoomId()))
-                && (this.getNum() == null ? other.getNum() == null : this.getNum().equals(other.getNum()));
+            && (this.getRfid() == null ? other.getRfid() == null : this.getRfid().equals(other.getRfid()))
+            && (this.getRoomId() == null ? other.getRoomId() == null : this.getRoomId().equals(other.getRoomId()))
+            && (this.getNum() == null ? other.getNum() == null : this.getNum().equals(other.getNum()));
     }
 
     @Override

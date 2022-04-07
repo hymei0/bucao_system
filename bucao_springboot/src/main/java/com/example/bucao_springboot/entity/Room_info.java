@@ -8,7 +8,7 @@ import lombok.Data;
 @TableName("Room_info")
 @Data
 public class Room_info {
-    @TableId(value = "room_id", type = IdType.AUTO)
-    private String room_id;
+    @TableId(value = "id", type = IdType.AUTO)
+    private String id;
     private String section;
 }

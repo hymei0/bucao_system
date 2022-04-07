@@ -3,7 +3,7 @@
 
 </style>
 <template>
-  <div class="Bucao_info" style="padding:10px">
+  <div class="Bucao_room" style="padding:10px">
     <!--    功能区域-->
     <div style="display: flex; margin: 10px 0"  align="left">
       <div style="width: 10%;display: flex" align="left">
@@ -22,17 +22,16 @@
     </div>
 
     <!--    数据展示区-->
-    <el-table :data="Bucao_infotable" border stripe style="width: 100%" @selection-change="handleSelectionChange"> <!--显示表格边框和斑马纹-->
+    <el-table :data="Bucao_roomtable" border stripe style="width: 100%" @selection-change="handleSelectionChange"> <!--显示表格边框和斑马纹-->
       <el-table-column type="selection" width="55"></el-table-column>
+      <el-table-column prop="room_id" label="病房号" />
       <el-table-column prop="rfno" label="布草类型" sortable /> <!--prop:属性名  label:表头的名字-->
       <el-table-column prop="rfid" label="RFID编号" sortable />
-      <el-table-column prop="state" label="布草状态" />
-      <el-table-column prop="washtimes" label=洗涤次数 />
-      <el-table-column prop="indate" label=入库时间 />
-      <el-table-column prop="outdate" label=出库时间 />
+      <el-table-column prop="num" label=数量 />
       <el-table-column fix="right" label="操作" >
         <!--        内容修改区-->
         <template #default="scope">
+          <el-button  type="text"  @click="handleEdit(scope.row)">详情</el-button>
           <el-button  type="text"  @click="handleEdit(scope.row)">编辑</el-button>
           <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.rfno,scope.row.rfid)">
             <template #reference>
@@ -130,7 +129,7 @@ const background = ref(true)
 const disabled = ref(false)
 
 export default {
-  name: "Bucao_info",
+  name: "Bucao_room",
   components: {
   },
 
@@ -147,10 +146,10 @@ export default {
       tag:'',   //1表示编辑修改数据，0表示新增数据
 //对象区
       //RFID标签类别信息表
-      Bucao_infotable:[],
+      Bucao_roomtable:[],
       options:[],
       ids: [],
-      excelUploadUrl:'http://localhost:9090/Bucao_info/import',
+      excelUploadUrl:'http://localhost:9090/Bucao_room/import',
       //布草状态：
       options1:[
         {
@@ -185,11 +184,9 @@ export default {
       //表单验证
       rules :{
         rfno: [{ required: true, message: '请选择布草类型', trigger: 'blur' }],
-        rfid: [{ required: true, message: '请输入RFID编码', trigger: 'blur' }],
-        state: [{ required: true, message: '请选择布草状态', trigger: 'blur' }],
-        washtimes: [{ required: true, message: '请输入洗涤次数', trigger: 'blur' }],
-        indate: [{required: true, message: '请选择入库时间', trigger: 'blur' }],
-        outdate: [{required: true, message: '请选择报废时间', trigger: 'blur' }]
+        rfid: [{ required: true, message: '请选择布草编号', trigger: 'blur' }],
+        num: [{ required: true, message: '请输入布草数量', trigger: 'blur' }],
+        room_id: [{required: true, message: '请选择房间号', trigger: 'blur' }]
       }
     }
 
@@ -201,7 +198,7 @@ export default {
 //方法区
   methods:{
     handleSelectionChange(val) {
-      this.ids = val.map(v => [v.rfno,v.rfid])   // [{id,name}, {id,name}] => [id,id]
+      this.ids = val.map(v => [v.rfno,v.rfid,v.room_id])   // [{id,name}, {id,name}] => [id,id]
     },
     deleteBatch() {
       console.log(this.ids)
@@ -209,7 +206,7 @@ export default {
         this.$message.warning("请选择数据！")
         return
       }
-      request.post("/Bucao_info/deleteBatch", this.ids).then(res => {
+      request.post("/Bucao_room/deleteBatch", this.ids).then(res => {
         if (res.code === '1') {
           this.$message.success("批量删除成功")
           this.load()
@@ -227,7 +224,7 @@ export default {
     },
     //数据导出：法一：从后端的数据库中导出
     exportdata() {
-      location.href = "http://" + "localhost" + ":9090/Bucao_info/export";
+      location.href = "http://" + "localhost" + ":9090/Bucao_room/export";
     },
     //添加按钮事件处理
     add()
@@ -242,7 +239,7 @@ export default {
       request.get("/rfid_kinds/bucaoinfo" ).then(re =>{
         this.options=re
       })
-      request.get("/Bucao_info",  {
+      request.get("/Bucao_room",  {
         params:{
           pageNum: this.currentPage,
           pageSize: this.pageSize,
@@ -250,7 +247,7 @@ export default {
         }
       }).then(res =>{
         console.log(res)
-        this.Bucao_infotable=res.data.records
+        this.Bucao_roomtable=res.data.records
         this.total=res.data.total
       })
     },
@@ -264,7 +261,7 @@ export default {
     //删除按钮事件处理
     handleDelete(rfno1,rfid1){
 
-      request.delete("/Bucao_info",{
+      request.delete("/Bucao_room",{
         params:{
           rfno:rfno1,
           rfid:rfid1
@@ -302,7 +299,7 @@ export default {
     {
       if(this.tag==='1')//该项记录的主键存在，进行更新操作
       {
-        request.put("/Bucao_info",this.form).then(res=>{
+        request.put("/Bucao_room",this.form).then(res=>{
           if(res.code==='1')
           {
             this.$message({
@@ -328,7 +325,7 @@ export default {
       {
         console.log(this.options)
 
-        request.post("/Bucao_info",this.form).then(res=>{
+        request.post("/Bucao_room",this.form).then(res=>{
           console.log(res)
           if(res.code==='1')
           {

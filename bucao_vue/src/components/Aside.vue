@@ -65,7 +65,7 @@
             <span style="font-size: small;font-weight: bold;" >布草-用户信息</span>
           </template>
         </el-menu-item>
-        <el-menu-item index="bucao_user" style="padding-left: 60px; font-size:small">
+        <el-menu-item index="bucao_room" style="padding-left: 60px; font-size:small">
           <template #title>
             <el-icon><toilet-paper /></el-icon>
             <span style="font-size: small;font-weight: bold;" >布草-病房信息</span>
@@ -100,12 +100,24 @@
         </el-menu-item>
       </el-sub-menu>
 
-      <el-menu-item index="manager">
+      <el-sub-menu index="managers">
         <template #title>
           <el-icon><headset /></el-icon>
           <span style="font-size: medium;font-weight: bold;" >联系管理员</span>
         </template>
-      </el-menu-item>
+        <el-menu-item index="manager" style="padding-left: 60px; font-size:small">
+          <template #title>
+            <el-icon><grape /></el-icon>
+            <span style="font-size: small;font-weight: bold;" >管理员信息</span>
+          </template>
+        </el-menu-item>
+        <el-menu-item index="online" style="padding-left: 60px; font-size:small">
+          <template #title>
+            <el-icon><chat-dot-square /></el-icon>
+            <span style="font-size: small;font-weight: bold;" >小智在线</span>
+          </template>
+        </el-menu-item>
+      </el-sub-menu>
 
     </el-menu>
   </div>

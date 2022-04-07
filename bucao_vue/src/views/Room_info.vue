@@ -3,7 +3,7 @@
 
 </style>
 <template>
-  <div class="Bucao_info" style="padding:10px">
+  <div class="Room_info" style="padding:10px">
     <!--    功能区域-->
     <div style="display: flex; margin: 10px 0"  align="left">
       <div style="width: 10%;display: flex" align="left">
@@ -22,19 +22,15 @@
     </div>
 
     <!--    数据展示区-->
-    <el-table :data="Bucao_infotable" border stripe style="width: 100%" @selection-change="handleSelectionChange"> <!--显示表格边框和斑马纹-->
+    <el-table :data="Room_infotable" border stripe style="width: 100%" @selection-change="handleSelectionChange"> <!--显示表格边框和斑马纹-->
       <el-table-column type="selection" width="55"></el-table-column>
-      <el-table-column prop="rfno" label="布草类型" sortable /> <!--prop:属性名  label:表头的名字-->
-      <el-table-column prop="rfid" label="RFID编号" sortable />
-      <el-table-column prop="state" label="布草状态" />
-      <el-table-column prop="washtimes" label=洗涤次数 />
-      <el-table-column prop="indate" label=入库时间 />
-      <el-table-column prop="outdate" label=出库时间 />
+      <el-table-column prop="id" label="病房号" sortable /> <!--prop:属性名  label:表头的名字-->
+      <el-table-column prop="section" label="所属部门" sortable />
       <el-table-column fix="right" label="操作" >
         <!--        内容修改区-->
         <template #default="scope">
           <el-button  type="text"  @click="handleEdit(scope.row)">编辑</el-button>
-          <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.rfno,scope.row.rfid)">
+          <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.id)">
             <template #reference>
               <el-button  type="danger" >删除</el-button>
             </template>
@@ -46,16 +42,16 @@
     <div style="display: flex">
       <div class="demo-pagination-block">
         <el-pagination
-          v-model:currentPage="currentPage"
-          v-model:page-size="pageSize"
-          :page-sizes="[40,30,20,10]"
-          layout="total, sizes, prev, pager, next, jumper "
-          :total="total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-      >
+            v-model:currentPage="currentPage"
+            v-model:page-size="pageSize"
+            :page-sizes="[40,30,20,10]"
+            layout="total, sizes, prev, pager, next, jumper "
+            :total="total"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+        >
 
-        <!--        添加的的对话框-->
+          <!--        添加的的对话框-->
         </el-pagination>
       </div>
       <!--    导入导出-->
@@ -75,39 +71,19 @@
 
       </div>
     </div>
-    <el-dialog v-model="dialogVisible" title="布草信息管理" width="30%" :before-close="handleClose">
+    <el-dialog v-model="dialogVisible" title="部门信息管理" width="30%" :before-close="handleClose">
       <el-form :model="form" label-width="120px" :rules="rules">
-        <el-form-item label="布草类型" prop="rfno">
-          <el-select v-model="form.rfno" class="m-2" placeholder="Select" size="large" v-bind:disabled="edi">
+        <el-form-item label="病房号" prop="id">
+          <el-input v-model="form.id" style="width:70%" autocomplete="off" v-bind:disabled="edi"/>
+        </el-form-item>
+        <el-form-item label="所属部门" prop="section">
+          <el-select v-model="form.section" class="m-2" placeholder="Select" size="large">
             <el-option
                 v-for="item in options"
-                :key="item.kind+item.note"
-                :label="item.kind+item.note"
-                :value="item.RFNO"
-            />
+                :key="item.id"
+                :label="item.na"
+                :value="item.na"/>
           </el-select>
-        </el-form-item>
-        <el-form-item label="RFID编号" prop="rfid">
-          <el-input v-model="form.rfid" style="width:70%" autocomplete="off" v-bind:disabled="edi"/>
-        </el-form-item>
-        <el-form-item label="状  态" prop="state">
-          <el-select v-model="form.state" class="m-2" placeholder="Select" size="large">
-            <el-option
-                v-for="item in options1"
-                :key="item.lable"
-                :label="item.lable"
-                :value="item.label"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="洗涤次数" prop="washtimes">
-          <el-input v-model="form.washtimes" autocomplete="off"  style="width:70%"/>
-        </el-form-item>
-        <el-form-item label="入库时间" prop="indate">
-          <el-date-picker v-model="form.indate" type="date" placeholder="选择日期" style="width:70%"/>
-        </el-form-item>
-        <el-form-item label="出库时间" v-if="form.state=='已报废'" prop="outdate">
-          <el-date-picker v-model="form.outdate" type="date" placeholder="选择日期" style="width:70%"/>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -130,7 +106,7 @@ const background = ref(true)
 const disabled = ref(false)
 
 export default {
-  name: "Bucao_info",
+  name: "Room_info",
   components: {
   },
 
@@ -147,47 +123,14 @@ export default {
       tag:'',   //1表示编辑修改数据，0表示新增数据
 //对象区
       //RFID标签类别信息表
-      Bucao_infotable:[],
+      Room_infotable:[],
       options:[],
       ids: [],
-      excelUploadUrl:'http://localhost:9090/Bucao_info/import',
-      //布草状态：
-      options1:[
-        {
-          label: '闲置中',
-        },
-        {
-          label: '运输中',
-        },
-
-        {
-          label: '使用中',
-        },
-        {
-          label: '待回收',
-        },
-        {
-          label: '已回收',
-        },
-
-        {
-          label: '洗涤中',
-        },
-        {
-          label: '已报废',
-        },
-        {
-          label: '未知',
-        }
-      ],
+      excelUploadUrl:'http://localhost:9090/Room_info/import',
       //表单验证
       rules :{
-        rfno: [{ required: true, message: '请选择布草类型', trigger: 'blur' }],
-        rfid: [{ required: true, message: '请输入RFID编码', trigger: 'blur' }],
-        state: [{ required: true, message: '请选择布草状态', trigger: 'blur' }],
-        washtimes: [{ required: true, message: '请输入洗涤次数', trigger: 'blur' }],
-        indate: [{required: true, message: '请选择入库时间', trigger: 'blur' }],
-        outdate: [{required: true, message: '请选择报废时间', trigger: 'blur' }]
+        id: [{ required: true, message: '请输入部门编号', trigger: 'blur' }],
+        section: [{ required: true, message: '请输入所属部门', trigger: 'blur' }]
       }
     }
 
@@ -199,7 +142,7 @@ export default {
 //方法区
   methods:{
     handleSelectionChange(val) {
-      this.ids = val.map(v => [v.rfno,v.rfid])   // [{id,name}, {id,name}] => [id,id]
+      this.ids = val.map(v => v.id)   // [{id,name}, {id,name}] => [id,id]
     },
     deleteBatch() {
       console.log(this.ids)
@@ -207,7 +150,7 @@ export default {
         this.$message.warning("请选择数据！")
         return
       }
-      request.post("/Bucao_info/deleteBatch", this.ids).then(res => {
+      request.post("/Room_info/deleteBatch", this.ids).then(res => {
         if (res.code === '1') {
           this.$message.success("批量删除成功")
           this.load()
@@ -225,11 +168,14 @@ export default {
     },
     //数据导出：法一：从后端的数据库中导出
     exportdata() {
-      location.href = "http://" + "localhost" + ":9090/Bucao_info/export";
+      location.href = "http://" + "localhost" + ":9090/Room_info/export";
     },
     //添加按钮事件处理
     add()
     {
+      request.get("/Section/rfid_kinds").then(re=>{
+        this.options=re
+      })
       this.tag='0'
       this.edi=false
       this.dialogVisible=true
@@ -237,10 +183,7 @@ export default {
     },
     //查询
     load(){
-      request.get("/rfid_kinds/bucaoinfo" ).then(re =>{
-        this.options=re
-      })
-      request.get("/Bucao_info",  {
+      request.get("/Room_info",  {
         params:{
           pageNum: this.currentPage,
           pageSize: this.pageSize,
@@ -248,7 +191,7 @@ export default {
         }
       }).then(res =>{
         console.log(res)
-        this.Bucao_infotable=res.data.records
+        this.Room_infotable=res.data.records
         this.total=res.data.total
       })
     },
@@ -260,13 +203,9 @@ export default {
       this.dialogVisible=true   //打开弹窗
     },
     //删除按钮事件处理
-    handleDelete(rfno1,rfid1){
+    handleDelete(id){
 
-      request.delete("/Bucao_info",{
-        params:{
-          rfno:rfno1,
-          rfid:rfid1
-        }
+      request.delete("/Room_info/"+id,{
       }).then(res=>{
         if(res.code==='1')
         {
@@ -300,7 +239,7 @@ export default {
     {
       if(this.tag==='1')//该项记录的主键存在，进行更新操作
       {
-        request.put("/Bucao_info",this.form).then(res=>{
+        request.put("/Room_info",this.form).then(res=>{
           if(res.code==='1')
           {
             this.$message({
@@ -326,7 +265,7 @@ export default {
       {
         console.log(this.options)
 
-        request.post("/Bucao_info",this.form).then(res=>{
+        request.post("/Room_info",this.form).then(res=>{
           console.log(res)
           if(res.code==='1')
           {
