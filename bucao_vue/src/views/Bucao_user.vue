@@ -86,7 +86,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="用户姓名" prop="num">
-          <el-input v-model="form.userName" style="width:70%" autocomplete="off" disabled/>
+          <el-input v-model="form.userName" style="width:70%" autocomplete="off" v-bind:disabled="edi"/>
         </el-form-item>
         <el-form-item label="布草RFID编码" prop="rfidx">
           <el-select v-model="form.rfidx" class="m-2" placeholder="Select" size="large" v-bind:disabled="edi">

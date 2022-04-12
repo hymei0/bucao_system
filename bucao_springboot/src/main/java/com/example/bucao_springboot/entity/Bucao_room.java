@@ -28,13 +28,20 @@ public class Bucao_room {
      */
     @MppMultiId
     private String roomId;
-
     /**
      *
      */
-    private Integer num;
+    @TableField()
+    private String roomSection;
+    /**
+     *
+     */
+    @TableField()
+    private String bucaoSection;
 
     @TableField(exist = false)
     private String RFIDX;
+
+
 
 }

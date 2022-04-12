@@ -94,13 +94,22 @@ public class Room_InfoController {
         return Result.success(Room_info_page);
     }
 
-    //显示个人信息
-    @GetMapping("/{id}")
-    public Result<?> SelectPerson_Info(@PathVariable String id)
-    {
-        room_infoMapper.selectById(id);
-        System.out.println("Room_info已查询到用户"+id+"的信息：");
+    //批量查询所属部门接口
+    @GetMapping("/allsection")
+    public Result<?> allSections(@RequestBody List<String> ids) {
+
+        room_infoMapper.selectBatchIds(ids);
         return Result.success();
+    }
+
+    //显示部门信息
+    @GetMapping("/{id}")
+    public Result<?> SelectRoom_Info(@PathVariable String id)
+    {
+
+         Room_info room= room_infoMapper.selectById(id);
+        System.out.println("Room_info已查询到部门"+id+"的信息：");
+        return Result.success(room);
     }
     //无条件查询
     @GetMapping("/selectall")

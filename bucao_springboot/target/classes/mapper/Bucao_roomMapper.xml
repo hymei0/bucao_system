@@ -4,15 +4,17 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.bucao_springboot.mapper.Bucao_roomMapper">
 
-    <resultMap id="BaseResultMap" type="com.example.bucao_springboot.entity.Bucao_room">
+    <resultMap id="bucao_roomMapper" type="com.example.bucao_springboot.entity.Bucao_room">
             <id property="rfno" column="rfno" jdbcType="VARCHAR"/>
             <id property="rfid" column="rfid" jdbcType="VARCHAR"/>
             <id property="roomId" column="room_id" jdbcType="VARCHAR"/>
-            <result property="num" column="num" jdbcType="INTEGER"/>
+        <id property="room_section" column="room_section" jdbcType="VARCHAR"/>
+        <id property="bucao_section" column="bucao_section" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         rfno,rfid,room_id,
-        num
+        room_section,bucao_section
     </sql>
+
 </mapper>

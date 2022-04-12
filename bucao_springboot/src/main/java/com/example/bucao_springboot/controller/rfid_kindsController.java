@@ -61,6 +61,14 @@ public class rfid_kindsController {
         return Result.success();
 
     }
+    //通过id查询
+    @GetMapping("/{id}")
+    public Result<?> SelectRFID_Info(@PathVariable String id)
+    {
+        RFid_kinds rfid = rfid_kindsMapper.selectById(id);
+        System.out.println("rfid_kinds已查询到布草类别"+id+"的信息：");
+        return Result.success(rfid);
+    }
 
     //删除接口
     @DeleteMapping("/{id}")

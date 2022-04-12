@@ -64,10 +64,21 @@ const routes = [
         path: 'manager',
         name: 'Manager',
         component: ()=>import("@/views/managerviews/Manager.vue"),
+      },
+      {
+        path: 'statistics',
+        name: 'statistics',
+        component: ()=>import("@/charts/statistics.vue"),
+      },
+      {
+        path: 'datavisual',
+        name: 'datavisual',
+        component: ()=>import("@/charts/Datavisual.vue"),
       }
     ]
 
   },
+
   {
     path: '/login',
     name: 'login',

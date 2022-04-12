@@ -11,8 +11,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
 import com.example.bucao_springboot.entity.Bucao_room;
 import com.example.bucao_springboot.mapper.Bucao_roomMapper;
+import com.example.bucao_springboot.mapper.RFid_kindsMapper;
+import com.example.bucao_springboot.mapper.Room_infoMapper;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
@@ -33,6 +36,7 @@ public class Bucao_roomController {
     //将xxx_infoMapper引入到xxx_infoController中,不太规范，一般是写service类，controller引入service,service引入mapper
     @Resource
     Bucao_roomMapper bucao_roomMapper;
+
 
     //新增接口
     @PostMapping  //post接口：前台把json数据传过来，通过此接口接收到  并转化成xxx类
@@ -101,12 +105,15 @@ public class Bucao_roomController {
         //LambdaQueryWrapper<Bucao_room> wrapper = Wrappers.<Bucao_room>lambdaQuery();
 
         QueryWrapper<Bucao_room> wrapper=new QueryWrapper<>();
+
         if(StrUtil.isNotBlank(search))//不为null,则进行模糊匹配
         {
 
             wrapper.like("rfid",search).or().like("rfno",search).or().like("roomId",search);//eq(a,b)<=>a=b
         }
         Page<Bucao_room> Bucao_room_page=bucao_roomMapper.selectPage(new Page<>(pageNum,pageSize), wrapper);
+        System.out.println(bucao_roomMapper.selectList(wrapper));
+
         return Result.success(Bucao_room_page);
     }
     /**批量删除接口:复合主键
@@ -143,7 +150,6 @@ public class Bucao_roomController {
             Map<String, Object> row1 = new LinkedHashMap<>();
             row1.put("病房号", Bucao_room.getRoomId());
             row1.put("布草RFID编号", Bucao_room.getRFIDX());
-            row1.put("数量", Bucao_room.getNum());
 
             list.add(row1);
         }
