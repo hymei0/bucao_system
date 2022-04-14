@@ -4,6 +4,20 @@
 </style>
 <template>
   <div class="User_info" style="padding:10px">
+    <!-- 面包屑导航 -->
+    <el-breadcrumb prefix-icon="arrow-right-bold " style="width: 100%;margin-top: 10px;margin-left: 10px">
+      <el-breadcrumb-item style="font-size: large; ">用户管理</el-breadcrumb-item>
+      <el-breadcrumb-item style="font-size: large; ">用户信息</el-breadcrumb-item>
+    </el-breadcrumb>
+    <!-- 搜索，切换 -->
+    <el-row :gutter="23">
+      <el-col :span="18">
+        <el-divider></el-divider>
+
+      </el-col>
+      <el-col :span="6">
+      </el-col>
+    </el-row>
     <!--    功能区域-->
     <div style="display: flex; margin: 10px 0"  align="left">
       <div style="width: 10%;display: flex" align="left">
@@ -38,8 +52,6 @@
       </el-table-column>
       <el-table-column prop="telephone" label="联系电话" />
       <el-table-column prop="address" label="地址" />
-      <el-table-column prop="days" label="住院天数" />
-      <el-table-column prop="expenses" label="欠费情况(￥)" />
       <el-table-column fix="right" label="操作" >
         <!--        内容修改区-->
         <template #default="scope">
@@ -119,11 +131,8 @@
         <el-form-item label="电 话" prop="telephone">
           <el-input v-model.number="form.telephone"   style="width:70%"/>
         </el-form-item>
-        <el-form-item label="住院天数" prop="days">
-          <el-input v-model.number="form.days"   style="width:70%"/>
-        </el-form-item>
-        <el-form-item label="欠费情况" prop="days">
-          <el-input v-model="form.expenses" type="digit"  style="width:70%"/>
+        <el-form-item label="地 址" prop="address">
+          <el-input v-model.number="form.address"   style="width:70%"/>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -184,7 +193,8 @@ export default {
         uname: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
         sex: [{ required: true, message: '请选择性别', trigger: 'blur' }],
         psd: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-        telephone: [{required: true, message: '请输入电话号码', trigger: 'blur' }]
+        telephone: [{required: true, message: '请输入电话号码', trigger: 'blur' }],
+        address: [{required: true, message: '请输入地址', trigger: 'blur' }]
       }
     }
 

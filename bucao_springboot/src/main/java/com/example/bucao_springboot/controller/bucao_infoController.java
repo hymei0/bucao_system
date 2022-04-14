@@ -64,7 +64,6 @@ public class bucao_infoController {
     {
         try {
             bucao_infoMapper.update(bucao_info, Wrappers.<Bucao_info>lambdaUpdate().eq(Bucao_info::getRfno, bucao_info.getRfno()).eq(Bucao_info::getRfid, bucao_info.getRfid()));
-            System.out.println(bucao_info.getRfno());
             return Result.success();
         }catch (Exception e){
             return Result.error("-1","更新错误");
@@ -95,6 +94,19 @@ public class bucao_infoController {
         QueryWrapper<Bucao_info> queryWrapper = new QueryWrapper<>();
         List<Map<String, Object>> list=bucao_infoMapper.selectMaps(queryWrapper);
         return list;
+    }
+
+    //入库数据统计
+    @GetMapping("/indata")
+    public Result<?>  indata(){
+        //查询数据库中所有数据月份和数据
+        return Result.success(bucao_infoMapper.Indata());
+    }
+    //入库数据统计
+    @GetMapping("/outdata")
+    public Result<?>  echarts(){
+        //查询数据库中所有数据月份和数据
+        return Result.success(bucao_infoMapper.Outdata());
     }
 
     //查询一条信息接口

@@ -4,6 +4,20 @@
 </style>
 <template>
   <div class="Bucao_room" style="padding:10px">
+    <!-- 面包屑导航 -->
+    <el-breadcrumb prefix-icon="arrow-right-bold " style="width: 100%;margin-top: 10px;margin-left: 10px">
+      <el-breadcrumb-item style="font-size: large; ">布草管理</el-breadcrumb-item>
+      <el-breadcrumb-item style="font-size: large; ">布草-病房信息</el-breadcrumb-item>
+    </el-breadcrumb>
+    <!-- 搜索，切换 -->
+    <el-row :gutter="23">
+      <el-col :span="18">
+        <el-divider></el-divider>
+
+      </el-col>
+      <el-col :span="6">
+      </el-col>
+    </el-row>
     <!--    功能区域-->
     <div style="display: flex; margin: 10px 0"  align="left">
       <div style="width: 10%;display: flex" align="left">

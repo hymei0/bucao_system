@@ -1,5 +1,4 @@
 package com.example.bucao_springboot.controller;
-
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
@@ -10,7 +9,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
-import com.example.bucao_springboot.entity.Room_info;
 import com.example.bucao_springboot.entity.User_info;
 import com.example.bucao_springboot.mapper.User_infoMapper;
 import org.springframework.web.bind.annotation.*;
@@ -79,6 +77,7 @@ public class User_infoController {
         try {
             User_info user=user_infoMapper.selectOne(Wrappers.<User_info>lambdaQuery().eq(User_info::getID,user_info.getID()).or().eq(User_info::getTelephone,user_info.getTelephone()));
             if(user==null) {
+                user_info.setPsd(user_info.getID());
                 user_infoMapper.insert(user_info);
                 System.out.println("User_info已添加用户"+user_info.getID()+"信息：");
                 return Result.success();
@@ -89,6 +88,7 @@ public class User_infoController {
             }
         }catch (Exception e)
         {
+            System.out.println(e.toString());
             return Result.error("-1","系统后台出错啦，请联系工作人员");
         }
     }
@@ -135,9 +135,9 @@ public class User_infoController {
     @GetMapping("/{id}")
     public Result<?> SelectPerson_Info(@PathVariable String id)
     {
-        user_infoMapper.selectById(id);
+        User_info user=user_infoMapper.selectById(id);
         System.out.println("User_info已查询到用户"+id+"的信息");
-        return Result.success();
+        return Result.success(user);
     }
 
 
@@ -174,8 +174,6 @@ public class User_infoController {
             row1.put("头像", user_info.getPortrait());
             row1.put("联系电话", user_info.getTelephone());
             row1.put("地址", user_info.getAddress());
-            row1.put("住院时间(天)", user_info.getDays());
-            row1.put("欠费情况(￥)", user_info.getExpenses());
             list.add(row1);
         }
         // 2. 写excel
@@ -216,8 +214,7 @@ public class User_infoController {
             user_info.setTelephone(row.get(4).toString());
             user_info.setAddress(row.get(5).toString());
             user_info.setPsd(row.get(0).toString());
-            user_info.setDays(Integer.parseInt(row.get(6).toString()));
-            user_info.setExpenses(Double.parseDouble(row.get(7).toString()));
+            //user_info.setExpenses(Double.parseDouble(row.get(7).toString()));
 
             saveList.add(user_info);
         }

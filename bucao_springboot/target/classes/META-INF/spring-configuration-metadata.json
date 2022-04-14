@@ -1,0 +1,32 @@
+{
+  "groups": [
+    {
+      "name": "alipay",
+      "type": "com.example.bucao_springboot.common.AliPayConfig",
+      "sourceType": "com.example.bucao_springboot.common.AliPayConfig"
+    }
+  ],
+  "properties": [
+    {
+      "name": "alipay.alipay-public-key",
+      "type": "java.lang.String",
+      "sourceType": "com.example.bucao_springboot.common.AliPayConfig"
+    },
+    {
+      "name": "alipay.app-id",
+      "type": "java.lang.String",
+      "sourceType": "com.example.bucao_springboot.common.AliPayConfig"
+    },
+    {
+      "name": "alipay.app-private-key",
+      "type": "java.lang.String",
+      "sourceType": "com.example.bucao_springboot.common.AliPayConfig"
+    },
+    {
+      "name": "alipay.notify-url",
+      "type": "java.lang.String",
+      "sourceType": "com.example.bucao_springboot.common.AliPayConfig"
+    }
+  ],
+  "hints": []
+}

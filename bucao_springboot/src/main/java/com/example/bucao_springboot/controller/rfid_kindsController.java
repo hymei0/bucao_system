@@ -48,6 +48,7 @@ public class rfid_kindsController {
                 return Result.error("-1","该类布草已经存在");
             }
         }catch (Exception e){
+            System.out.println(e.toString());
             return Result.error("-1","系统错误，请稍后重试");
         }
 
@@ -89,6 +90,16 @@ public class rfid_kindsController {
             }
         }
         return Result.success( rfid_kindsMapper);
+    }
+    //查询各种布草的库存
+    @GetMapping("/kinds_stocks")
+    public Result<?>  kinds_stocks(){
+        return Result.success(rfid_kindsMapper.STOCKS());
+    }
+    //查询各种布草的库存
+    @GetMapping("/section_stocks")
+    public Result<?>  kinds_section(){
+        return Result.success(rfid_kindsMapper.STOCKS_setion());
     }
 
     //分页查询

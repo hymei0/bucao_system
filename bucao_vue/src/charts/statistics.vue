@@ -4,9 +4,8 @@
   <div class="stbox">
     <!-- 面包屑导航 -->
     <el-breadcrumb prefix-icon="arrow-right-bold " style="width: 100%;margin-top: 10px;margin-left: 10px">
-      <el-breadcrumb-item >图表</el-breadcrumb-item>
-
-      <el-breadcrumb-item>系统数据可视化</el-breadcrumb-item>
+      <el-breadcrumb-item style="font-size: large; ">图表</el-breadcrumb-item>
+      <el-breadcrumb-item style="font-size: large; ">系统数据可视化</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 搜索，切换 -->
     <el-row :gutter="23">
@@ -16,7 +15,6 @@
             title="欢迎使用 , 系统已正常运行38天"
             type="success">
           </el-alert>
-
       </el-col>
       <el-col :span="6">
       </el-col>
@@ -25,17 +23,17 @@
     <el-row :gutter="23">
       <el-col :span="8" class="text-c">
         <div class="st-gbox">
-          <div class="cavasbox" ref="SCEchart"></div>
+          <div class="cavasbox" ref="INDATA_chart"></div>
         </div>
       </el-col>
       <el-col :span="8" class="text-c">
         <div class="st-gbox">
-          <div class="cavasbox" ref="SUMEchart"></div>
+          <div class="cavasbox" ref="OUTDATA_Echart"></div>
         </div>
       </el-col>
       <el-col :span="8" class="text-c">
         <div class="st-gbox">
-          <div class="cavasbox" ref="ClickEchart"></div>
+          <div class="cavasbox" ref="ScrapEchart"></div>
         </div>
       </el-col>
     </el-row>
@@ -44,12 +42,12 @@
       <el-row :gutter="23">
         <el-col :span="12" class="text-c">
           <div class="paybox">
-            <div class="cavasbox" ref="payEchart"></div>
+            <div class="cavasbox" ref="BucaoKindsEchart"></div>
           </div>
         </el-col>
         <el-col :span="12" class="text-c">
           <div class="paybox">
-            <div class="cavasbox" ref="payNumEchart"></div>
+            <div class="cavasbox" ref="Distribute_Echart"></div>
           </div>
         </el-col>
       </el-row>
@@ -59,21 +57,23 @@
 <script type="text/ecmascript-6">
 
 import * as echarts from 'echarts';
+import request from "@/utils/request";
 export default {
   name: "welcome",
   data() {
     return {
       machineNo: '',
       type: 'day',
+
       //  布草入库总量条形统计图
-      SCEoption: {
+      INDATAoption: {
         tooltip: {
           trigger: 'item',
           formatter: "{a} <br/>{b}月 : {c}"
         },
         legend: {
           data: [{
-            name: '布草入库总量',
+            name: '2022年布草入库总量',
             icon: 'rect'
           }],
           top: 1,
@@ -129,10 +129,10 @@ export default {
           }
         },
         series: [{
-          name: '布草入库总量',
+          name: '2022年布草入库总量',
           type: 'bar',
           barGap: 0,
-          data: [6000, 8000,9000, 5000, 6000, 3000, 4000, 6000, 5000, 4000, 6000, 4000],
+          data: [0,0,0,0,0,0,0,0,0,0,0,0],
           barWidth: 10,
           itemStyle: {
             normal: {
@@ -159,14 +159,14 @@ export default {
         }]
       },
       //  布草回收情况折线统计图
-      SUMoption: {
+      OUTDATA_option: {
         tooltip: {
           trigger: 'item',
           formatter: "{a} <br/>{b}月 : {c}"
         },
         legend: {
           data: [{
-            name: '布草回收情况',
+            name: '2022年布草回收情况',
             icon: 'rect'
           }],
           top: 1,
@@ -222,11 +222,11 @@ export default {
           }
         },
         series: [{
-          name: '布草回收情况',
+          name: '2022年布草回收情况',
           //   type: 'bar',
           type: 'line',
           barGap: 0,
-          data: [3000, 5000, 6500, 2000, 2900, 1000, 3000, 4000, 2000, 3000, 4000, 5000],
+          data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
           barWidth: 10,
           itemStyle: {
             color: "#108ff9"
@@ -234,14 +234,14 @@ export default {
         }]
       },
       //  布草报废情况条形统计图
-      Clickoption: {
+      Scrapoption: {
         tooltip: {
           trigger: 'item',
           formatter: "{a} <br/>{b}月 : {c}"
         },
         legend: {
           data: [{
-            name: '布草报废情况汇总',
+            name: '2022年布草报废情况汇总',
             icon: 'rect'
           }],
           top: 1,
@@ -297,10 +297,10 @@ export default {
           }
         },
         series: [{
-          name: '布草报废情况汇总',
+          name: '2022年布草报废情况汇总',
           type: 'bar',
           barGap: 0,
-          data: [900, 1000, 1800, 300, 500, 600, 400, 800, 500, 200, 600, 400],
+          data: [0, 0,0,0,0,0,0,0,0,0,0,0],
           barWidth: 10,
           itemStyle: {
             color: "#48cefd"
@@ -308,7 +308,7 @@ export default {
         }]
       },
       //  医院布草类型信息统计图
-      payoption: {
+      BucaoKindsoption: {
         backgroundColor: '#2c343c',
         title: {
           text: '医院布草类型统计信息',
@@ -339,14 +339,8 @@ export default {
             type: 'pie',
             radius: '55%',
             center: ['50%', '50%'],
-            data: [
-              { value: 335, name: '床上用品' },
-              { value: 310, name: '医疗仪器护罩' },
-              { value: 274, name: '医疗服' },
-              { value: 235, name: '病号服' },
-              { value: 100, name: '隔离类布草' }
-            ].sort(function (a, b) { return a.value - b.value; }),
-            roseType: 'radius',
+            data: [].sort(function (a, b) { return a.value - b.value; }),
+            roseType: 'area',
             label: {
               normal: {
                 textStyle: {
@@ -366,7 +360,7 @@ export default {
             },
             itemStyle: {
               normal: {
-                color: '#c23531',
+                color: '#e71414',
                 shadowBlur: 200,
                 shadowColor: 'rgba(0, 0, 0, 0.5)'
               }
@@ -380,7 +374,7 @@ export default {
           }
         ]
       },
-      payNumoption: {
+      Distribute_option: {
         backgroundColor: '#2c343c',
         title: {
           text: '医院布草分布信息',
@@ -412,11 +406,6 @@ export default {
             radius: '55%',
             center: ['50%', '50%'],
             data: [
-              { value: 335, name: '急诊' },
-              { value: 310, name: '普通门诊' },
-              { value: 274, name: '发热门诊' },
-              { value: 535, name: '住院部' },
-              { value: 100, name: '医疗器材布草' }
             ].sort(function (a, b) { return a.value - b.value; }),
             roseType: 'radius',
             label: {
@@ -460,41 +449,81 @@ export default {
     // 点聚合组件
   },
   // 创建完毕状态(里面是操作)
-  created() { },
+  created() {
+
+  },
   // 挂载结束状态(里面是操作)
   mounted() {
-    this.getSCE()
-    this.getSUM()
-    this.getClick()
-    this.getpay()
-    this.getpayNum()
+    this.getINDATA()
+    this.getOUTDATA_()
+    this.getScrap()
+    this.getBucaoKinds()
+    this.getDistribute_()
   },
   // 里面的函数只有调用才会执行
   methods: {
-    // 交易总笔数
-    getSCE() {
-      this.chart = echarts.init(this.$refs.SCEchart)
-      this.chart.setOption(this.SCEoption)
+    // 布草入库数据统计
+    getINDATA() {
+      this.chart1 = echarts.init(this.$refs.INDATA_chart)
+      request.get("/Bucao_info/indata").then(res=>{
+          for(var i=0;i<res.data.length;i++)
+          {
+             this.INDATAoption.series[0].data[parseInt(res.data[i].month)-1]=res.data[i].num
+          }
+        this.chart1.setOption(this.INDATAoption,true)
+      })
+
     },
-    // 交易总金额
-    getSUM() {
-      this.chart = echarts.init(this.$refs.SUMEchart)
-      this.chart.setOption(this.SUMoption)
+    // 布草出库数据统计
+    getOUTDATA_() {
+      this.chart2 = echarts.init(this.$refs.OUTDATA_Echart)
+      request.get("/Bucao_info/outdata").then(res=>{
+        for(var i=0;i<res.data.length;i++)
+        {
+          this.OUTDATA_option.series[0].data[parseInt(res.data[i].month)-1]=res.data[i].num
+        }
+        this.chart2.setOption(this.OUTDATA_option,true)
+      })
+
     },
-    // 总点击量
-    getClick() {
-      this.chart = echarts.init(this.$refs.ClickEchart)
-      this.chart.setOption(this.Clickoption)
+    // 布草报废数据统计
+    getScrap() {
+      this.chart3 = echarts.init(this.$refs.ScrapEchart)
+      request.get("/Bucao_info/outdata").then(res=>{
+        for(var i=0;i<res.data.length;i++)
+        {
+          this.Scrapoption.series[0].data[parseInt(res.data[i].month)-1]=res.data[i].num
+        }
+        this.chart3.setOption(this.Scrapoption,true)
+      })
+
     },
-    // 支付方式统计
-    getpay() {
-      this.chart = echarts.init(this.$refs.payEchart)
-      this.chart.setOption(this.payoption)
+    // 布草种类库存据统计
+    getBucaoKinds() {
+      this.chart4 = echarts.init(this.$refs.BucaoKindsEchart)
+      request.get("/rfid_kinds/kinds_stocks").then(res=>{
+        for(var i=0;i<res.data.length;i++)
+        {
+          this.BucaoKindsoption.series[0].data.push({name:res.data[i].kind,value:res.data[i].stocks})
+        }
+        this.BucaoKindsoption.series[0].data.sort(function (a, b) { return a.value - b.value; }),
+
+            this.chart4.setOption(this.BucaoKindsoption,true)
+      })
     },
-    // 支付方式统计
-    getpayNum() {
-      this.chart = echarts.init(this.$refs.payNumEchart)
-      this.chart.setOption(this.payNumoption)
+    // 布草分布数据统计
+    getDistribute_() {
+      this.chart5 = echarts.init(this.$refs.Distribute_Echart)
+      request.get("/rfid_kinds/section_stocks").then(res=>{
+        for(var i=0;i<res.data.length;i++)
+        {
+          this.Distribute_option.series[0].data.push({name:res.data[i].section,value:res.data[i].stocks})
+        }
+        this.Distribute_option.series[0].data.sort(function (a, b) { return a.value - b.value; }),
+
+            this.chart5.setOption(this.Distribute_option,true)
+      })
+
     }
 
   }

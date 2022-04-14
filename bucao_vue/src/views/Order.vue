@@ -3,7 +3,21 @@
 
 </style>
 <template>
-  <div class="Bucao_info" style="padding:10px">
+  <div class="order" style="padding:10px">
+    <!-- 面包屑导航 -->
+    <el-breadcrumb prefix-icon="arrow-right-bold " style="width: 100%;margin-top: 10px;margin-left: 10px">
+      <el-breadcrumb-item style="font-size: large; ">用户管理</el-breadcrumb-item>
+      <el-breadcrumb-item style="font-size: large; ">订单信息</el-breadcrumb-item>
+    </el-breadcrumb>
+    <!-- 搜索，切换 -->
+    <el-row :gutter="23">
+      <el-col :span="18">
+        <el-divider></el-divider>
+
+      </el-col>
+      <el-col :span="6">
+      </el-col>
+    </el-row>
     <!--    功能区域-->
     <div style="display: flex; margin: 10px 0"  align="left">
       <div style="width: 10%;display: flex" align="left">
@@ -22,21 +36,24 @@
     </div>
 
     <!--    数据展示区-->
-    <el-table :data="Bucao_infotable" border stripe style="width: 100%" @selection-change="handleSelectionChange"> <!--显示表格边框和斑马纹-->
+    <el-table :row-class-name="tableRowClassName" v-model:data="Ordertable" border stripe style="width: 100%" @selection-change="handleSelectionChange"> <!--显示表格边框和斑马纹-->
       <el-table-column type="selection" width="55"></el-table-column>
-      <el-table-column prop="rfno" label="布草类型" sortable /> <!--prop:属性名  label:表头的名字-->
-      <el-table-column prop="rfid" label="RFID编号" sortable />
-      <el-table-column prop="state" label="布草状态" />
-      <el-table-column prop="washtimes" label=洗涤次数 />
-      <el-table-column prop="indate" label=入库时间 />
-      <el-table-column prop="outdate" label=出库时间 />
+      <el-table-column prop="userid" label="证件号" sortable /> <!--prop:属性名  label:表头的名字-->
+      <el-table-column prop="roomId" label="病房号" />
+      <el-table-column prop="uname" label="名字" />
+      <el-table-column prop="sex" label="性别" />
+      <el-table-column prop="telephone" label="联系电话" />
+      <el-table-column prop="address" label="地址" />
+      <el-table-column prop="days" label="住院天数" />
+      <el-table-column prop="expenses" label="欠费情况(￥)" style="color: red"/>
       <el-table-column fix="right" label="操作" >
         <!--        内容修改区-->
         <template #default="scope">
           <el-button  type="text"  @click="handleEdit(scope.row)">编辑</el-button>
-          <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.rfno,scope.row.rfid)">
+          <el-button  type="text"  @click="handlebuy(scope.row)" v-bind:disabled="scope.row.expenses<=0" style="color: green">支付</el-button>
+          <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.userid,scope.row.roomId)">
             <template #reference>
-              <el-button  type="danger" >删除</el-button>
+              <el-button  type="text" style="color: red" >删除</el-button>
             </template>
           </el-popconfirm>
         </template>
@@ -46,68 +63,63 @@
     <div style="display: flex">
       <div class="demo-pagination-block">
         <el-pagination
-          v-model:currentPage="currentPage"
-          v-model:page-size="pageSize"
-          :page-sizes="[40,30,20,10]"
-          layout="total, sizes, prev, pager, next, jumper "
-          :total="total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-      >
+            v-model:currentPage="currentPage"
+            v-model:page-size="pageSize"
+            :page-sizes="[40,30,20,10]"
+            layout="total, sizes, prev, pager, next, jumper "
+            :total="total"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+        >
 
-        <!--        添加的的对话框-->
+          <!--        添加的的对话框-->
         </el-pagination>
       </div>
       <!--    导入导出-->
       <div style="margin-top: 5px;margin-left: 10px">
-        <el-upload
-            :action=excelUploadUrl
-            :on-success="handleUploadSuccess"
-            :show-file-list=false
-            :limit="1"
-            accept='.xlsx'
-            style="display: inline-block; margin: 0 10px">
-          <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" >导入</el-button>
 
-        </el-upload>
-
-        <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" @click="exportdata">导出</el-button>
+        <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" @click="handleDownload">导出</el-button>
 
       </div>
     </div>
-    <el-dialog v-model="dialogVisible" title="布草信息管理" width="30%" :before-close="handleClose">
+    <el-dialog v-model="dialogVisible" title="用户信息" width="30%" :before-close="handleClose">
       <el-form :model="form" label-width="120px" :rules="rules">
-        <el-form-item label="布草类型" prop="rfno">
-          <el-select v-model="form.rfno" class="m-2" placeholder="Select" size="large" v-bind:disabled="edi">
+
+        <el-form-item label="账  号" prop="userid">
+          <el-select v-model="form.userid" class="m-2" @change="GetUserName" default-first-option="true" placeholder="Select" size="large" v-bind:disabled="edi">
             <el-option
-                v-for="item in options"
-                :key="item.kind+item.note"
-                :label="item.kind+item.note"
-                :value="item.RFNO"
+                v-for="item in userIDoptions"
+                :key="item.ID"
+                :label="item.ID"
+                :value="item.ID"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="RFID编号" prop="rfid">
-          <el-input v-model="form.rfid" style="width:70%" autocomplete="off" v-bind:disabled="edi"/>
+        <el-form-item label="姓  名" prop="uname">
+          <el-input v-model="form.uname" autocomplete="off"  style="width:70%" disabled/>
         </el-form-item>
-        <el-form-item label="状  态" prop="state">
-          <el-select v-model="form.state" class="m-2" placeholder="Select" size="large">
+        <el-form-item label="性  别" prop="sex">
+          <el-input v-model.number="form.sex"   style="width:70%" disabled/>
+        </el-form-item>
+        <el-form-item label="电 话" prop="telephone">
+          <el-input v-model.number="form.telephone"   style="width:70%" disabled/>
+        </el-form-item>
+        <el-form-item label="病房号" prop="roomId">
+          <el-select v-model="form.roomId" class="m-2"  default-first-option="true" placeholder="Select" size="large" v-bind:disabled="edi">
             <el-option
-                v-for="item in options1"
-                :key="item.lable"
-                :label="item.lable"
-                :value="item.value"
+                v-for="item in roomoptions"
+                :key="item.id"
+                :label="item.id"
+                :value="item.id"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="洗涤次数" prop="washtimes">
-          <el-input v-model="form.washtimes" autocomplete="off"  style="width:70%"/>
+
+        <el-form-item label="住院天数" prop="days">
+          <el-input v-model.number="form.days"   style="width:70%"/>
         </el-form-item>
-        <el-form-item label="入库时间" prop="indate">
-          <el-date-picker v-model="form.indate" type="date" placeholder="选择日期" style="width:70%"/>
-        </el-form-item>
-        <el-form-item label="出库时间" v-if="form.state=='已报废'" prop="outdate">
-          <el-date-picker v-model="form.outdate" type="date" placeholder="选择日期" style="width:70%"/>
+        <el-form-item label="欠费情况" prop="days">
+          <el-input v-model="form.expenses" type="digit"  style="width:70%"/>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -124,13 +136,15 @@
 
 import { ref } from 'vue'
 import request from "@/utils/request";
+import {ElMessage} from "element-plus";
 
+var XLSX = require("xlsx");
 const samll = ref(false)
 const background = ref(true)
 const disabled = ref(false)
 
 export default {
-  name: "Bucao_info",
+  name: "order",
   components: {
   },
 
@@ -147,49 +161,30 @@ export default {
       tag:'',   //1表示编辑修改数据，0表示新增数据
 //对象区
       //RFID标签类别信息表
-      Bucao_infotable:[],
+      Ordertable:[],
       options:[],
+      userIDoptions:[],
+      roomoptions:[],
       ids: [],
-      excelUploadUrl:'http://localhost:9090/Bucao_info/import',
+      filesUploadUrl: "http://" + "localhost" + ":9090/files/upload",   //头像图片上传地址
+      excelUploadUrl:'http://localhost:9090/Order/import',
       //布草状态：
       options1:[
         {
-          value: '使用中',
-          label: '使用中',
+          label: '男',
         },
         {
-          value: '洗涤中',
-          label: '洗涤中',
-        },
-        {
-          value: '待回收',
-          label: '待回收',
-        },
-        {
-          value: '闲置中',
-          label: '闲置中',
-        },
-        {
-          value: '已报废',
-          label: '已报废',
-        },
-        {
-          value: '已回收',
-          label: '已回收',
-        },
-        {
-          value: '未知',
-          label: '未知',
+          label: '女',
         }
       ],
       //表单验证
       rules :{
-        rfno: [{ required: true, message: '请选择布草类型', trigger: 'blur' }],
-        rfid: [{ required: true, message: '请输入RFID编码', trigger: 'blur' }],
-        state: [{ required: true, message: '请选择布草状态', trigger: 'blur' }],
-        washtimes: [{ required: true, message: '请输入洗涤次数', trigger: 'blur' }],
-        indate: [{required: true, message: '请选择入库时间', trigger: 'blur' }],
-        outdate: [{required: true, message: '请选择报废时间', trigger: 'blur' }]
+        userid: [{ required: true, message: '请输入证件号', trigger: 'blur' }],
+        uname: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+        roomId: [{ required: true, message: '请选择病房号', trigger: 'blur' }],
+        sex: [{ required: true, message: '请选择性别', trigger: 'blur' }],
+        psd: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+        telephone: [{required: true, message: '请输入电话号码', trigger: 'blur' }]
       }
     }
 
@@ -200,16 +195,47 @@ export default {
 
 //方法区
   methods:{
+    handlebuy(row) {
+      request.get("/order/buy/" + bookId).then(res => {
+        // 请求成功跳转沙箱支付的页面
+        window.open(res.data)
+      })
+    },
+
+    //标红table指定行
+    tableRowClassName({row, rowIndex}) {
+
+      //判断条件（quantityStock ，warningLimit ，quantityStock 列表字段信息）
+      if (row.expenses > 0) {
+        // 后面的css样式
+        return 'warning-row';
+
+      } else {
+        return 'success-row';
+      }
+
+      return '';
+    },
+
+    //获取用户姓名函数
+    GetUserName(){
+      request.get("/User_info/"+this.form.userid).then(res=>{
+        this.form.uname=res.data.uname
+        this.form.sex=res.data.sex
+        this.form.telephone=res.data.telephone
+      })
+    },
+
     handleSelectionChange(val) {
-      this.ids = val.map(v => [v.rfno,v.rfid])   // [{id,name}, {id,name}] => [id,id]
+      this.ids = val.map(v => [v.userid,v.roomId])   // [{id,name}, {id,name}] => [id,id]
     },
     deleteBatch() {
-      console.log(this.ids)
+
       if (!this.ids.length) {
         this.$message.warning("请选择数据！")
         return
       }
-      request.post("/Bucao_info/deleteBatch", this.ids).then(res => {
+      request.post("/Order/deleteBatch", this.ids).then(res => {
         if (res.code === '1') {
           this.$message.success("批量删除成功")
           this.load()
@@ -227,7 +253,7 @@ export default {
     },
     //数据导出：法一：从后端的数据库中导出
     exportdata() {
-      location.href = "http://" + "localhost" + ":9090/Bucao_info/export";
+      location.href = "http://" + "localhost" + ":9090/Order/export";
     },
     //添加按钮事件处理
     add()
@@ -239,18 +265,20 @@ export default {
     },
     //查询
     load(){
-      request.get("/rfid_kinds/bucaoinfo" ).then(re =>{
-        this.options=re
+      request.get("/Room_info/selectall" ).then(re =>{
+        this.roomoptions=re.data
       })
-      request.get("/Bucao_info",  {
+      request.get("/User_info/selectall" ).then(re =>{
+        this.userIDoptions=re.data
+      })
+      request.get("/Order",  {
         params:{
           pageNum: this.currentPage,
           pageSize: this.pageSize,
           search: this.search
         }
       }).then(res =>{
-        console.log(res)
-        this.Bucao_infotable=res.data.records
+        this.Ordertable=res.data.records
         this.total=res.data.total
       })
     },
@@ -262,12 +290,11 @@ export default {
       this.dialogVisible=true   //打开弹窗
     },
     //删除按钮事件处理
-    handleDelete(rfno1,rfid1){
-
-      request.delete("/Bucao_info",{
+    handleDelete(id1,id2){
+      request.delete("/Order",{
         params:{
-          rfno:rfno1,
-          rfid:rfid1
+          userid:id1,
+          roomId:id2
         }
       }).then(res=>{
         if(res.code==='1')
@@ -302,7 +329,7 @@ export default {
     {
       if(this.tag==='1')//该项记录的主键存在，进行更新操作
       {
-        request.put("/Bucao_info",this.form).then(res=>{
+        request.put("/Order",this.form).then(res=>{
           if(res.code==='1')
           {
             this.$message({
@@ -321,14 +348,14 @@ export default {
             this.form={}
           }
         }).catch(err =>{
-          this.$message.error('添加失败，请稍后再试！')
+          this.$message.error('修改失败，请稍后再试！')
         })
       }
       else  //新增
       {
         console.log(this.options)
 
-        request.post("/Bucao_info",this.form).then(res=>{
+        request.post("/Order",this.form).then(res=>{
           console.log(res)
           if(res.code==='1')
           {
@@ -349,7 +376,35 @@ export default {
           }
         })
       }
-    }
+    },
+    //数据导出：从前端导出
+    handleDownload() {
+      var workbook = XLSX.utils.book_new();//新建一个新的工作表
+      var worksheet = XLSX.utils.json_to_sheet(this.Ordertable,{heard:["userid","roomId","uname","sex","telephone","address",,"days","expenses"]});//从 JS 值数组的数组创建工作表
+      XLSX.utils.book_append_sheet(workbook, worksheet, "RFID分类表");//将工作表附加到工作簿
+      // let workbook = XLSX.utils.table_to_book(document.getElementById('table'))//通过抓取页面中的 HTML TABLE 创建工作表
+      try {
+        XLSX.utils.sheet_add_aoa(worksheet, [
+          // <-- Do nothing in row 4
+          [ "证件号", "病房号","名字", "性别","电话","地址","住院天数","应缴费用"/*F1*/]  // <-- Write "abc" to cell E5
+        ]);
+        XLSX.writeFile(workbook, '订单信息.xlsx')//导出工作表
+      } catch(e) {
+        console.log(e, workbook);
+      }
+    },
   }
 }
 </script>
+
+<style scoped>
+
+/deep/ .el-table .success-row {
+  color: rgb(27, 33, 27) !important;
+}
+
+/deep/ .el-table .warning-row {
+  color: #f51f1f !important;
+}
+
+</style>

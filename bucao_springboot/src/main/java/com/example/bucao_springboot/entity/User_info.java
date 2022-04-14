@@ -16,6 +16,5 @@ public class User_info {
     private String telephone;
     private String address;
     private String sex;
-    private int days;
-    private double expenses;
+
 }

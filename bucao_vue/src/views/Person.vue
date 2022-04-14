@@ -1,7 +1,18 @@
 <template>
   <div >
-
-
+    <!-- 面包屑导航 -->
+    <el-breadcrumb prefix-icon="arrow-right-bold " style="width: 100%;margin-top: 10px;margin-left: 10px">
+      <el-breadcrumb-item style="font-size: large; ">我的</el-breadcrumb-item>
+      <el-breadcrumb-item style="font-size: large; ">个人信息</el-breadcrumb-item>
+    </el-breadcrumb>
+    <!-- 搜索，切换 -->
+    <el-row :gutter="23">
+      <el-col :span="18">
+        <el-divider></el-divider>
+      </el-col>
+      <el-col :span="6">
+      </el-col>
+    </el-row>
     <el-card style="width:50%;margin: 100px 300px">
       <h2 style="text-align: center;padding-bottom: 40px">个人信息</h2>
       <el-form ref="form" :model="form" label-width="80px" :label-position="labelPosition" style="width: 65%;margin-left: 90px" align="center">
@@ -41,12 +52,7 @@
         <el-form-item label="电 话" prop="telephone">
           <el-input v-model="form.telephone" v-bind:disabled='!edi'></el-input>
         </el-form-item>
-        <el-form-item label="住院天数" prop="days" v-if="form.roles==='user'">
-          <el-input v-model.number="form.days" v-bind:disabled='!edi'></el-input>
-        </el-form-item>
-        <el-form-item label="应缴费用" prop="expenses" :precision="2" v-if="form.roles==='user'">
-          <el-input v-model="form.expenses" type="digit" v-bind:disabled='!edi'></el-input>
-        </el-form-item>
+
         <el-form-item style="display: flex" >
           <div style="width: 100%" align="center">
             <el-button type="primary" :icon="ico"  style="width: 50px;" v-bind:disabled='edi' @click="update"/>

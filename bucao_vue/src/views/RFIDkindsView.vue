@@ -1,5 +1,19 @@
 <template>
   <div class="home" style="padding:10px">
+    <!-- 面包屑导航 -->
+    <el-breadcrumb prefix-icon="arrow-right-bold " style="width: 100%;margin-top: 10px;margin-left: 10px">
+      <el-breadcrumb-item style="font-size: large; ">系统信息</el-breadcrumb-item>
+      <el-breadcrumb-item style="font-size: large; ">RFID标签分类</el-breadcrumb-item>
+    </el-breadcrumb>
+    <!-- 搜索，切换 -->
+    <el-row :gutter="23">
+      <el-col :span="18">
+        <el-divider></el-divider>
+
+      </el-col>
+      <el-col :span="6">
+      </el-col>
+    </el-row>
 <!--    功能区域-->
     <div style="display: flex; margin: 10px 0"  align="left">
       <div style="width: 10%;display: flex" align="left">
@@ -307,7 +321,7 @@ export default {
             this.form={}
           }
         }).catch(err =>{
-          this.$message.error('添加失败，请稍后再试！')
+          this.$message.error('更新失败，请稍后再试！')
       })
       }
       else  //新增
