@@ -116,10 +116,10 @@
         </el-form-item>
 
         <el-form-item label="入院日期" prop="comeTime">
-          <el-date-picker v-model="form.comeTime" @change="dataChange(form.comeTime)" type="date" placeholder="选择日期" style="width:70%"/>
+          <el-date-picker v-model="form.comeTime"  type="date" placeholder="选择日期" style="width:70%"/>
         </el-form-item>
         <el-form-item label="出院日期" prop="outTime">
-          <el-date-picker v-model="form.outTime" @change="dataChange(form.outTime)" type="date" placeholder="选择日期" style="width:70%"/>
+          <el-date-picker v-model="form.outTime"  type="date" placeholder="选择日期" style="width:70%"/>
         </el-form-item>
         <el-form-item label="应缴费用" prop="days">
           <el-input v-model="form.expenses" type="digit"  style="width:70%"/>
@@ -141,6 +141,7 @@
 import { ref } from 'vue'
 import request from "@/utils/request";
 import {ElMessage} from "element-plus";
+import {getDateNums} from "@/utils/getorderno";
 
 var XLSX = require("xlsx");
 const samll = ref(false)
@@ -170,6 +171,7 @@ export default {
       userIDoptions:[],
       roomoptions:[],
       ids: [],
+      orderno:'',
       filesUploadUrl: "http://" + "localhost" + ":9090/files/upload",   //头像图片上传地址
       excelUploadUrl:'http://localhost:9090/User_room/import',
       //布草状态：
@@ -200,15 +202,32 @@ export default {
 //方法区
   methods:{
     handlebuy(row) {
-      request.get("/User_room/buy/" + bookId).then(res => {
+      this.order_nums(row.userid)
+      request.get("/Order/buy" ,{
+        params:{
+          userId:row.userid,
+          roomId:row.roomid,
+          orderNo:this.orderno
+        }
+      }).then(res => {
         // 请求成功跳转沙箱支付的页面
-        window.open(res.data)
+        location.href =(res.data)
       })
     },
-    dataChange(val) {
-      console.log(`时间格式---`, val)//时间格式--- (2) ['2021-01-01', '2021-01-09', __ob__: Observer]
 
+    //随机生成订单唯一的编号，加上用户的uid，每个用户都有属于自己的唯一uid（让后台去处理），生成随机订单号
+    order_nums(userid) {
+      var outTradeNo = ""; //订单号
+
+
+      for (var i = 0; i < 6; i++) //6位随机数，用以加在时间戳后面。
+      {
+        outTradeNo += Math.floor(Math.random() * 10);
+      }
+      outTradeNo = String(getDateNums(new Date())) + String(outTradeNo) + String(userid);
+      this.orderno = outTradeNo;
     },
+
     //标红table指定行
     tableRowClassName({row, rowIndex}) {
 

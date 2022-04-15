@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import net.sf.jsqlparser.expression.DateTimeLiteralExpression;
 
-import java.util.Date;
+import java.sql.Date;
 
 @TableName("ORDER_INFO")
 

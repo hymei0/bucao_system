@@ -19,14 +19,14 @@
       </div>
     </div>
 
-    <div style="width:100%;margin-top: 120px;margin-left: 180px">
+    <div style="width:100%;margin-top: 100px;margin-left: 180px">
       <h1 class="title" style="display: flex;margin-left:20px" >
         <img src="../assets/img/logo.png" style="width: 60px;height: 60px" alt="">
         <span style="padding-top: 5px;padding-left: 10px">布草智能柜管理系统</span>
       </h1>
 
       <el-card style="width:90%;margin: 30px -80px">
-        <h2 style="text-align: center;padding-bottom: 20px">注册</h2>
+        <h2 style="text-align: center;padding-bottom: 20px">注 册</h2>
         <el-form
             :model="form"
             status-icon
@@ -114,7 +114,8 @@ export default {
         id: [{ required: true, message: '请输入身份证号或手机号', trigger: 'blur' }],
         telephone:[{required:true,message:"请输入电话号码",trigger:'blur'},
           {min: 11, type:'number',max: 11, message: "请输入11位有效数字", trigger: 'blur'}],
-        confirm:[{required: true, message: '请确认密码', trigger: 'blur'}]
+        confirm:[{required: true, message: '请确认密码', trigger: 'blur'}],
+        sex:[{required:true,message:"请选择性别",trigger:'blur'}]
       }
     }
   },

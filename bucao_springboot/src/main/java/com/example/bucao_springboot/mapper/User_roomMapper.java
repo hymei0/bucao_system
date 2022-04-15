@@ -30,4 +30,7 @@ public interface User_roomMapper extends BaseMapper<User_room> {
     int delete1(String userid, String roomid);
     @Update("update user_room set come_time=#{date1},out_time=#{date2},expenses=#{exp} where userid=#{id2} and roomid=#{id1}")
     void update(Date date1, Date date2,Double exp, String id1, String id2);
+
+    @Select("SELECT * FROM USER_ROOM WHERE userid=#{userId}AND roomid=#{roomId}")
+    User_room selectById(String userId, String roomId);
 }

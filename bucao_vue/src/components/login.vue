@@ -20,7 +20,7 @@
 
   </div>
   <div>
-    <div style="width:85%;margin: 170px 210px">
+    <div style="width:85%;margin: 100px 210px">
       <h1 class="title" style="display: flex" >
         <img src="../assets/img/logo.png" style="width: 60px;height: 60px" alt="">
         <span style="padding-top: 5px;padding-left: 10px">布草智能柜管理系统</span>

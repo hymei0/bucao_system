@@ -40,6 +40,7 @@ export default {
     let str = sessionStorage.getItem("user_info") || "{}"
     //类型转换
     this.user = JSON.parse(str)
+
     if(this.user.portrait===null)
     //默认头像
     {

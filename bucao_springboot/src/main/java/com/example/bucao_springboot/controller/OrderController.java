@@ -12,7 +12,10 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
 import com.example.bucao_springboot.entity.Order;
+import com.example.bucao_springboot.entity.User_room;
 import com.example.bucao_springboot.mapper.OrderMapper;
+import com.example.bucao_springboot.mapper.Room_infoMapper;
+import com.example.bucao_springboot.mapper.User_roomMapper;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,6 +37,9 @@ import java.util.Map;
 public class OrderController {
     @Resource
     OrderMapper OrderMapper;
+
+    @Resource
+    User_roomMapper User_roomMapper;
 
     //新增接口
     @PostMapping
@@ -90,6 +97,34 @@ public class OrderController {
         QueryWrapper<Order> queryWrapper = new QueryWrapper<>();
         List<Map<String, Object>> list=OrderMapper.selectMaps(queryWrapper);
         return Result.success(list);
+    }
+
+    @GetMapping("/buy")
+    public Result<?> buy(@RequestParam String userId,
+                         @RequestParam String roomId,
+                         @RequestParam String orderNo) {
+        User_room User_room = User_roomMapper.selectById(userId,roomId);
+
+        String payUrl = "http://localhost:9090/alipay/pay?subject=" + "医疗费" + "&traceNo=" + orderNo + "&totalAmount=" + User_room.getExpenses();
+
+        //User user = getUser();
+        long millis=System.currentTimeMillis();
+        Date date=new Date(millis);
+        System.out.println("当前时间为"+date);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        Order order = new Order();
+        order.setOrderno(orderNo);
+        order.setExpenses(User_room.getExpenses());
+        order.setUserId(userId);
+        order.setRoomId(roomId);
+        order.setComeTime(User_room.getComeTime());
+        order.setOutTime(User_room.getOutTime());
+        order.setPaytime(date);
+        order.setState("未支付");
+        save(order);
+        // 新建订单，扣减库存
+        return Result.success(payUrl);
     }
 
     //分页查询
@@ -178,9 +213,6 @@ public class OrderController {
             Order.setOrderno(row.get(0).toString());
             Order.setUserId(row.get(1).toString());
             Order.setRoomId(row.get(2).toString());
-            Order.setComeTime(Date.valueOf(row.get(3).toString()));
-            Order.setOutTime(Date.valueOf(row.get(4).toString()));
-            Order.setPaytime(Date.valueOf(row.get(5).toString()));
             Order.setExpenses(Double.parseDouble(row.get(6).toString()));
 
             if(row.get(3).toString()==null   ||   row.get(3).toString().equals("")) {

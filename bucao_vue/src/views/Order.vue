@@ -190,6 +190,7 @@ export default {
       dialogVisible:false,
       form:{},
       edi:false,
+      user: {},
       tag:'',   //1表示编辑修改数据，0表示新增数据
 //对象区
       //RFID标签类别信息表
@@ -223,6 +224,14 @@ export default {
   },
   created() {
     this.load()
+    let userStr = sessionStorage.getItem("user_info") || "{}"
+    this.user = JSON.parse(userStr)
+    // 请求服务端，确认当前登录用户的 合法信息
+    request.get("/User_info/" + this.user.id).then(res => {
+      if (res.code === '1') {
+        this.user = res.data
+      }
+    })
   },
 
 //方法区
@@ -232,10 +241,6 @@ export default {
         // 请求成功跳转沙箱支付的页面
         window.open(res.data)
       })
-    },
-    dataChange(val) {
-      console.log(`时间格式---`, val)//时间格式--- (2) ['2021-01-01', '2021-01-09', __ob__: Observer]
-
     },
     //随机生成订单唯一的编号，加上用户的uid，每个用户都有属于自己的唯一uid（让后台去处理），生成随机订单号
     order_nums() {
