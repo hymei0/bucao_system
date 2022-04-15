@@ -5,32 +5,21 @@ import Vue from 'vue'
 export default createStore({
   // 变量状态
   state: {
-    person_info:{
-      id:'',
-      psd:'',
-      rule:'' // ‘u’表示普通用户，‘m’表示管理员
-    },
-    currentPathName: ''
-
-
+    user: {}
   },
-  //
-  getters: {
-  },
-  //
   mutations: {
-    UpdataPersonInfo(person_info,uform)
-    {
-      this.state.person_info=uform
-    },
-    setPath (state) {
-      state.currentPathName = localStorage.getItem("currentPathName")
-    },
+    SET_USER(state, user) {
+      state.user = user
+    }
   },
-  //
   actions: {
+    SET_USER({commit}, user) {
+      this.state.user = user
+    }
   },
-  //
+  getters: {
+    getUser: (state) => state.user
+  },
   modules: {
   }
 })

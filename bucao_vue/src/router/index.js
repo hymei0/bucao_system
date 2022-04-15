@@ -74,6 +74,11 @@ const routes = [
         path: 'datavisual',
         name: 'datavisual',
         component: ()=>import("@/charts/Datavisual.vue"),
+      },
+      {
+        path: 'user_room',
+        name: 'user_room',
+        component: ()=>import("@/views/User_room.vue"),
       }
     ]
 

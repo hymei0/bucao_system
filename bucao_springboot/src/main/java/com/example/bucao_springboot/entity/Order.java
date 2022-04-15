@@ -1,29 +1,36 @@
 package com.example.bucao_springboot.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.github.jeffreyning.mybatisplus.anno.MppMultiId;
-import lombok.Data;
 
-@TableName("USER_ROOM")
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import lombok.Data;
+import net.sf.jsqlparser.expression.DateTimeLiteralExpression;
+
+import java.util.Date;
+
+@TableName("ORDER_INFO")
 
 @Data
 public class Order {
-    @MppMultiId // 复合主键
-    private String userid;
-    @MppMultiId // 复合主键
+    @TableId
+    private String orderno;
+
+    private String userId;
+
     private String roomId;
 
-    @TableField(exist = false)
-    private String uname;
-    @TableField(exist = false)
-    private String sex;
-    @TableField(exist = false)
-    private String telephone;
-    @TableField(exist = false)
-    private String address;
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date comeTime;
 
-    private int days;
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date outTime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date paytime;
 
     private double expenses;
+
+    private String state;
 }

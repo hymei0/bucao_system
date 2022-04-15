@@ -1,6 +1,7 @@
 package com.example.bucao_springboot.controller;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.poi.excel.ExcelUtil;
@@ -10,8 +11,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
-import com.example.bucao_springboot.entity.Bucao_info;
-import com.example.bucao_springboot.entity.Order;
 import com.example.bucao_springboot.entity.Order;
 import com.example.bucao_springboot.mapper.OrderMapper;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -39,10 +39,10 @@ public class OrderController {
     public Result<?> save(@RequestBody Order order)
     {
         try {
-            Order user=OrderMapper.selectOne(Wrappers.<Order>lambdaQuery().eq(Order::getUserid,order.getUserid()).or().eq(Order::getRoomId,order.getRoomId()));
+            Order user=OrderMapper.selectOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderno,order.getOrderno()));
             if(user==null) {
                 OrderMapper.insert(order);
-                System.out.println("Order已添加用户"+order.getUserid()+"的订单信息：");
+                System.out.println("Order已添加用户"+order.getUserId()+"的订单信息：");
                 return Result.success();
             }
             else
@@ -60,9 +60,8 @@ public class OrderController {
     public Result<?> update(@RequestBody Order order)
     {
         try {
-            System.out.println(order);
-            OrderMapper.update(order.getDays(),order.getExpenses(),order.getRoomId(),order.getUserid());
 
+            OrderMapper.updateById(order);
             return Result.success();
         }catch (Exception e){
             System.out.println(e.toString());
@@ -71,18 +70,13 @@ public class OrderController {
 
     }
 
-
     //删除接口
-    @DeleteMapping
-    public Result<?> delete(@RequestParam String userid,
-                            @RequestParam String roomId)
+    @DeleteMapping("/{id}")
+    public Result<?> delete(@PathVariable String id)
     {
         try {
-            // Bucao_info bucao=bucao_infoMapper.selectOne(Wrappers.<Bucao_info>lambdaQuery().eq(Bucao_info::getRfno,bucao_info.getRfno()).eq(Bucao_info::getRfid,bucao_info.getRfid()));
-            QueryWrapper<Order> wrapper = new QueryWrapper<>();
 
-            wrapper.eq("userid", userid).eq("room_id", roomId);
-            int rows=OrderMapper.delete(wrapper);
+            int rows=OrderMapper.deleteById(id);
             //int rows = OrderMapper.delete1(userid,roomid);
             return Result.success();
         }catch (Exception e){
@@ -93,7 +87,9 @@ public class OrderController {
     //无条件查询
     @GetMapping("/selectall")
     public Result<?>  selectall(){
-        return Result.success(OrderMapper.GetOrder());
+        QueryWrapper<Order> queryWrapper = new QueryWrapper<>();
+        List<Map<String, Object>> list=OrderMapper.selectMaps(queryWrapper);
+        return Result.success(list);
     }
 
     //分页查询
@@ -103,16 +99,13 @@ public class OrderController {
                               @RequestParam(defaultValue = "") String search)
     //参数：pageNum：当前页，pageSize:每页多少条 search:查询关键字
     {
-
+        LambdaQueryWrapper<Order> wrapper = Wrappers.<Order>lambdaQuery();
         if(StrUtil.isNotBlank(search))//不为null,则进行模糊匹配
         {
-            Page<Order> Order_page=OrderMapper.findPage(new Page<>(pageNum,pageSize),search);
-            return Result.success(Order_page);
+            wrapper.like(Order::getOrderno,search);//eq(a,b)<=>a=b
         }
-        else{
-            Page<Order> Order_page=OrderMapper.findPage1(new Page<>(pageNum,pageSize));
-            return Result.success(Order_page);
-        }
+        Page<Order> orderpage=OrderMapper.selectPage(new Page<>(pageNum,pageSize), wrapper);
+        return Result.success(orderpage);
     }
 
 
@@ -123,14 +116,9 @@ public class OrderController {
      */
 
     @PostMapping("/deleteBatch")
-    public Result<?> deleteBatch(@RequestBody List<List<String>> ids) {
+    public Result<?> deleteBatch(@RequestBody List<String> ids) {
 
-        for(List<String> id:ids)
-        {
-            QueryWrapper<Order> wrapper = new QueryWrapper<>();
-            wrapper.eq("userid", id.get(0)).eq("room_id", id.get(1));
-            OrderMapper.delete(wrapper);
-        }
+        OrderMapper.deleteBatchIds(ids);
         return Result.success();
     }
 
@@ -148,14 +136,13 @@ public class OrderController {
         List<Order> all = OrderMapper.selectList(null);
         for (Order Order : all) {
             Map<String, Object> row1 = new LinkedHashMap<>();
-            row1.put("证件号", Order.getUserid());
-            row1.put("姓名", Order.getUname());
-            row1.put("性别", Order.getSex());
-            row1.put("联系电话", Order.getTelephone());
-            row1.put("地址", Order.getAddress());
+            row1.put("订单号", Order.getOrderno());
+            row1.put("用户编号", Order.getUserId());
             row1.put("病房号", Order.getRoomId());
-            row1.put("住院天数", Order.getDays());
+            row1.put("入院时间",DateUtil.format(Order.getComeTime(),"yyyy-MM-dd"));
+            row1.put("出院时间", DateUtil.format(Order.getOutTime(),"yyyy-MM-dd"));
             row1.put("应缴费用", Order.getExpenses());
+            row1.put("缴费时间", DateUtil.format(Order.getPaytime(),"yyyy-MM-dd HH:mm:ss"));
             list.add(row1);
         }
         // 2. 写excel
@@ -163,7 +150,7 @@ public class OrderController {
         writer.write(list, true);
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
-        String fileName = URLEncoder.encode("订单数据表数据表", "UTF-8");
+        String fileName = URLEncoder.encode("订单数据表", "UTF-8");
         response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
 
         ServletOutputStream out = response.getOutputStream();
@@ -188,17 +175,39 @@ public class OrderController {
         List<Order> saveList = new ArrayList<>();
         for (List<Object> row : lists) {
             Order Order = new Order();
-            Order.setUserid(row.get(0).toString());
-            Order.setRoomId(row.get(6).toString());
-            Order.setDays(Integer.parseInt(row.get(7).toString()));
-            Order.setExpenses(Double.parseDouble(row.get(8).toString()));
+            Order.setOrderno(row.get(0).toString());
+            Order.setUserId(row.get(1).toString());
+            Order.setRoomId(row.get(2).toString());
+            Order.setComeTime(Date.valueOf(row.get(3).toString()));
+            Order.setOutTime(Date.valueOf(row.get(4).toString()));
+            Order.setPaytime(Date.valueOf(row.get(5).toString()));
+            Order.setExpenses(Double.parseDouble(row.get(6).toString()));
+
+            if(row.get(3).toString()==null   ||   row.get(3).toString().equals("")) {
+                Order.setComeTime(null);
+            }else
+            {
+                Order.setComeTime(Date.valueOf(DateUtil.format(DateUtil.parse(row.get(3).toString()),"yyyy-MM-dd")));
+            }
+            if(row.get(4).toString()==null   ||   row.get(4).toString().equals("")) {
+                Order.setOutTime(null);
+            }else
+            {
+                Order.setOutTime(Date.valueOf(DateUtil.format(DateUtil.parse(row.get(4).toString()),"yyyy-MM-dd")));
+            }
+            if(row.get(6).toString()==null   ||   row.get(6).toString().equals("")) {
+                Order.setPaytime(null);
+            }else
+            {
+                Order.setPaytime(Date.valueOf(DateUtil.format(DateUtil.parse(row.get(6).toString()),"yyyy-MM-dd HH:mm:ss")));
+            }
 
 
             saveList.add(Order);
         }
         for (Order Order : saveList) {
 
-            if(Order.getUserid()!=null&&Order.getRoomId()!=null)
+            if(Order.getOrderno()!=null)
             {
                 OrderMapper.insert(Order);
             }

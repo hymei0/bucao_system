@@ -8,21 +8,28 @@ import lombok.Data;
 
 import java.sql.Date;
 
-@TableName("bucao_info")
+@TableName("USER_ROOM")
+
 @Data
-public class Bucao_info {
+public class User_room {
 
     @MppMultiId // 复合主键
-    @TableField("rfno")
-    private String rfno;
-
+    private String userid;
     @MppMultiId // 复合主键
-    @TableField("rfid")
-    private String rfid;
-    private String state;
-    private Integer washtimes;
+    private String roomid;
+
+    @TableField(exist = false)
+    private String uname;
+    @TableField(exist = false)
+    private String sex;
+    @TableField(exist = false)
+    private String telephone;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date comeTime;
+
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    private Date indate;
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    private Date outdate;
+    private Date outTime;
+
+    private double expenses;
 }

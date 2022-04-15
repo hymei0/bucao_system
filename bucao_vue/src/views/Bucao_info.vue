@@ -118,10 +118,10 @@
           <el-input v-model="form.washtimes" autocomplete="off"  style="width:70%"/>
         </el-form-item>
         <el-form-item label="入库时间" prop="indate">
-          <el-date-picker v-model="form.indate" type="date" placeholder="选择日期" style="width:70%"/>
+          <el-date-picker v-model="form.indate" value-format="YYYY-MM-DD" type="date" placeholder="选择日期" style="width:70%"/>
         </el-form-item>
         <el-form-item label="出库时间" v-if="form.state=='已报废'" prop="outdate">
-          <el-date-picker v-model="form.outdate" type="date" placeholder="选择日期" style="width:70%"/>
+          <el-date-picker v-model="form.outdate" value-format="YYYY-MM-DD" type="date" placeholder="选择日期" style="width:70%"/>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -312,6 +312,7 @@ export default {
     /*对话框按钮*/
     save()
     {
+      console.log(this.form)
       if(this.tag==='1')//该项记录的主键存在，进行更新操作
       {
         request.put("/Bucao_info",this.form).then(res=>{
@@ -338,8 +339,6 @@ export default {
       }
       else  //新增
       {
-        console.log(this.options)
-
         request.post("/Bucao_info",this.form).then(res=>{
           console.log(res)
           if(res.code==='1')

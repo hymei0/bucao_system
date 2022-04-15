@@ -40,6 +40,12 @@
             <span style="font-size: small;font-weight: bold;" >用户信息管理</span>
           </template>
         </el-menu-item>
+        <el-menu-item index="/user_room" style="padding-left: 60px; font-size:small">
+          <template #title>
+            <el-icon><shopping-cart-full /></el-icon>
+            <span style="font-size: small;font-weight: bold;" >住院信息</span>
+          </template>
+        </el-menu-item>
         <el-menu-item index="/order" style="padding-left: 60px; font-size:small">
           <template #title>
             <el-icon><shopping-cart-full /></el-icon>

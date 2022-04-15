@@ -234,14 +234,17 @@ public class bucao_infoController {
 
             saveList.add(bucao_info);
         }
+        Integer success=0;
         for (Bucao_info bucao_info : saveList) {
-            System.out.println(bucao_info);
+
             if(bucao_info.getRfid()!=null&&bucao_info.getRfno()!=null)
             {
                 bucao_infoMapper.insert(bucao_info);
+                System.out.println(bucao_info+"导入成功");
+                success=success+1;
             }
         }
-        return Result.success();
+        return Result.success(success);
     }
 
 }
