@@ -37,7 +37,7 @@ public class User_roomController {
     public Result<?> save(@RequestBody User_room user_room)
     {
         try {
-            User_room user=User_roomMapper.selectOne(Wrappers.<User_room>lambdaQuery().eq(User_room::getUserid,user_room.getUserid()).or().eq(User_room::getRoomid,user_room.getRoomid()));
+            User_room user=User_roomMapper.selectOne(Wrappers.<User_room>lambdaQuery().eq(User_room::getUserid,user_room.getUserid()).eq(User_room::getRoomid,user_room.getRoomid()));
             if(user==null) {
                 User_roomMapper.insert(user_room);
                 System.out.println("User_room已添加用户"+user_room.getUserid()+"的住院信息：");

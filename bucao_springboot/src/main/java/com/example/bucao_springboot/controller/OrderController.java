@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
 import com.example.bucao_springboot.entity.Order;
+import com.example.bucao_springboot.entity.RFid_kinds;
 import com.example.bucao_springboot.entity.User_room;
 import com.example.bucao_springboot.mapper.OrderMapper;
 import com.example.bucao_springboot.mapper.Room_infoMapper;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.sql.Date;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -43,13 +45,24 @@ public class OrderController {
 
     //新增接口
     @PostMapping
-    public Result<?> save(@RequestBody Order order)
-    {
+    public Result<?> save(@RequestBody Order order)  {
+
+//        SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        String date=sdf.format(System.currentTimeMillis()).toString();
+//        order.setCreatetime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date));
+//        System.out.println(order);
+
+
         try {
-            Order user=OrderMapper.selectOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderno,order.getOrderno()));
-            if(user==null) {
+            Order order1=OrderMapper.selectOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderno,order.getOrderno()));
+            if(order1==null) {
+//                SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                String date=sdf.format(System.currentTimeMillis()).toString();
+//                order.setCreatetime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date));
+
                 OrderMapper.insert(order);
                 System.out.println("Order已添加用户"+order.getUserId()+"的订单信息：");
+                System.out.println(order);
                 return Result.success();
             }
             else
@@ -67,7 +80,6 @@ public class OrderController {
     public Result<?> update(@RequestBody Order order)
     {
         try {
-
             OrderMapper.updateById(order);
             return Result.success();
         }catch (Exception e){
@@ -82,7 +94,6 @@ public class OrderController {
     public Result<?> delete(@PathVariable String id)
     {
         try {
-
             int rows=OrderMapper.deleteById(id);
             //int rows = OrderMapper.delete1(userid,roomid);
             return Result.success();
@@ -100,30 +111,13 @@ public class OrderController {
     }
 
     @GetMapping("/buy")
-    public Result<?> buy(@RequestParam String userId,
-                         @RequestParam String roomId,
-                         @RequestParam String orderNo) {
-        User_room User_room = User_roomMapper.selectById(userId,roomId);
+    public Result<?> buy(@RequestBody Order order) {
 
-        String payUrl = "http://localhost:9090/alipay/pay?subject=" + "医疗费" + "&traceNo=" + orderNo + "&totalAmount=" + User_room.getExpenses();
 
-        //User user = getUser();
-        long millis=System.currentTimeMillis();
-        Date date=new Date(millis);
-        System.out.println("当前时间为"+date);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        Order order = new Order();
-        order.setOrderno(orderNo);
-        order.setExpenses(User_room.getExpenses());
-        order.setUserId(userId);
-        order.setRoomId(roomId);
-        order.setComeTime(User_room.getComeTime());
-        order.setOutTime(User_room.getOutTime());
-        order.setPaytime(date);
-        order.setState("未支付");
-        save(order);
-        // 新建订单，扣减库存
+        String payUrl = "http://localhost:9090/alipay/pay?subject=" + order.getSubject() + "&traceNo=" + order.getOrderno() + "&totalAmount=" + order.getExpenses();
+
+        // 更新订单，扣减库存
         return Result.success(payUrl);
     }
 
@@ -142,7 +136,6 @@ public class OrderController {
         Page<Order> orderpage=OrderMapper.selectPage(new Page<>(pageNum,pageSize), wrapper);
         return Result.success(orderpage);
     }
-
 
     /**批量删除接口:复合主键
      *
@@ -174,8 +167,8 @@ public class OrderController {
             row1.put("订单号", Order.getOrderno());
             row1.put("用户编号", Order.getUserId());
             row1.put("病房号", Order.getRoomId());
-            row1.put("入院时间",DateUtil.format(Order.getComeTime(),"yyyy-MM-dd"));
-            row1.put("出院时间", DateUtil.format(Order.getOutTime(),"yyyy-MM-dd"));
+            row1.put("创建时间",DateUtil.format(Order.getCreatetime(),"yyyy-MM-dd HH:mm:ss"));
+            row1.put("订单名", Order.getSubject());
             row1.put("应缴费用", Order.getExpenses());
             row1.put("缴费时间", DateUtil.format(Order.getPaytime(),"yyyy-MM-dd HH:mm:ss"));
             list.add(row1);
@@ -214,18 +207,13 @@ public class OrderController {
             Order.setUserId(row.get(1).toString());
             Order.setRoomId(row.get(2).toString());
             Order.setExpenses(Double.parseDouble(row.get(6).toString()));
+            Order.setRoomId(row.get(4).toString());
 
             if(row.get(3).toString()==null   ||   row.get(3).toString().equals("")) {
-                Order.setComeTime(null);
+                Order.setCreatetime(null);
             }else
             {
-                Order.setComeTime(Date.valueOf(DateUtil.format(DateUtil.parse(row.get(3).toString()),"yyyy-MM-dd")));
-            }
-            if(row.get(4).toString()==null   ||   row.get(4).toString().equals("")) {
-                Order.setOutTime(null);
-            }else
-            {
-                Order.setOutTime(Date.valueOf(DateUtil.format(DateUtil.parse(row.get(4).toString()),"yyyy-MM-dd")));
+                Order.setCreatetime(Date.valueOf(DateUtil.format(DateUtil.parse(row.get(3).toString()),"yyyy-MM-dd")));
             }
             if(row.get(6).toString()==null   ||   row.get(6).toString().equals("")) {
                 Order.setPaytime(null);
@@ -233,7 +221,6 @@ public class OrderController {
             {
                 Order.setPaytime(Date.valueOf(DateUtil.format(DateUtil.parse(row.get(6).toString()),"yyyy-MM-dd HH:mm:ss")));
             }
-
 
             saveList.add(Order);
         }

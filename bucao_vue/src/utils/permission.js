@@ -1,5 +1,5 @@
 import router from "@/router";
-import Layout from "@/layout/Layout";
+import Layout from "@/Layout/Layout";
 
 // 注意：这个文件是设置动态路由的
 // permissions是一个资源的数组
@@ -14,6 +14,7 @@ export function activeRouter() {
             redirect: "/home",
             children: []
         }
+        console.log(user)
         user.permissions.forEach(p => {
             let obj = {
                 path: p.path,

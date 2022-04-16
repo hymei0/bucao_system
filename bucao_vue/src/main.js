@@ -1,4 +1,4 @@
-import { createApp } from 'vue'
+import Vue, { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
@@ -19,6 +19,6 @@ Object.keys(icons).forEach(key => {
     app.component(key, icons[key])
 })
 
-Vue.use(ElementUI);
+//Vue.use(ElementUI);
 
 

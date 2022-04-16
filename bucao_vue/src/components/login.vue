@@ -29,7 +29,7 @@
       <el-card style="width:85%;margin: 70px -100px">
         <h2 style="text-align: center;padding-bottom: 20px">登 录</h2>
         <div align="center">
-          <el-radio-group v-model="form.role">
+          <el-radio-group v-model="form.roles">
             <el-radio label="user" style="font-size: large">普通用户</el-radio>
             <el-radio label="manager" style="font-size: large">管 理 员</el-radio>
           </el-radio-group>
@@ -59,7 +59,7 @@
           <el-form-item>
             <el-button type="primary" @click="submitForm" style="position: absolute;width: 100px;top:1px">登录</el-button>
             <el-button  @click="resetForm" style="position: absolute;right:90px;top:1px;width:100px">重置</el-button>
-            <el-button type="text" @click="$router.push('/register') " style="position: absolute;right:0px;top:5px;width:60px" v-if="form.role==='user'">前往注册</el-button>
+            <el-button type="text" @click="$router.push('/register') " style="position: absolute;right:0px;top:5px;width:60px" v-if="form.roles==='user'">前往注册</el-button>
           </el-form-item>
         </el-form>
       </el-card>
@@ -72,6 +72,7 @@
 import request from "@/utils/request";
 import ValidCode from "@/components/ValidCode"
 import {ArrowLeft, ArrowRight} from '@element-plus/icons-vue'
+import {activeRouter} from "@/utils/permission";
 
 
 export default {
@@ -103,7 +104,8 @@ export default {
       rules :{
         psd: [{ required: true, message: '请输入密码', trigger: 'blur' }],
         id: [{ required: true, message: '请输入身份证号或手机号', trigger: 'blur' }],
-        validCode:[{required: true, message: '请输入验证码', trigger: 'blur' }]
+        validCode:[{required: true, message: '请输入验证码', trigger: 'blur' }],
+        roles: [{ required: true, message: '请选择角色', trigger: 'blur' }]
       }
     }
   },
@@ -145,20 +147,24 @@ export default {
     createValidCode(data) {
       this.validCode = data
     },
-   submitForm(){
-     // this.$refs['form'].validate((valid)=>{
-     //   if(!valid)
-     //   {
-     //     this.$message({
-     //       type:"error",
-     //       message:"输入有误"
-     //     })
-     //   }
-     // })
+    submitForm(){
+      // this.$refs[this.form].validate((valid)=>{
+      //   if(!valid)
+      //    {
+      //      this.$message({
+      //        type:"error",
+      //        message:"输入有误"
+      //      })
+      //    }
+      //  })
      if (!this.form.validCode) {
        this.$message.error("请填写验证码")
        return
      }
+      if (!this.form.roles) {
+        this.$message.error("请选择角色")
+        return
+      }
      if(this.form.validCode.toLowerCase() !== this.validCode.toLowerCase()) {
        this.$message.error("验证码错误")
        return
@@ -168,13 +174,15 @@ export default {
           {
             if(res.code==='1')
             {
+              sessionStorage.setItem("user_info",JSON.stringify(res.data))
+              //登录成功页面跳转，跳转到主页
+              this.$router.push("/")
+
               this.$message({
               type:"success",
               message:"登录成功",
               })
-              sessionStorage.setItem("user_info",JSON.stringify(res.data))
-              //登录成功页面跳转，跳转到主页
-              this.$router.push("/")
+
             }
             else
             {

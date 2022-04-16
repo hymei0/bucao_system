@@ -2,7 +2,9 @@ package com.example.bucao_springboot.controller;
 
 import com.alipay.easysdk.factory.Factory;
 import com.alipay.easysdk.payment.page.models.AlipayTradePagePayResponse;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.bucao_springboot.controller.entity.AliPay;
+import com.example.bucao_springboot.entity.Order;
 import com.example.bucao_springboot.mapper.OrderMapper;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,9 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
-// http://y7zhhi.natappfree.cc/alipay/notyfy
+// http:/y7zhhi.natappfree.cc/alipay/notyfy
 @RestController
 @RequestMapping("/alipay")
 public class AliPayController {
@@ -27,7 +31,17 @@ public class AliPayController {
         try {
             //  发起API调用（以创建当面付收款二维码为例）
             response = Factory.Payment.Page()
-                    .pay(aliPay.getSubject(), aliPay.getTraceNo(), aliPay.getTotalAmount(), "");
+                    .pay(aliPay.getSubject(), aliPay.getTraceNo(), aliPay.getTotalAmount(), "http://localhost:9090/alipay/pay/notify");
+              Order order=orderMapper.selectOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderno,aliPay.getTraceNo()));
+              order.setState("已支付");
+
+              SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+             String date=sdf.format(System.currentTimeMillis()).toString();
+
+            order.setPaytime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date));
+
+
+            orderMapper.updateById(order);
         } catch (Exception e) {
             System.err.println("调用遭遇异常，原因：" + e.getMessage());
             throw new RuntimeException(e.getMessage(), e);

@@ -116,10 +116,10 @@
         </el-form-item>
 
         <el-form-item label="入院日期" prop="comeTime">
-          <el-date-picker v-model="form.comeTime"  type="date" placeholder="选择日期" style="width:70%"/>
+          <el-date-picker v-model="form.comeTime"  value-format="YYYY-MM-DD" type="date" placeholder="选择日期" style="width:70%"/>
         </el-form-item>
         <el-form-item label="出院日期" prop="outTime">
-          <el-date-picker v-model="form.outTime"  type="date" placeholder="选择日期" style="width:70%"/>
+          <el-date-picker v-model="form.outTime"  value-format="YYYY-MM-DD" type="date" placeholder="选择日期" style="width:70%"/>
         </el-form-item>
         <el-form-item label="应缴费用" prop="days">
           <el-input v-model="form.expenses" type="digit"  style="width:70%"/>
@@ -147,6 +147,9 @@ var XLSX = require("xlsx");
 const samll = ref(false)
 const background = ref(true)
 const disabled = ref(false)
+import { ElLoading } from 'element-plus'
+
+const fullscreenLoading = ref(false)
 
 export default {
   name: "User_room",
@@ -162,6 +165,8 @@ export default {
       total: 0,
       dialogVisible:false,
       form:{},
+      orderform:{},
+      paytime:'',        //记录订单生成时间
       edi:false,
       tag:'',   //1表示编辑修改数据，0表示新增数据
 //对象区
@@ -202,20 +207,67 @@ export default {
 //方法区
   methods:{
     handlebuy(row) {
-      this.order_nums(row.userid)
-      request.get("/Order/buy" ,{
-        params:{
-          userId:row.userid,
-          roomId:row.roomid,
-          orderNo:this.orderno
+
+      this.orderform.userId=JSON.parse(JSON.stringify(row.userid))
+      this.orderform.roomId=JSON.parse(JSON.stringify(row.roomid))
+      this.orderform.orderno=JSON.parse(JSON.stringify(this.order_nums(row.userid)))
+      this.orderform.createtime=JSON.parse(JSON.stringify(this.format().toString()))
+      this.orderform.subject="医疗费"
+      this.orderform.expenses=JSON.parse(JSON.stringify(row.expenses))
+      this.orderform.paytime=null
+      this.orderform.state="未支付"
+      console.log(this.orderform)
+      request.post("/Order",this.orderform).then(res=>{
+        this.LOADING("正在创建订单")
+        if(res.code==='0') {
+          this.$message.error("订单创建失败")
+          return
+        }else {
+          this.form = row
+          this.form.expenses = 0.00
+          request.put("/User_room", this.form).then(re => {
+            if (re.code === '0') {
+              this.$message.error("订单创建失败")
+              return
+            }
+          })
         }
-      }).then(res => {
-        // 请求成功跳转沙箱支付的页面
-        location.href =(res.data)
+
       })
     },
 
-    //随机生成订单唯一的编号，加上用户的uid，每个用户都有属于自己的唯一uid（让后台去处理），生成随机订单号
+    LOADING(text)  {
+      const loading = ElLoading.service({
+        lock: true,
+        text: text,
+        background: 'rgba(0, 0, 0, 0.7)',
+      })
+      setTimeout(() => {
+        this.$router.push("/order")
+        this.$message.success("订单创建成功")
+        loading.close()
+      }, 2000)
+    },
+
+    /**
+     * 获取当前时间
+     * 格式YYYY-MM-DD
+     */
+    format () {
+      var date = new Date()
+      var month = date.getMonth() + 1
+      var strDate = date.getDate()
+      if (month >= 1 && month <= 9) {
+        month = '0' + month
+      }
+      if (strDate >= 0 && strDate <= 9) {
+        strDate = '0' + strDate
+      }
+      var currentDate = date.getFullYear() + '-' + month + '-' + strDate + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
+      return currentDate
+    },
+
+//随机生成订单唯一的编号，加上用户的uid，每个用户都有属于自己的唯一uid（让后台去处理），生成随机订单号
     order_nums(userid) {
       var outTradeNo = ""; //订单号
 
@@ -225,7 +277,7 @@ export default {
         outTradeNo += Math.floor(Math.random() * 10);
       }
       outTradeNo = String(getDateNums(new Date())) + String(outTradeNo) + String(userid);
-      this.orderno = outTradeNo;
+      return outTradeNo;
     },
 
     //标红table指定行

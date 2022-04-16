@@ -25,7 +25,7 @@ public class User_room {
     @TableField(exist = false)
     private String telephone;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private Date comeTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")

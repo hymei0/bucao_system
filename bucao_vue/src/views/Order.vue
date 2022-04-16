@@ -38,12 +38,12 @@
     <!--    数据展示区-->
     <el-table :row-class-name="tableRowClassName" v-model:data="Ordertable" border stripe style="width: 100%" @selection-change="handleSelectionChange"> <!--显示表格边框和斑马纹-->
       <el-table-column type="selection" width="55"></el-table-column>
-      <el-table-column prop="orderno" label="订单号" sortable align= "center" min-width="125%"/> <!--prop:属性名  label:表头的名字-->
-      <el-table-column prop="userId" label="用户账号" align= "center" min-width="60%"/>
-      <el-table-column prop="roomId" label="病房号" align= "center" min-width="60%"/>
-      <el-table-column prop="comeTime" label="入院日期" align= "center" min-width="60%"/>
-      <el-table-column prop="outTime" label="出院日期" align= "center" min-width="60%"/>
-      <el-table-column prop="expenses" label="应缴费用(￥)"  align= "center" min-width="60%"/>
+      <el-table-column prop="orderno" label="订单号" sortable align= "center" min-width="120%"/> <!--prop:属性名  label:表头的名字-->
+      <el-table-column prop="subject" label="订单名" align= "center" min-width="50%"/>
+      <el-table-column prop="userId" label="用户账号" align= "center" min-width="50%"/>
+      <el-table-column prop="roomId" label="病房号" align= "center" min-width="50%"/>
+      <el-table-column prop="createtime" label="订单创建时间" align= "center" min-width="90%"/>
+      <el-table-column prop="expenses" label="应缴费用(￥)"  align= "center" min-width="50%"/>
       <el-table-column prop="paytime" label="缴费时间" align= "center" min-width="100%" />
       <el-table-column prop="state" label="支付状态" align= "center" min-width="60%"/>
       <el-table-column fix="right" label="操作" align= "center">
@@ -77,22 +77,22 @@
       </div>
       <!--    导入导出-->
 
-        <div style="margin-top: 5px;margin-left: 10px;display: flex">
-          <el-upload
-              :action=excelUploadUrl
-              :on-success="handleUploadSuccess"
-              :show-file-list=false
-              :limit="1"
-              accept='.xlsx'
-              style="display: inline-block; margin: 0 10px"
-          >
-            <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" ><el-icon><upload /></el-icon></el-button>
+      <div style="margin-top: 5px;margin-left: 10px;display: flex">
+        <el-upload
+            :action=excelUploadUrl
+            :on-success="handleUploadSuccess"
+            :show-file-list=false
+            :limit="1"
+            accept='.xlsx'
+            style="display: inline-block; margin: 0 10px"
+        >
+          <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" ><el-icon><upload /></el-icon></el-button>
 
-          </el-upload>
+        </el-upload>
 
-          <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" @click="exportdata"><el-icon><download /></el-icon></el-button>
+        <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" @click="exportdata"><el-icon><download /></el-icon></el-button>
 
-        </div>
+      </div>
 
     </div>
     <el-dialog v-model="dialogVisible" title="订单信息" width="30%" >
@@ -101,7 +101,7 @@
           <el-input v-model="form.orderno" autocomplete="off"  style="width:70%" disabled/>
         </el-form-item>
         <el-form-item label="病人帐号" prop="userId">
-          <el-select v-model="form.userId" class="m-2" @change="order_nums"  placeholder="Select" size="large" v-bind:disabled="edi">
+          <el-select v-model="form.userId" class="m-2" @change="order_nums(form.userId)"  placeholder="Select" size="large" v-bind:disabled="edi">
             <el-option
                 v-for="item in userIDoptions"
                 :key="item.ID"
@@ -120,25 +120,23 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="入院日期" prop="comeTime">
-          <el-date-picker v-model="form.comeTime"  type="date" value-format="YYYY-MM-DD"  placeholder="选择日期" style="width:70%"/>
+        <el-form-item label="订单名称" prop="subject">
+          <el-input v-model="form.subject" style="width:70%"/>
         </el-form-item>
-        <el-form-item label="出院日期" prop="outTime">
-          <el-date-picker v-model="form.outTime" type="date" value-format="YYYY-MM-DD"  placeholder="选择日期" style="width:70%"/>
+        <el-form-item label="创建时间" prop="createtime">
+          <el-date-picker v-model="form.createtime"  type="datetime" value-format="YYYY-MM-DD HH:mm:ss"  placeholder="选择日期" style="width:70%"/>
         </el-form-item>
+
         <el-form-item label="应缴费用" prop="expenses">
           <el-input v-model="form.expenses" type="digit"  style="width:70%"/>
         </el-form-item>
         <el-form-item label="缴费时间" prop="paytime">
-
           <el-date-picker
               v-model="form.paytime"
               type="datetime"
               placeholder="选择日期"
               value-format="YYYY-MM-DD HH:mm:ss"
-              @change="dataChange(form.paytime)"
               style="width:70%"/>
-
         </el-form-item>
 
 
@@ -169,6 +167,7 @@ import { ref } from 'vue'
 import request from "@/utils/request";
 import {getDateNums} from "@/utils/getorderno";
 import {ElMessage} from "element-plus";
+import {format} from "@/utils/gettime";
 
 var XLSX = require("xlsx");
 const samll = ref(false)
@@ -189,6 +188,7 @@ export default {
       total: 0,
       dialogVisible:false,
       form:{},
+      orderform:{},
       edi:false,
       user: {},
       tag:'',   //1表示编辑修改数据，0表示新增数据
@@ -216,11 +216,10 @@ export default {
         userId: [{ required: true, message: '请输入证件号', trigger: 'blur' }],
         orderno: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
         roomId: [{ required: true, message: '请选择病房号', trigger: 'blur' }],
-        comeTime: [{ required: true, message: '请选择入院日期', trigger: 'blur' }],
+        createtime: [{ required: true, message: '请选择订单创建时间', trigger: 'blur' }],
         state: [{ required: true, message: '请选择支付状态', trigger: 'blur' }]
       }
     }
-
   },
   created() {
     this.load()
@@ -228,7 +227,7 @@ export default {
     this.user = JSON.parse(userStr)
     // 请求服务端，确认当前登录用户的 合法信息
     request.get("/User_info/" + this.user.id).then(res => {
-      if (res.code === '1') {
+      if(res.code === '1'){
         this.user = res.data
       }
     })
@@ -237,22 +236,54 @@ export default {
 //方法区
   methods:{
     handlebuy(row) {
-      request.get("/order/buy/" + bookId).then(res => {
-        // 请求成功跳转沙箱支付的页面
-        window.open(res.data)
-      })
+      // 请求成功跳转沙箱支付的页面
+      window.open("http://localhost:9090/alipay/pay?subject=" + row.subject + "&traceNo=" + row.orderno + "&totalAmount=" + row.expenses);
+      console.log("http://localhost:9090/alipay/pay?subject=" + row.subject + "&traceNo=" + row.orderno + "&totalAmount=" + row.expenses)
+      this.load()
+
+      // //this.orderform.paytime = JSON.parse(JSON.stringify(format()))
+      // console.log(this.orderform)
+      // request.get("/Order/buy", {
+      //   params: {
+      //     orderno: this.currentPage,
+      //     paytime: this.orderform.paytime,
+      //     search: this.search
+      //   }
+      // }).then(res => {
+      //   // window.open(res.data)
+      //   // location.href = (res.data)
+      //   this.orderform=JSON.parse(JSON.stringify(row))
+      //   this.orderform.paytime = JSON.parse(JSON.stringify(format()))
+      //   this.orderform.state =  JSON.parse(JSON.stringify("已支付"))
+      //   request.put("/Order", this.orderform).then(re=> {
+      //     if (re.code === '1') {
+      //       window.open(res.data)
+      //       // window.open("http://localhost:9090/alipay/pay?subject=" + row.subject + "&traceNo=" + row.orderno + "&totalAmount=" + row.expenses);
+      //       console.log("http://localhost:9090/alipay/pay?subject=" + row.subject + "&traceNo=" + row.orderno + "&totalAmount=" + row.expenses)
+      //
+      //     } else {
+      //       this.$message({
+      //         type: "warning",
+      //         message: res.msg
+      //       })
+      //       this.form = {}
+      //     }
+      //   }).catch(err => {
+      //     this.$message.error('修改失败，请稍后再试！')
+      //   })
+      // })
     },
     //随机生成订单唯一的编号，加上用户的uid，每个用户都有属于自己的唯一uid（让后台去处理），生成随机订单号
-    order_nums() {
+    order_nums(userid) {
       var outTradeNo = ""; //订单号
 
-
-        for (var i = 0; i < 6; i++) //6位随机数，用以加在时间戳后面。
-        {
-          outTradeNo += Math.floor(Math.random() * 10);
-        }
-        outTradeNo = String(getDateNums(new Date())) + String(outTradeNo) + String(this.form.userId);
-        this.form.orderno = outTradeNo;
+      for (var i = 0; i < 6; i++) //6位随机数，用以加在时间戳后面。
+      {
+        outTradeNo += Math.floor(Math.random() * 10);
+      }
+      outTradeNo = String(getDateNums(new Date())) + String(outTradeNo) + String(userid);
+      this.form.orderno=outTradeNo;
+      return outTradeNo;
     },
 
     //标红table指定行
@@ -308,11 +339,11 @@ export default {
       this.edi=false
       this.dialogVisible=true
       this.form={} //清空表单
+      this.form.subject='医疗费'
 
     },
     //查询
     load(){
-
       request.get("/Room_info/selectall" ).then(re =>{
         this.roomoptions=re.data
       })
