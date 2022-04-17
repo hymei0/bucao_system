@@ -254,6 +254,8 @@ export default {
       this.edi=false
       this.dialogVisible=true
       this.form={} //清空表单
+
+      this.form.roles="user"
     },
     //查询
     load(){

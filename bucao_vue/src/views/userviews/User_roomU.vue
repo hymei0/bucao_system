@@ -21,12 +21,7 @@
     <!--    功能区域-->
     <div style="display: flex; margin: 10px 0"  align="left">
       <div style="width: 10%;display: flex" align="left">
-        <el-button @click="add" type="primary">新增</el-button>
-        <el-popconfirm title="确定删除吗？" @confirm="deleteBatch">
-          <template #reference>
-            <el-button type="danger" >批量删除</el-button>
-          </template>
-        </el-popconfirm>
+        <el-button @click="add"  type="text" v-if="flag===false">办理住院</el-button>
       </div>
       <!--    搜索区域-->
       <div style="width: 100%" align="right">
@@ -37,25 +32,19 @@
 
     <!--    数据展示区-->
     <el-table :row-class-name="tableRowClassName" v-model:data="User_roomtable" bUser_room stripe style="width: 100%" @selection-change="handleSelectionChange"> <!--显示表格边框和斑马纹-->
-      <el-table-column type="selection" width="55"></el-table-column>
-      <el-table-column prop="userid" label="证件号" sortable align= "center"/> <!--prop:属性名  label:表头的名字-->
+      <el-table-column prop="userid" label="ID" align= "center"/> <!--prop:属性名  label:表头的名字-->
       <el-table-column prop="roomid" label="病房号" align= "center"/>
       <el-table-column prop="uname" label="名字" align= "center"/>
       <el-table-column prop="sex" label="性别" align= "center"/>
       <el-table-column prop="telephone" label="联系电话" align= "center"/>
-      <el-table-column prop="comeTime" label="入院日期" align= "center"/>
-      <el-table-column prop="outTime" label="出院日期" align= "center"/>
+      <el-table-column prop="comeTime" sortable label="入院日期" align= "center"/>
+      <el-table-column prop="outTime" sortable label="出院日期" align= "center"/>
       <el-table-column prop="expenses" label="应缴费用(￥)" align= "center"/>
       <el-table-column fix="right" label="操作" align= "center">
         <!--        内容修改区-->
         <template #default="scope">
-          <el-button  type="text"  @click="handleEdit(scope.row)">编辑</el-button>
-          <el-button  type="text"  @click="handlebuy(scope.row)" v-bind:disabled="scope.row.expenses<=0" style="color: green">缴费</el-button>
-          <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.userid,scope.row.roomid)">
-            <template #reference>
-              <el-button  type="text" style="color: red" >删除</el-button>
-            </template>
-          </el-popconfirm>
+          <el-button  type="text"  @click="handlebuy(scope.row)" v-bind:disabled="scope.row.expenses<=0" >缴费</el-button>
+          <el-button  type="text"  @click="handleOut(scope.row)" v-bind:disabled="scope.row.outTime!=null">办理出院</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -82,18 +71,11 @@
 
       </div>
     </div>
-    <el-dialog v-model="dialogVisible" title="住院信息" width="30%" >
+    <el-dialog v-model="dialogVisible" title="住院信息" width="30%"  v-if="tag==='0'" >
       <el-form :model="form" label-width="120px" :rules="rules">
 
-        <el-form-item label="账  号" prop="userid">
-          <el-select v-model="form.userid" class="m-2" @change="GetUserName" default-first-option="true" placeholder="Select" size="large" v-bind:disabled="edi">
-            <el-option
-                v-for="item in userIDoptions"
-                :key="item.ID"
-                :label="item.ID"
-                :value="item.ID"
-            />
-          </el-select>
+        <el-form-item label="账  号" prop="userid" disabled>
+          <el-input v-model="form.userid" autocomplete="off"  style="width:70%" disabled/>
         </el-form-item>
         <el-form-item label="姓  名" prop="uname">
           <el-input v-model="form.uname" autocomplete="off"  style="width:70%" disabled/>
@@ -108,28 +90,34 @@
           <el-select v-model="form.roomid" class="m-2"  placeholder="Select" size="large" v-bind:disabled="edi">
             <el-option
                 v-for="item in roomoptions"
-                :key="item.id"
-                :label="item.id"
-                :value="item.id"
+                :key="item"
+                :label="item"
+                :value="item"
             />
           </el-select>
         </el-form-item>
 
-        <el-form-item label="入院日期" prop="comeTime">
-          <el-date-picker v-model="form.comeTime"  value-format="YYYY-MM-DD" type="date" placeholder="选择日期" style="width:70%"/>
-        </el-form-item>
-        <el-form-item label="出院日期" prop="outTime">
-          <el-date-picker v-model="form.outTime"  value-format="YYYY-MM-DD" type="date" placeholder="选择日期" style="width:70%"/>
-        </el-form-item>
-        <el-form-item label="应缴费用" prop="days">
-          <el-input v-model="form.expenses" type="digit"  style="width:70%"/>
-        </el-form-item>
 
       </el-form>
       <template #footer>
       <span class="dialog-footer">
         <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" @click="save">确定</el-button>
+      </span>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="dialogVisible" title="输入密码" width="30%" v-if="tag==='1'">
+      <el-form :model="form" label-width="120px" :rules="rules">
+        <el-form-item label="请输入密码" prop="psd">
+          <el-input v-model="psd" autocomplete="off"  style="width:70%" type="password" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="update">确定</el-button
+        >
       </span>
       </template>
     </el-dialog>
@@ -165,6 +153,9 @@ export default {
       total: 0,
       dialogVisible:false,
       form:{},
+      user:{},
+      psd:'',     //帮里出院手续时需要输密码进行验证
+      flag:true,  //记录当前用户是否已经住院
       orderform:{},
       paytime:'',        //记录订单生成时间
       edi:false,
@@ -201,13 +192,56 @@ export default {
 
   },
   created() {
+    let str = sessionStorage.getItem("user_info") || "{}"
+    //类型转换
+    this.user = JSON.parse(str)
+    //请求服务端，确认当前登录用户的 合法信息
+    request.get("/User_info/"+ this.user.id).then(re=> {
+      if (re.code === '1') {
+        this.user = re.data
+      }
+    })
     this.load()
   },
 
 //方法区
   methods:{
-    handlebuy(row) {
+    update(){
+      if(this.psd===''||this.psd!=this.user.psd)
+      {
+        this.$message({
+          type:"error",
+          message:"请输入正确密码"
+        })
+      }
+      else
+      {
+        this.form.outTime=JSON.parse(JSON.stringify(this.format()))
+        request.put("/User_room",this.form).then(res=>{
+          if(res.code==='1')
+          {
+            this.$message({
+              type:"success",
+              message:"办理成功"
+            })
+            this.load()
+            this.dialogVisible=false
+          }
+          else
+          {
+            this.$message({
+              type:"warning",
+              message:res.msg
+            })
+          }
+        }).catch(err =>{
+          this.$message.error('办理出院失败，请稍后再试！')
+        })
+      }
 
+
+    },
+    handlebuy(row) {
       this.orderform.userId=JSON.parse(JSON.stringify(row.userid))
       this.orderform.roomId=JSON.parse(JSON.stringify(row.roomid))
       this.orderform.orderno=JSON.parse(JSON.stringify(this.order_nums(row.userid)))
@@ -243,7 +277,7 @@ export default {
         background: 'rgba(0, 0, 0, 0.7)',
       })
       setTimeout(() => {
-        this.$router.push("/order")
+        this.$router.push("/MyOrder")
         this.$message.success("订单创建成功")
         loading.close()
       }, 2000)
@@ -336,61 +370,62 @@ export default {
     //添加按钮事件处理
     add()
     {
+      this.form={} //清空表单
       this.tag='0'
       this.edi=false
       this.dialogVisible=true
-      this.form={} //清空表单
+      this.form.userid=JSON.parse(JSON.stringify(this.user.id))
+      this.form.uname=JSON.parse(JSON.stringify(this.user.uname))
+      this.form.sex=JSON.parse(JSON.stringify(this.user.sex))
+      this.form.telephone=JSON.parse(JSON.stringify(this.user.telephone))
+      this.form.comeTime=JSON.parse(JSON.stringify(this.format()))
+      this.form.outTime=null
+      this.form.expenses=10.00
     },
     //查询
     load(){
-      request.get("/Room_info/selectall" ).then(re =>{
-        this.roomoptions=re.data
-      })
-      request.get("/User_info/selectall" ).then(re =>{
-        this.userIDoptions=re.data
-      })
-      request.get("/User_room",  {
+
+      request.get("/User_room/foruser",  {
         params:{
           pageNum: this.currentPage,
           pageSize: this.pageSize,
-          search: this.search
+          search: this.search,
+          userid:this.user.id,
         }
       }).then(res =>{
         this.User_roomtable=res.data.records
         this.total=res.data.total
       })
+      request.get("/User_room/suitableroom" ).then(re =>{
+        this.roomoptions=re.data
+      })
+      request.get("/User_room/suitableuser" ).then(re =>{
+       for(var i=0;i<re.data.length;i++)
+       {
+         if(re.data[i]==this.user.id){
+           this.flag=false
+           break
+         }
+         this.flag=true
+       }
+      })
+      //this.roomoptions.removed(1)
     },
     //编辑按钮事件处理
-    handleEdit(row){
+    handleOut(row){
+      if(row.expenses>0){
+        this.$message({
+          type:"warning",
+          message:"请先缴费"
+        })
+        return
+      }
+
+      this.psd=''
       this.tag='1'
       this.edi=true
       this.form=JSON.parse(JSON.stringify(row))//对表单的数据进行深拷贝
       this.dialogVisible=true   //打开弹窗
-    },
-    //删除按钮事件处理
-    handleDelete(id1,id2){
-      request.delete("/User_room",{
-        params:{
-          userid:id1,
-          roomid:id2
-        }
-      }).then(res=>{
-        if(res.code==='1')
-        {
-          this.$message({
-            type:"success",
-            message:"删除成功"
-          })
-        }
-        else {
-          this.$message({
-            type: "warning",
-            message: res.msg
-          })
-        }
-        this.load()
-      })
-
     },
     //表格大小事件处理：改变当前每页个数
     handleSizeChange()
@@ -405,7 +440,7 @@ export default {
     /*对话框按钮*/
     save()
     {
-      console.log(this.form)
+
       if(this.tag==='1')//该项记录的主键存在，进行更新操作
       {
         request.put("/User_room",this.form).then(res=>{
@@ -432,8 +467,6 @@ export default {
       }
       else  //新增
       {
-        console.log(this.options)
-
         request.post("/User_room",this.form).then(res=>{
           console.log(res)
           if(res.code==='1')

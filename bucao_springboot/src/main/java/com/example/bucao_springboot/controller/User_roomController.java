@@ -37,7 +37,7 @@ public class User_roomController {
     public Result<?> save(@RequestBody User_room user_room)
     {
         try {
-            User_room user=User_roomMapper.selectOne(Wrappers.<User_room>lambdaQuery().eq(User_room::getUserid,user_room.getUserid()).eq(User_room::getRoomid,user_room.getRoomid()));
+            User_room user=User_roomMapper.selectOne(Wrappers.<User_room>lambdaQuery().eq(User_room::getUserid,user_room.getUserid()).eq(User_room::getRoomid,user_room.getRoomid()).eq(User_room::getComeTime,user_room.getComeTime()));
             if(user==null) {
                 User_roomMapper.insert(user_room);
                 System.out.println("User_room已添加用户"+user_room.getUserid()+"的住院信息：");
@@ -72,13 +72,14 @@ public class User_roomController {
     //删除接口
     @DeleteMapping
     public Result<?> delete(@RequestParam String userid,
-                            @RequestParam String roomid)
+                            @RequestParam String roomid,
+                            @RequestParam Date comeTime)
     {
         try {
             // Bucao_info bucao=bucao_infoMapper.selectOne(Wrappers.<Bucao_info>lambdaQuery().eq(Bucao_info::getRfno,bucao_info.getRfno()).eq(Bucao_info::getRfid,bucao_info.getRfid()));
             QueryWrapper<User_room> wrapper = new QueryWrapper<>();
 
-            wrapper.eq("userid", userid).eq("roomid", roomid);
+            wrapper.eq("userid", userid).eq("roomid", roomid).eq("come_time", comeTime);
             int rows=User_roomMapper.delete(wrapper);
             //int rows = User_roomMapper.delete1(userid,roomid);
             return Result.success();
@@ -93,7 +94,19 @@ public class User_roomController {
         return Result.success(User_roomMapper.GetUser_room());
     }
 
-    //分页查询
+    //查询未住满的病房号
+    @GetMapping("/suitableroom")
+    public Result<?>  suitableroom(){
+        return Result.success(User_roomMapper.Getsuitableroom());
+    }
+
+    //查询未办理住院的病人
+    @GetMapping("/suitableuser")
+    public Result<?>  suitableuser(){
+        return Result.success(User_roomMapper.Getsuitableuser());
+    }
+
+    //分页查询:面向管理员的接口
     @GetMapping
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "10") Integer pageSize,
@@ -111,6 +124,25 @@ public class User_roomController {
             return Result.success(User_room_page);
         }
     }
+    //分页查询:面向用户的接口
+    @GetMapping("foruser")
+    public Result<?> findPageuser(@RequestParam(defaultValue = "1") Integer pageNum,
+                              @RequestParam(defaultValue = "10") Integer pageSize,
+                              @RequestParam(defaultValue = "") String search,
+                                  @RequestParam(defaultValue = "") String userid)
+    //参数：pageNum：当前页，pageSize:每页多少条 search:查询关键字
+    {
+
+        if(StrUtil.isNotBlank(search))//不为null,则进行模糊匹配
+        {
+            Page<User_room> User_room_page=User_roomMapper.findPageuser(new Page<>(pageNum,pageSize),search,userid);
+            return Result.success(User_room_page);
+        }
+        else{
+            Page<User_room> User_room_page=User_roomMapper.findPage1user(new Page<>(pageNum,pageSize),userid);
+            return Result.success(User_room_page);
+        }
+    }
 
 
     /**批量删除接口:复合主键
@@ -125,7 +157,7 @@ public class User_roomController {
         for(List<String> id:ids)
         {
             QueryWrapper<User_room> wrapper = new QueryWrapper<>();
-            wrapper.eq("userid", id.get(0)).eq("roomid", id.get(1));
+            wrapper.eq("userid", id.get(0)).eq("roomid", id.get(1)).eq("come_time", id.get(2));
             User_roomMapper.delete(wrapper);
         }
         return Result.success();
@@ -145,7 +177,7 @@ public class User_roomController {
         List<User_room> all = User_roomMapper.selectList(null);
         for (User_room User_room : all) {
             Map<String, Object> row1 = new LinkedHashMap<>();
-            row1.put("证件号", User_room.getUserid());
+            row1.put("ID", User_room.getUserid());
             row1.put("姓名", User_room.getUname());
             row1.put("性别", User_room.getSex());
             row1.put("联系电话", User_room.getTelephone());

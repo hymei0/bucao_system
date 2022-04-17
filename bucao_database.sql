@@ -67,11 +67,11 @@ psd varchar(20) NOT NULL COMMENT'密码',
 telephone CHAR(20) COMMENT'电话',
 address varchar(30) COMMENT'地址',
 sex char(2)  check (sex in('男','女')) COMMENT'性别',
-roles varcharacter(15) not null check (roles in('管理员','普通用户')) COMMENT'角色'
+roles varcharacter(15) not null check (roles in('user','manager')) COMMENT'角色'
 );
 insert into user_info values
-('0311','何元梅','https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg','0311','17826103075','贵州毕节','女','管理员'),
-('6666','张怀旭','https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg','0311','17826103075','贵州毕节','男','普通用户');
+('0311','何元梅','https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg','0311','17826103075','贵州毕节','女','manager'),
+('6666','张怀旭','https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg','0311','17826103075','贵州毕节','男','user');
 
  -- 4.Manager_info:管理员信息表
  CREATE TABLE Manager_info(
@@ -139,7 +139,8 @@ CONSTRAINT PRIMARY KEY(USERID,ROOMID),
 CONSTRAINT U_ID FOREIGN KEY(USERID) REFERENCES USER_INFO(ID),
 CONSTRAINT R_ID FOREIGN KEY(ROOMID) REFERENCES ROOM_INFO(ID)
 );
-INSERT INTO USER_ROOM VALUES('0311','14-0318','2022-01-12',null,0.00);
+INSERT INTO USER_ROOM VALUES
+('0311','14-0318','2022-01-12',null,0.00);
 
 -- order表
 CREATE TABLE Order_info(

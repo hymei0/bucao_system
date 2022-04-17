@@ -8,10 +8,10 @@
       </h4>
     </div>
     <div style="flex:1">
-<!--      <h4 style="padding-top: 35px;color: aliceblue">{{user.pri}}</h4>-->
+      <h4 style="padding-top: 35px;padding-left: 50px; color: aliceblue">欢迎{{user.pri}}</h4>
     </div>
     <div style="width:150px;padding-top:5px;display: flex">
-      <h4 style="padding-top: 35px;color: aliceblue">{{user.uname}}</h4>
+      <h4 style="padding-top: 35px;color: aliceblue">{{user.mname}}</h4>
       <el-dropdown>
         <el-avatar :size="63" :src="user.portrait" style=" border-radius: 50%;" />
         <span class="el-dropdown-link">

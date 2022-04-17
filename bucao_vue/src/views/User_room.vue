@@ -51,7 +51,7 @@
         <template #default="scope">
           <el-button  type="text"  @click="handleEdit(scope.row)">编辑</el-button>
           <el-button  type="text"  @click="handlebuy(scope.row)" v-bind:disabled="scope.row.expenses<=0" style="color: green">缴费</el-button>
-          <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.userid,scope.row.roomid)">
+          <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.userid,scope.row.roomid,scope.row.comeTime)">
             <template #reference>
               <el-button  type="text" style="color: red" >删除</el-button>
             </template>
@@ -89,9 +89,9 @@
           <el-select v-model="form.userid" class="m-2" @change="GetUserName" default-first-option="true" placeholder="Select" size="large" v-bind:disabled="edi">
             <el-option
                 v-for="item in userIDoptions"
-                :key="item.ID"
-                :label="item.ID"
-                :value="item.ID"
+                :key="item"
+                :label="item"
+                :value="item"
             />
           </el-select>
         </el-form-item>
@@ -108,9 +108,9 @@
           <el-select v-model="form.roomid" class="m-2"  placeholder="Select" size="large" v-bind:disabled="edi">
             <el-option
                 v-for="item in roomoptions"
-                :key="item.id"
-                :label="item.id"
-                :value="item.id"
+                :key="item"
+                :label="item"
+                :value="item"
             />
           </el-select>
         </el-form-item>
@@ -305,7 +305,7 @@ export default {
     },
 
     handleSelectionChange(val) {
-      this.ids = val.map(v => [v.userid,v.roomid])   // [{id,name}, {id,name}] => [id,id]
+      this.ids = val.map(v => [v.userid,v.roomid,v.comeTime])   // [{id,name}, {id,name}] => [id,id]
     },
     deleteBatch() {
 
@@ -343,10 +343,10 @@ export default {
     },
     //查询
     load(){
-      request.get("/Room_info/selectall" ).then(re =>{
+      request.get("/User_room/suitableroom" ).then(re =>{
         this.roomoptions=re.data
       })
-      request.get("/User_info/selectall" ).then(re =>{
+      request.get("/User_room/suitableuser" ).then(re =>{
         this.userIDoptions=re.data
       })
       request.get("/User_room",  {
@@ -368,11 +368,12 @@ export default {
       this.dialogVisible=true   //打开弹窗
     },
     //删除按钮事件处理
-    handleDelete(id1,id2){
+    handleDelete(id1,id2,id3){
       request.delete("/User_room",{
         params:{
           userid:id1,
-          roomid:id2
+          roomid:id2,
+          comeTime:id3
         }
       }).then(res=>{
         if(res.code==='1')

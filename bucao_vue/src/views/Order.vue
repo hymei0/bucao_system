@@ -50,7 +50,7 @@
         <!--        内容修改区-->
         <template #default="scope">
           <el-button  type="text"  @click="handleEdit(scope.row)">编辑</el-button>
-          <el-button  type="text"  @click="handlebuy(scope.row)" v-bind:disabled="scope.row.state===0" style="color: green">支付</el-button>
+          <el-button  type="text"  @click="handlebuy(scope.row)" v-bind:disabled="scope.row.state==='已支付'">支付</el-button>
           <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.orderno)">
             <template #reference>
               <el-button  type="text" style="color: red" >删除</el-button>

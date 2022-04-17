@@ -142,15 +142,15 @@ public class ManagerInfoController {
 
     //显示个人信息
     @GetMapping("/{id}")
-    public Result<?> SelectPerson_Info(@PathVariable String Id)
+    public Result<?> SelectPerson_Info(@PathVariable String id)
     {
-        ManagerInfo user=ManagerInfoMapper.selectById(Id);
+        ManagerInfo user=ManagerInfoMapper.selectById(id);
         if(user==null)
         {
             return Result.error("-1","该管理员不存在");
         }
         else{
-            System.out.println("ManagerInfo已查询到管理员"+Id+"的信息");
+            System.out.println("ManagerInfo已查询到管理员"+id+"的信息");
             return Result.success(user);
         }
     }

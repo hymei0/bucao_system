@@ -20,24 +20,15 @@
     </el-row>
     <!--    功能区域-->
     <div style="display: flex; margin: 10px 0"  align="left">
-      <div style="width: 10%;display: flex" align="left">
-        <el-button @click="add" type="primary">新增</el-button>
-        <el-popconfirm title="确定删除吗？" @confirm="deleteBatch">
-          <template #reference>
-            <el-button type="danger" >批量删除</el-button>
-          </template>
-        </el-popconfirm>
-      </div>
       <!--    搜索区域-->
       <div style="width: 100%" align="right">
-        <el-input prefix-icon="search" v-model="search"  placeholder="请输入关键字" style="width:15%" clearable/>
+        <el-input prefix-icon="search" v-model="search"  placeholder="请输入订单号" style="width:15%" clearable/>
         <el-button  type="primary"  style="margin-left: 5px;margin-bottom: 3px" @click="load">搜索</el-button>
       </div>
     </div>
 
     <!--    数据展示区-->
     <el-table :row-class-name="tableRowClassName" v-model:data="Ordertable" border stripe style="width: 100%" @selection-change="handleSelectionChange"> <!--显示表格边框和斑马纹-->
-      <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column prop="orderno" label="订单号" sortable align= "center" min-width="120%"/> <!--prop:属性名  label:表头的名字-->
       <el-table-column prop="subject" label="订单名" align= "center" min-width="50%"/>
       <el-table-column prop="userId" label="用户账号" align= "center" min-width="50%"/>
@@ -49,13 +40,9 @@
       <el-table-column fix="right" label="操作" align= "center">
         <!--        内容修改区-->
         <template #default="scope">
-          <el-button  type="text"  @click="handleEdit(scope.row)">编辑</el-button>
+
           <el-button  type="text"  @click="handlebuy(scope.row)" v-bind:disabled="scope.row.state===0" style="color: green">支付</el-button>
-          <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.orderno)">
-            <template #reference>
-              <el-button  type="text" style="color: red" >删除</el-button>
-            </template>
-          </el-popconfirm>
+
         </template>
       </el-table-column>
     </el-table>
@@ -78,20 +65,7 @@
       <!--    导入导出-->
 
       <div style="margin-top: 5px;margin-left: 10px;display: flex">
-        <el-upload
-            :action=excelUploadUrl
-            :on-success="handleUploadSuccess"
-            :show-file-list=false
-            :limit="1"
-            accept='.xlsx'
-            style="display: inline-block; margin: 0 10px"
-        >
-          <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" ><el-icon><upload /></el-icon></el-button>
-
-        </el-upload>
-
         <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" @click="exportdata"><el-icon><download /></el-icon></el-button>
-
       </div>
 
     </div>
