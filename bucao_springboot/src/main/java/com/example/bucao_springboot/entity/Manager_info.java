@@ -10,48 +10,48 @@ import lombok.Data;
 @Data
 public class Manager_info {
     /**
-     *
+     * 管理员id
      */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId
     private String id;
 
     /**
-     *
+     * 管理员姓名
      */
     private String mname;
 
     /**
-     *
+     * 管理员密码
      */
     private String psd;
 
     /**
-     *
+     * 权限
      */
     private String pri;
 
     /**
-     *
+     * 头像
      */
     private String portrait;
 
     /**
-     *
+     * 电话
      */
     private String telephone;
 
     /**
-     *
+     * 地址
      */
     private String address;
 
     /**
-     *
+     * 邮箱
      */
     private String email;
 
     /**
-     *
+     * 性别
      */
     private String sex;
 

@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Layout from '../Layout/Layout.vue'
+import LayoutU from '../Layout/LayoutU.vue'
 
 const routes = [
+  //*************************** 面向管理员的主页   *************************
   {
     path: '/',
     name: 'Layout',
@@ -21,9 +23,9 @@ const routes = [
         component: ()=>import("@/views/RFIDkindsView"),
       },
       {
-        path:'person',
-        name:'person',
-        component:()=>import("@/views/Person")
+        path:'/personM',
+        name:'personM',
+        component:()=>import("@/views/managerviews/PersonM")
       },
       {
         path: 'bucao_info',
@@ -60,11 +62,7 @@ const routes = [
         name: 'Room_info',
         component: ()=>import("@/views/Room_info"),
       },
-      {
-        path: 'manager',
-        name: 'Manager',
-        component: ()=>import("@/views/managerviews/Manager.vue"),
-      },
+
       {
         path: 'statistics',
         name: 'statistics',
@@ -79,9 +77,85 @@ const routes = [
         path: 'user_room',
         name: 'user_room',
         component: ()=>import("@/views/User_room.vue"),
+      },
+      {
+        path: '/manager',
+        name: 'Manager',
+        component: ()=>import("@/views/managerviews/Manager.vue"),
+      },{
+        path: 'personM',
+        name: 'PersonM',
+        component: ()=>import("@/views/managerviews/PersonM.vue"),
       }
     ]
 
+  },
+    //*************************** 面向用户的主页 *************************
+  {
+    path: '/LayoutU',
+    name: 'LayoutU',
+    component: LayoutU,
+    // 重定向
+    redirect:"/homeU",
+    //嵌套路由
+    children:[
+      {
+        path: '/homeU',
+        name: 'HomeU',
+        component: ()=>import("@/views/userviews/HomeU"),
+      },
+      {
+        path: '/statisticsU',
+        name: 'statisticsU',
+        component: ()=>import("@/charts/statisticsU.vue"),
+      },
+
+      {
+        path: '/User_roomU',
+        name: 'User_roomU',
+        component: ()=>import("@/views/userviews/User_roomU"),
+      },
+      {
+        path: '/managerU',
+        name: 'ManagerU',
+        component: ()=>import("@/views/userviews/ManagerU.vue"),
+      },
+      {
+        path: '/MyOrder',
+        name: 'MyOrder',
+        component: ()=>import("@/views/userviews/MyOrder"),
+      },
+      {
+        path: '/Mybucao',
+        name: 'Mybucao',
+        component: ()=>import("@/views/userviews/Mybucao"),
+      },
+      {
+        path: '/bucao_infoU',
+        name: 'Bucao_infoU',
+        component: ()=>import("@/views/userviews/Bucao_infoU"),
+      },
+      {
+        path: '/RFID_kindsU',
+        name: 'RFID_kindsU',
+        component: ()=>import("@/views/userviews/RFIDkindsViewU"),
+      },
+      {
+        path: '/Room_infoU',
+        name: 'Room_infoU',
+        component: ()=>import("@/views/userviews/Room_infoU"),
+      },
+      {
+        path: '/SectionU',
+        name: 'SectionU',
+        component: ()=>import("@/views/userviews/SectionViewU"),
+      },
+      {
+        path:'/person',
+        name:'person',
+        component:()=>import("@/views/Person")
+      },
+    ]
   },
 
   {
@@ -90,10 +164,10 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../components/login.vue')
   },
 
+
   {
     path: '/register',
     name: 'register',
-
     component: () => import(/* webpackChunkName: "about" */ '../components/register.vue')
   }
 ]

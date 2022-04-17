@@ -29,6 +29,4 @@ public class User_info {
     @TableField(exist = false)
     private String token;
 
-
-
 }

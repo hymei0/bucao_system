@@ -99,7 +99,7 @@ export default {
       direction1:ArrowLeft,
       direction2:ArrowRight,
       index:0,
-      form:{role:'user'},
+      form:{role:'user'},//默认为普通用户登录
       validCode:'',//存放自动生成的验证码
       rules :{
         psd: [{ required: true, message: '请输入密码', trigger: 'blur' }],
@@ -169,33 +169,52 @@ export default {
        this.$message.error("验证码错误")
        return
      }
+     console.log(this.form)
+      if(this.form.roles==='user') {
+        request.post("/User_info/login", this.form).then(res => {
+              if (res.code === '1') {
+                sessionStorage.setItem("user_info", JSON.stringify(res.data))
+                //登录成功页面跳转，跳转到主页
+                this.$router.push("/LayoutU")
+                this.$message({
+                  type: "success",
+                  message: "登录成功",
+                })
 
-      request.post("/User_info/login",this.form).then(res=>
-          {
-            if(res.code==='1')
-            {
-              sessionStorage.setItem("user_info",JSON.stringify(res.data))
-              //登录成功页面跳转，跳转到主页
-              this.$router.push("/")
-
-              this.$message({
-              type:"success",
-              message:"登录成功",
-              })
-
+              } else {
+                this.$message({
+                  type: "error",
+                  message: res.msg
+                })
+              }
             }
-            else
-            {
-              this.$message({
-                type:"error",
-                message:res.msg
-              })
-            }
-          }
-      ).catch(err=>{
-        this.$message.error('登录失败，请稍后再试！')
-      })
+        ).catch(err => {
+          this.$message.error('登录失败，请稍后再试！')
+        })
+      }else{
+        request.post("/ManagerInfo/login", this.form).then(res => {
+              if (res.code === '1') {
+                sessionStorage.setItem("user_info", JSON.stringify(res.data))
+                //登录成功页面跳转，跳转到主页
+                this.$router.push("/")
 
+                this.$message({
+                  type: "success",
+                  message: "登录成功",
+                })
+
+              } else {
+                this.$message({
+                  type: "error",
+                  message: res.msg
+                })
+              }
+            }
+        ).catch(err => {
+          this.$message.error('登录失败，请稍后再试！')
+        })
+
+      }
     },
     resetForm(){
          this.form={}

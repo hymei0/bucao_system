@@ -7,9 +7,7 @@
         <span style="padding-top: 15px;padding-left: 10px">江南大学附属医院布草智能柜管理系统</span>
       </h4>
     </div>
-    <div style="flex:1">
-<!--      <h4 style="padding-top: 35px;color: aliceblue">{{user.pri}}</h4>-->
-    </div>
+    <div style="flex:1"></div>
     <div style="width:150px;padding-top:5px;display: flex">
       <h4 style="padding-top: 35px;color: aliceblue">{{user.uname}}</h4>
       <el-dropdown>
@@ -21,7 +19,7 @@
        </span>
         <template #dropdown>
           <el-dropdown-menu style="width: 100px">
-            <el-dropdown-item @click="$router.push('/personM')">个人信息</el-dropdown-item>
+            <el-dropdown-item @click="$router.push('/person')">个人信息</el-dropdown-item>
             <el-dropdown-item @click="$router.push('/login')" >退出系统</el-dropdown-item>
           </el-dropdown-menu>
         </template>
@@ -34,7 +32,7 @@
 import request from "@/utils/request";
 
 export default {
-  name: "Header",
+  name: "HeaderU",
   data(){
     return{
       user: {}
@@ -46,11 +44,18 @@ export default {
     this.user = JSON.parse(str)
 
     //请求服务端，确认当前登录用户的 合法信息
+    request.get("/User_info/" + this.user.id).then(res => {
+      if (res.code === '1') {
+        this.user = res.data
+      }
+      else{
           request.get("/ManagerInfo/"+ this.user.id).then(re=> {
             if (re.code === '1') {
               this.user = re.data
             }
           })
+      }
+    })
 
     if(this.user.portrait===null)
     //默认头像

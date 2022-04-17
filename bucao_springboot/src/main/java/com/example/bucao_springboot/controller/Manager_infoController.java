@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/Manager_info")
+//@RequestMapping("/Manager_info")
 
 public class Manager_infoController {
     //将xxxx_infoMapper引入到xxxx_infoController中,不太规范，一般是写service类，controller引入service,service引入mapper
@@ -43,7 +43,7 @@ public class Manager_infoController {
 
         if(res == null)
         {
-            return Result.error("-1","用户名或密码错误");
+            return Result.error("-1","管理员名或密码错误");
         }
         System.out.println("Manager_info已登录到"+manager_info.getId()+"的账户");
         return Result.success(res);
@@ -56,12 +56,12 @@ public class Manager_infoController {
             Manager_info user=manager_infoMapper.selectOne(Wrappers.<Manager_info>lambdaQuery().eq(Manager_info::getId,manager_info.getId()).or().eq(Manager_info::getTelephone,manager_info.getTelephone()));
             if(user==null) {
                 manager_infoMapper.insert(manager_info);
-                System.out.println("Manager_info已添加用户"+manager_info.getId()+"信息：");
+                System.out.println("Manager_info已添加管理员"+manager_info.getId()+"信息：");
                 return Result.success();
             }
             else
             {
-                return Result.error("-1","该用户已存在");
+                return Result.error("-1","该管理员已存在");
             }
         }catch (Exception e)
         {
@@ -73,7 +73,7 @@ public class Manager_infoController {
     public Result<?> update(@RequestBody Manager_info manager_info)
     {
         manager_infoMapper.updateById(manager_info);
-        System.out.println("Manager_info已更新用户"+manager_info.getId()+"的信息：");
+        System.out.println("Manager_info已更新管理员"+manager_info.getId()+"的信息：");
         return Result.success();
     }
 
@@ -82,7 +82,7 @@ public class Manager_infoController {
     public Result<?> delete(@PathVariable String id)
     {
         manager_infoMapper.deleteById(id);
-        System.out.println("Manager_info已删除用户"+id+"的信息：");
+        System.out.println("Manager_info已删除管理员"+id+"的信息：");
         return Result.success();
     }
 
@@ -112,7 +112,7 @@ public class Manager_infoController {
     public Result<?> SelectPerson_Info(@PathVariable String id)
     {
         manager_infoMapper.selectById(id);
-        System.out.println("Manager_info已查询到用户"+id+"的信息：");
+        System.out.println("Manager_info已查询到管理员"+id+"的信息：");
         return Result.success();
     }
 
