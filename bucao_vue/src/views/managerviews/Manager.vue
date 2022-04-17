@@ -3,7 +3,7 @@
 
 </style>
 <template>
-  <div class="Manager_info" style="padding:10px">
+  <div class="ManagerInfo" style="padding:10px">
     <!--    功能区域-->
     <div style="display: flex; margin: 10px 0"  align="left">
       <div style="width: 10%;display: flex" align="left">
@@ -138,7 +138,7 @@ const background = ref(true)
 const disabled = ref(false)
 
 export default {
-  name: "Manager_info",
+  name: "ManagerInfo",
   components: {
   },
 
@@ -208,7 +208,7 @@ export default {
         this.$message.warning("请选择数据！")
         return
       }
-      request.post("/Manager_info/deleteBatch", this.ids).then(res => {
+      request.post("/ManagerInfo/deleteBatch", this.ids).then(res => {
         if (res.code === '1') {
           this.$message.success("批量删除成功")
           this.load()
@@ -226,7 +226,7 @@ export default {
     },
     //数据导出：法一：从后端的数据库中导出
     exportdata() {
-      location.href = "http://" + "localhost" + ":9090/Manager_info/export";
+      location.href = "http://" + "localhost" + ":9090/ManagerInfo/export";
     },
     //添加按钮事件处理
     add()
@@ -239,7 +239,7 @@ export default {
     //查询
     load(){
 
-      request.get("/Manager_info",  {
+      request.get("/ManagerInfo",  {
         params:{
           pageNum: this.currentPage,
           pageSize: this.pageSize,
@@ -261,7 +261,7 @@ export default {
     //删除按钮事件处理
     handleDelete(id){
 
-      request.delete("/Manager_info/"+id,{
+      request.delete("/ManagerInfo/"+id,{
       }).then(res=>{
         if(res.code==='1')
         {
@@ -295,7 +295,7 @@ export default {
     {
       if(this.tag==='1')//该项记录的主键存在，进行更新操作
       {
-        request.put("/Manager_info",this.form).then(res=>{
+        request.put("/ManagerInfo",this.form).then(res=>{
           if(res.code==='1')
           {
             this.$message({
@@ -321,7 +321,7 @@ export default {
       {
         console.log(this.options)
 
-        request.post("/Manager_info",this.form).then(res=>{
+        request.post("/ManagerInfo",this.form).then(res=>{
           console.log(res)
           if(res.code==='1')
           {

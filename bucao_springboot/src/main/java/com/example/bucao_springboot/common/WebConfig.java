@@ -15,7 +15,7 @@ public class WebConfig implements WebMvcConfigurer {
 // alipay没有携带token,但是我们限制SDK接口调用，为其放行；
         registry.addInterceptor(authInterceptor())
                 .addPathPatterns("/**")
-                .excludePathPatterns("/rfid_kinds/**","/rfid_kinds",
+                .excludePathPatterns("/rfid_kinds/**","/rfid_kinds","/ManagerInfo/**","/ManagerInfo",
                         "/Bucao_info/**","/Bucao_info","/Bucao_room/**","/Bucao_room",
                         "/Bucao_user","/Bucao_user/**","/Order","/Order/**",
                         "/User_info/**", "/User_info","/Room_info","/Room_info/**",

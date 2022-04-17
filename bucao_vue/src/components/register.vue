@@ -138,9 +138,9 @@ export default {
             {
               this.$message({
                 type:"success",
-                message:"登录成功"
+                message:"注册成功"
               })
-              //登录成功页面跳转，跳转到登录页面
+              //注册成功页面跳转，跳转到登录页面
               this.$router.push("/login")
             }
             else
@@ -152,7 +152,7 @@ export default {
             }
           }
       ).catch(err=>{
-        this.$message.error('登录失败，请稍后再试！')
+        this.$message.error('注册失败，请稍后再试！')
       })
 
     },

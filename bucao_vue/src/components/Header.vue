@@ -29,6 +29,8 @@
 </template>
 
 <script>
+import request from "@/utils/request";
+
 export default {
   name: "Header",
   data(){
@@ -40,6 +42,20 @@ export default {
     let str = sessionStorage.getItem("user_info") || "{}"
     //类型转换
     this.user = JSON.parse(str)
+
+    //请求服务端，确认当前登录用户的 合法信息
+    request.get("/User_info/" + this.user.id).then(res => {
+      if (res.code === '1') {
+        this.user = res.data
+      }
+      else{
+          request.get("/ManagerInfo/"+ this.user.id).then(re=> {
+            if (re.code === '1') {
+              this.user = re.data
+            }
+          })
+      }
+    })
 
     if(this.user.portrait===null)
     //默认头像

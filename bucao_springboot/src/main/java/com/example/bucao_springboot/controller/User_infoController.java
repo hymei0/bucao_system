@@ -60,6 +60,7 @@ public class User_infoController {
                 return Result.error("-1","该账号/或该电话已存在");
             }
         }catch (Exception e){
+            System.out.println(e.toString());
             return Result.error("-1","系统错误，请稍后重试");
         }
     }
@@ -135,9 +136,16 @@ public class User_infoController {
     @GetMapping("/{id}")
     public Result<?> SelectPerson_Info(@PathVariable String id)
     {
+
         User_info user=user_infoMapper.selectById(id);
-        System.out.println("User_info已查询到用户"+id+"的信息");
-        return Result.success(user);
+        if(user==null)
+        {
+            return Result.error("-1","该用户不存在");
+        }
+        else{
+            System.out.println("User_info已查询到用户"+id+"的信息");
+            return Result.success(user);
+        }
     }
 
 
