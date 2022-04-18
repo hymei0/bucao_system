@@ -56,7 +56,7 @@
         <el-menu-item index="/bucao_infoU" style="padding-left: 60px; font-size:small">
           <template #title>
             <el-icon><document /></el-icon>
-            <span style="font-size: small;font-weight: bold;" >布草基本信息</span>
+            <span style="font-size: small;font-weight: bold;" >布草信息</span>
           </template>
         </el-menu-item>
         <el-menu-item index="/Mybucao" style="padding-left: 60px; font-size:small">

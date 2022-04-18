@@ -49,7 +49,7 @@
           <el-button  type="text"  @click="handleEdit(scope.row)">编辑</el-button>
           <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.roomId,scope.row.rfno,scope.row.rfid)">
             <template #reference>
-              <el-button  type="danger" >删除</el-button>
+              <el-button  type="text" style="color: red" >删除</el-button>
             </template>
           </el-popconfirm>
         </template>

@@ -95,6 +95,13 @@ public class bucao_infoController {
         List<Map<String, Object>> list=bucao_infoMapper.selectMaps(queryWrapper);
         return list;
     }
+    //查询布草类型为病号服且状态为闲置或者入库的布草
+    @GetMapping("/foruser")
+    public List<Map<String, Object>>  selectforuser(){
+        List<Map<String, Object>> list=bucao_infoMapper.selectbucaoforuser();
+        return list;
+    }
+
 
     //入库数据统计
     @GetMapping("/indata")
@@ -110,7 +117,6 @@ public class bucao_infoController {
     }
 
     //查询一条信息接口
-    //删除接口
     @GetMapping("/detail")
     public Result<?> detail(@RequestParam String rfno,
                             @RequestParam String rfid)

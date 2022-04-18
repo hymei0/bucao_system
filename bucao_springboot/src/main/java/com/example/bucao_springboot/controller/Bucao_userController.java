@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
 import com.example.bucao_springboot.entity.Bucao_user;
+import com.example.bucao_springboot.entity.User_room;
 import com.example.bucao_springboot.mapper.Bucao_userMapper;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,6 +42,7 @@ public class Bucao_userController {
             wrapper.eq("rfno", bucao_user.getRfno()).eq("rfid", bucao_user.getRfid()).eq("user_id",bucao_user.getUserId());
             Bucao_user result=bucao_userMapper.selectOne(wrapper);
             if(result==null) {
+                bucao_userMapper.updatebucao(bucao_user.getRfno(),bucao_user.getRfid());
                 bucao_userMapper.insert(bucao_user);
                 return Result.success();
             }
@@ -48,6 +50,7 @@ public class Bucao_userController {
                 return Result.error("-1","该记录已存在，如有变更需求请进行修改操作！");
             }
         }catch (Exception e){
+            System.out.println(e.toString());
             return Result.error("-1","后台错啦，请联系开发人员");
         }
     }
@@ -60,7 +63,8 @@ public class Bucao_userController {
             bucao_userMapper.update(bucao_user, Wrappers.<Bucao_user>lambdaUpdate().eq(Bucao_user::getRfno, bucao_user.getRfno()).eq(Bucao_user::getRfid, bucao_user.getRfid()).eq(Bucao_user::getUserId, bucao_user.getUserId()));
             return Result.success();
         }catch (Exception e){
-            return Result.error("-1","更新错误");
+            System.out.println(e.toString());
+            return Result.error("-1","后台出错了，请联系开发人员");
         }
 
     }
@@ -81,11 +85,36 @@ public class Bucao_userController {
             System.out.println(UserId+","+rfid+rfno+"该记录删除成功");
             return Result.success();
         }catch (Exception e){
+            System.out.println(e.toString());
             return Result.error("-1","后台出错啦，请联系开发人员");
         }
     }
+    //分页查询:面向用户的接口
+    @GetMapping("foruser")
+    public Result<?> findPageuser(@RequestParam(defaultValue = "1") Integer pageNum,
+                                  @RequestParam(defaultValue = "10") Integer pageSize,
+                                  @RequestParam(defaultValue = "") String search,
+                                  @RequestParam(defaultValue = "") String userid)
+    //参数：pageNum：当前页，pageSize:每页多少条 search:查询关键字
+    {
+        try {
+            QueryWrapper<Bucao_user> wrapper = new QueryWrapper<>();
 
-    //分页查询
+            if (StrUtil.isNotBlank(search))//不为null,则进行模糊匹配
+            {
+                wrapper.eq("user_id", userid).like("rfid", search).or().like("rfno", search).or().like("user_id", search).or().like("room_id", search).or().like("user_name", search);//eq(a,b)<=>a=b
+            } else {
+                wrapper.eq("user_id", userid);
+            }
+            Page<Bucao_user> Bucao_user_page = bucao_userMapper.selectPage(new Page<>(pageNum, pageSize), wrapper);
+            return Result.success(Bucao_user_page);
+        }catch (Exception e){
+            System.out.println(e.toString());
+            return Result.error("-1","后台出错了，请联系开发人员");
+        }
+    }
+
+    //分页查询:面向管理员的接口
     @GetMapping
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "20") Integer pageSize,

@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
+import com.example.bucao_springboot.entity.Bucao_user;
 import com.example.bucao_springboot.entity.User_room;
 import com.example.bucao_springboot.mapper.User_roomMapper;
 import org.springframework.web.bind.annotation.*;
@@ -67,7 +68,22 @@ public class User_roomController {
         }
 
     }
+    @GetMapping("/getroomid")
+    public Result<?> delete(@RequestParam String userid)
+    {
 
+        try {
+            // Bucao_user bucao=Bucao_userMapper.selectOne(Wrappers.<Bucao_user>lambdaQuery().eq(Bucao_user::getRfno,Bucao_user.getRfno()).eq(Bucao_user::getRfid,Bucao_user.getRfid()));
+            QueryWrapper<User_room> wrapper = new QueryWrapper<>();
+
+            wrapper.eq("userid", userid);
+            User_room ur=User_roomMapper.selectOne(wrapper);
+            return Result.success(ur.getRoomid());
+        }catch (Exception e){
+            System.out.println(e.toString());
+            return Result.error("-1","后台出错啦，请联系开发人员");
+        }
+    }
 
     //删除接口
     @DeleteMapping
@@ -84,7 +100,8 @@ public class User_roomController {
             //int rows = User_roomMapper.delete1(userid,roomid);
             return Result.success();
         }catch (Exception e){
-            return Result.error("-1",e.toString());
+            System.out.println(e.toString());
+            return Result.error("-1","后台出错了，请联系开发人员");
         }
     }
 

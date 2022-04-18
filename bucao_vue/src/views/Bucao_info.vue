@@ -50,7 +50,7 @@
           <el-button  type="text"  @click="handleEdit(scope.row)">编辑</el-button>
           <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.rfno,scope.row.rfid)">
             <template #reference>
-              <el-button  type="danger" >删除</el-button>
+              <el-button  type="text" style="color: red" >删除</el-button>
             </template>
           </el-popconfirm>
         </template>
@@ -105,7 +105,7 @@
           <el-input v-model="form.rfid" style="width:70%" autocomplete="off" v-bind:disabled="edi"/>
         </el-form-item>
         <el-form-item label="状  态" prop="state">
-          <el-select v-model="form.state" class="m-2" placeholder="Select" size="large">
+          <el-select v-model="form.state" class="m-2" placeholder="Select" size="large" v-bind:disabled="edi">
             <el-option
                 v-for="item in options1"
                 :key="item.label"

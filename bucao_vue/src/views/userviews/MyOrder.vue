@@ -6,8 +6,8 @@
   <div class="order" style="padding:10px">
     <!-- 面包屑导航 -->
     <el-breadcrumb prefix-icon="arrow-right-bold " style="width: 100%;margin-top: 10px;margin-left: 10px">
-      <el-breadcrumb-item style="font-size: large; ">用户管理</el-breadcrumb-item>
-      <el-breadcrumb-item style="font-size: large; ">订单信息</el-breadcrumb-item>
+      <el-breadcrumb-item style="font-size: large; ">个人订单</el-breadcrumb-item>
+      <el-breadcrumb-item style="font-size: large; ">我的订单</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 搜索，切换 -->
     <el-row :gutter="23">
@@ -41,7 +41,7 @@
         <!--        内容修改区-->
         <template #default="scope">
 
-          <el-button  type="text"  @click="handlebuy(scope.row)" v-bind:disabled="scope.row.state===0" style="color: green">支付</el-button>
+          <el-button  type="text"  @click="handlebuy(scope.row)" v-bind:disabled="scope.row.state==='已支付'" >支付</el-button>
 
         </template>
       </el-table-column>
@@ -196,15 +196,16 @@ export default {
     }
   },
   created() {
-    this.load()
-    let userStr = sessionStorage.getItem("user_info") || "{}"
-    this.user = JSON.parse(userStr)
-    // 请求服务端，确认当前登录用户的 合法信息
-    request.get("/User_info/" + this.user.id).then(res => {
-      if(res.code === '1'){
-        this.user = res.data
+    let str = sessionStorage.getItem("user_info") || "{}"
+    //类型转换
+    this.user = JSON.parse(str)
+    //请求服务端，确认当前登录用户的 合法信息
+    request.get("/User_info/"+ this.user.id).then(re=> {
+      if (re.code === '1') {
+        this.user = re.data
       }
     })
+    this.load()
   },
 
 //方法区
@@ -318,17 +319,12 @@ export default {
     },
     //查询
     load(){
-      request.get("/Room_info/selectall" ).then(re =>{
-        this.roomoptions=re.data
-      })
-      request.get("/User_info/selectall" ).then(re =>{
-        this.userIDoptions=re.data
-      })
-      request.get("/Order",  {
+      request.get("/Order/foruser",  {
         params:{
           pageNum: this.currentPage,
           pageSize: this.pageSize,
-          search: this.search
+          search: this.search,
+          userid:this.user.id,
         }
       }).then(res =>{
         this.Ordertable=res.data.records

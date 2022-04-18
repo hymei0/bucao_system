@@ -7,7 +7,7 @@
     <!-- 面包屑导航 -->
     <el-breadcrumb prefix-icon="arrow-right-bold " style="width: 100%;margin-top: 10px;margin-left: 10px">
       <el-breadcrumb-item style="font-size: large; ">布草管理</el-breadcrumb-item>
-      <el-breadcrumb-item style="font-size: large; ">布草-用户信息</el-breadcrumb-item>
+      <el-breadcrumb-item style="font-size: large; ">我的布草</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 搜索，切换 -->
     <el-row :gutter="23">
@@ -21,12 +21,7 @@
     <!--    功能区域-->
     <div style="display: flex; margin: 10px 0"  align="left">
       <div style="width: 10%;display: flex" align="left">
-        <el-button @click="add" type="primary">新增</el-button>
-        <el-popconfirm title="确定删除吗？" @confirm="deleteBatch">
-          <template #reference>
-            <el-button type="danger" >批量删除</el-button>
-          </template>
-        </el-popconfirm>
+        <el-button @click="add" type="primary">领取布草</el-button>
       </div>
       <!--    搜索区域-->
       <div style="width: 100%" align="right">
@@ -36,8 +31,8 @@
     </div>
 
     <!--    数据展示区-->
-    <el-table :data="Bucao_usertable" border stripe style="width: 100%" @selection-change="handleSelectionChange"> <!--显示表格边框和斑马纹-->
-      <el-table-column type="selection" width="55"></el-table-column>
+    <el-table :data="Bucao_usertable" border stripe style="width: 100%"> <!--显示表格边框和斑马纹-->
+
       <el-table-column prop="userId" label="用户账号" />
       <el-table-column prop="userName" label="用户姓名" sortable />
       <el-table-column prop="roomId" label="所在病房" sortable />
@@ -46,10 +41,9 @@
         <!--        内容修改区-->
         <template #default="scope">
           <el-button  type="text" style="color:greenyellow" @click="handledetail(scope.row.rfno,scope.row.rfid)">详情</el-button>
-          <el-button  type="text"  @click="handleEdit(scope.row)">编辑</el-button>
-          <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.roomId,scope.row.rfno,scope.row.rfid)">
+          <el-popconfirm title="请把布草放入回收箱中" @confirm="handleDelete(scope.row.roomId,scope.row.rfno,scope.row.rfid)">
             <template #reference>
-              <el-button  type="danger" >删除</el-button>
+              <el-button  type="text" style="color:red;" >归还布草</el-button>
             </template>
           </el-popconfirm>
         </template>
@@ -77,38 +71,24 @@
       </div>
     </div>
     <!--        对话框-->
-    <el-dialog v-model="dialogVisible" title="布草分布管理" width="30%" :before-close="handleClose">
+    <el-dialog v-model="dialogVisible" title="布草分布管理" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">
         <el-form-item label="病人账号" prop="userId">
-          <el-select v-model="form.userId" class="m-2" placeholder="Select" size="large" v-bind:disabled="edi">
-            <el-option
-                v-for="item in useroptions"
-                :key="item.ID"
-                :label="item.ID"
-                :value="item.ID"
-            />
-          </el-select>
+          <el-input v-model="user.id" style="width:70%" autocomplete="off" disabled/>
         </el-form-item>
         <el-form-item label="病房号" prop="userId">
-          <el-select v-model="form.roomId" class="m-2" placeholder="Select" size="large" v-bind:disabled="edi">
-            <el-option
-                v-for="item in roomoptions"
-                :key="item.id"
-                :label="item.id"
-                :value="item.id"
-            />
-          </el-select>
+          <el-input v-model="roomid" style="width:70%" autocomplete="off" disabled/>
         </el-form-item>
         <el-form-item label="用户姓名" prop="num">
-          <el-input v-model="form.userName" style="width:70%" autocomplete="off" v-bind:disabled="edi"/>
+          <el-input v-model="user.uname" style="width:70%" autocomplete="off" disabled/>
         </el-form-item>
         <el-form-item label="布草RFID编码" prop="rfidx">
           <el-select v-model="form.rfidx" class="m-2" placeholder="Select" size="large" v-bind:disabled="edi">
             <el-option
                 v-for="item in bucaooptions"
-                :key="item.rfno+item.rfid"
-                :label="item.rfno+item.rfid"
-                :value="item.rfno+item.rfid"
+                :key="item.RFNO+item.RFID"
+                :label="item.RFNO+item.RFID"
+                :value="item.RFNO+item.RFID"
             />
           </el-select>
         </el-form-item>
@@ -179,12 +159,12 @@ export default {
       form:{},
       form1:{},
       edi:false,
+      user:{},
+      roomid:'',
       tag:'',   //1表示编辑修改数据，0表示新增数据
 //对象区
       //RFID标签类别信息表
       Bucao_usertable:[],
-      useroptions:[],
-      roomoptions:[],
       bucaooptions:[],
       ids: [],
       excelUploadUrl:'http://localhost:9090/Bucao_user/import',
@@ -200,29 +180,22 @@ export default {
 
   },
   created() {
+
+    let str = sessionStorage.getItem("user_info") || "{}"
+    //类型转换
+    this.user = JSON.parse(str)
+    //请求服务端，确认当前登录用户的 合法信息
+    request.get("/User_info/"+ this.user.id).then(re=> {
+      if (re.code === '1') {
+        this.user = re.data
+      }
+    })
     this.load()
   },
 
 //方法区
   methods:{
-    handleSelectionChange(val) {
-      this.ids = val.map(v => [v.rfno,v.rfid,v.roomId,v.userId])   // [{id,name}, {id,name}] => [id,id]
-    },
-    deleteBatch() {
-      console.log(this.ids)
-      if (!this.ids.length) {
-        this.$message.warning("请选择数据！")
-        return
-      }
-      request.post("/Bucao_user/deleteBatch", this.ids).then(res => {
-        if (res.code === '1') {
-          this.$message.success("批量删除成功")
-          this.load()
-        } else {
-          this.$message.error(res.msg)
-        }
-      })
-    },
+
     //数据导出：法一：从后端的数据库中导出
     exportdata() {
       location.href = "http://" + "localhost" + ":9090/Bucao_user/export";
@@ -234,6 +207,14 @@ export default {
       this.edi=false
       this.dialogVisible=true
       this.form={} //清空表单
+      request.get("/User_room/getroomid" ,{
+        params:{
+          userid:this.user.id
+        }
+      }).then(re =>{
+        this.roomid=re.data
+      })
+
     },
     //详情按钮事件处理
     handledetail(id1,id2){
@@ -261,21 +242,16 @@ export default {
     },
     //查询
     load(){
-      request.get("/Bucao_info/selectall" ).then(re =>{
+      request.get("/Bucao_info/foruser" ).then(re =>{
         this.bucaooptions=re
       })
-      request.get("/Room_info/selectall" ).then(re =>{
-        this.roomoptions=re.data
-      })
-      request.get("/User_info/selectall" ).then(re =>{
-        this.useroptions=re.data
-        console.log(this.useroptions)
-      })
-      request.get("/Bucao_user",  {
+
+      request.get("/Bucao_user/foruser",  {
         params:{
           pageNum: this.currentPage,
           pageSize: this.pageSize,
-          search: this.search
+          search: this.search,
+          userid:this.user.id,
         }
       }).then(res =>{
         this.Bucao_usertable=res.data.records
@@ -360,7 +336,9 @@ export default {
       {
         this.form.rfid=this.form.rfidx.match(/\d+/g).toString()
         this.form.rfno=this.form.rfidx.match(/[a-zA-Z]/ig).join('')
-
+        this.form.userName=JSON.parse(JSON.stringify(this.user.uname))
+        this.form.userId=JSON.parse(JSON.stringify(this.user.id))
+        this.form.roomId=JSON.parse(JSON.stringify(this.roomid))
         request.post("/Bucao_user",this.form).then(res=>{
           if(res.code==='1')
           {

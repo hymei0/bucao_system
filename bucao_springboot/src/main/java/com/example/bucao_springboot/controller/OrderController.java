@@ -120,8 +120,28 @@ public class OrderController {
         // 更新订单，扣减库存
         return Result.success(payUrl);
     }
+    //分页查询:面向用户的接口
+    @GetMapping("foruser")
+    public Result<?> findPageuser(@RequestParam(defaultValue = "1") Integer pageNum,
+                                  @RequestParam(defaultValue = "10") Integer pageSize,
+                                  @RequestParam(defaultValue = "") String search,
+                                  @RequestParam String userid)
+    //参数：pageNum：当前页，pageSize:每页多少条 search:查询关键字
+    {
+        LambdaQueryWrapper<Order> wrapper = Wrappers.<Order>lambdaQuery();
 
-    //分页查询
+        if(StrUtil.isNotBlank(search))//不为null,则进行模糊匹配
+        {
+            wrapper.like(Order::getOrderno,search).eq(Order::getUserId, userid);
+        }
+        else{
+            wrapper.eq(Order::getUserId, userid);
+        }
+        Page<Order> orderpage=OrderMapper.selectPage(new Page<>(pageNum,pageSize), wrapper);
+        return Result.success(orderpage);
+    }
+
+    //分页查询:面向管理员的接口
     @GetMapping
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "10") Integer pageSize,
@@ -165,12 +185,13 @@ public class OrderController {
         for (Order Order : all) {
             Map<String, Object> row1 = new LinkedHashMap<>();
             row1.put("订单号", Order.getOrderno());
+            row1.put("订单名", Order.getSubject());
             row1.put("用户编号", Order.getUserId());
             row1.put("病房号", Order.getRoomId());
             row1.put("创建时间",DateUtil.format(Order.getCreatetime(),"yyyy-MM-dd HH:mm:ss"));
-            row1.put("订单名", Order.getSubject());
             row1.put("应缴费用", Order.getExpenses());
             row1.put("缴费时间", DateUtil.format(Order.getPaytime(),"yyyy-MM-dd HH:mm:ss"));
+            row1.put("支付状态", Order.getState());
             list.add(row1);
         }
         // 2. 写excel
