@@ -6,8 +6,8 @@
   <div class="User_info" style="padding:10px">
     <!-- 面包屑导航 -->
     <el-breadcrumb prefix-icon="arrow-right-bold " style="width: 100%;margin-top: 10px;margin-left: 10px">
-      <el-breadcrumb-item style="font-size: large; ">用户管理</el-breadcrumb-item>
-      <el-breadcrumb-item style="font-size: large; ">用户信息</el-breadcrumb-item>
+      <el-breadcrumb-item style="font-size: large; ">部门管理</el-breadcrumb-item>
+      <el-breadcrumb-item style="font-size: large; ">部门信息</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 搜索，切换 -->
     <el-row :gutter="23">
@@ -97,7 +97,7 @@
 
       </div>
     </div>
-    <el-dialog v-model="dialogVisible" title="用户信息" width="30%" >
+    <el-dialog v-model="dialogVisible" title="部门信息" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">
 
         <el-form-item label="账  号" prop="id">

@@ -24,7 +24,10 @@ public class User_room {
     private String sex;
     @TableField(exist = false)
     private String telephone;
-
+    /**
+     * 出院的病人的住院记录依然存在，所以得加上住院时日期作为复合主键
+     */
+    @MppMultiId // 复合主键
     @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private Date comeTime;
 

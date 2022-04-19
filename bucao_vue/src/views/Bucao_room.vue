@@ -97,9 +97,10 @@
           <el-select v-model="form.rfidx" class="m-2" @change="GetBucaosection" placeholder="Select" size="large" v-bind:disabled="edi">
             <el-option
                 v-for="item in options"
-                :key="item.RFNO+item.RFID"
-                :label="item.RFNO+item.RFID"
-                :value="item.RFNO+item.RFID"
+
+                :key="item.rfno+item.rfid"
+                :label="item.rfno+item.rfid"
+                :value="item.rfno+item.rfid"
             />
           </el-select>
         </el-form-item>
@@ -268,11 +269,7 @@ export default {
     //查询
     load(){
 
-      request.get("/Bucao_info/foruser",{
-        params:{
-          rfid:'B'
-        }
-      } ).then(re =>{
+      request.get("/Bucao_info/selectall").then(re =>{
         this.options=re
       })
 

@@ -7,7 +7,7 @@
     <!-- 面包屑导航 -->
     <el-breadcrumb prefix-icon="arrow-right-bold " style="width: 100%;margin-top: 10px;margin-left: 10px">
       <el-breadcrumb-item style="font-size: large; ">布草管理</el-breadcrumb-item>
-      <el-breadcrumb-item style="font-size: large; ">布草-用户信息</el-breadcrumb-item>
+      <el-breadcrumb-item style="font-size: large; ">布草-部门信息</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 搜索，切换 -->
     <el-row :gutter="23">
@@ -38,15 +38,14 @@
     <!--    数据展示区-->
     <el-table :data="Bucao_usertable" border stripe style="width: 100%" @selection-change="handleSelectionChange"> <!--显示表格边框和斑马纹-->
       <el-table-column type="selection" width="55"></el-table-column>
-      <el-table-column prop="userId" label="用户账号" />
-      <el-table-column prop="userName" label="用户姓名" sortable />
+      <el-table-column prop="userId" label="部门账号" />
+      <el-table-column prop="userName" label="部门姓名" sortable />
       <el-table-column prop="roomId" label="所在病房" sortable />
       <el-table-column prop="rfidx" label="布草RFID编号" />
       <el-table-column fix="right" label="操作" >
         <!--        内容修改区-->
         <template #default="scope">
           <el-button  type="text" style="color:greenyellow" @click="handledetail(scope.row.rfno,scope.row.rfid)">详情</el-button>
-          <el-button  type="text"  @click="handleEdit(scope.row)">编辑</el-button>
           <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.userId,scope.row.rfno,scope.row.rfid)">
             <template #reference>
               <el-button  type="text" style="color: red" >删除</el-button>
@@ -99,7 +98,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="用户姓名" prop="num">
+        <el-form-item label="部门姓名" prop="num">
           <el-input v-model="form.userName" style="width:70%" autocomplete="off" disabled/>
         </el-form-item>
         <el-form-item label="布草RFID编码" prop="rfidx">
@@ -205,7 +204,7 @@ export default {
 
 //方法区
   methods:{
-    //获取用户姓名函数
+    //获取部门姓名函数
     GetUserName(){
       request.get("/User_info/"+this.form.userId).then(res=>{
         this.form.userName=res.data.uname

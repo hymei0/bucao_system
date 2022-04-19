@@ -35,7 +35,12 @@ public class Room_InfoController {
     //将xxxx_infoMapper引入到xxxx_infoController中,不太规范，一般是写service类，controller引入service,service引入mapper
     @Resource
     Room_infoMapper room_infoMapper;
-    //新增接口
+
+    /**新增接口
+     *
+     * @param room_info
+     * @return
+     */
     @PostMapping
     public Result<?> save(@RequestBody Room_info room_info)
     {
@@ -43,37 +48,64 @@ public class Room_InfoController {
             Room_info user=room_infoMapper.selectOne(Wrappers.<Room_info>lambdaQuery().eq(Room_info::getId,room_info.getId()));
             if(user==null) {
                 room_infoMapper.insert(room_info);
-                System.out.println("Room_info已添加用户"+room_info.getId()+"信息：");
+                System.out.println("Room_info已添加部门"+room_info.getId()+"信息：");
                 return Result.success();
             }
             else
             {
-                return Result.error("-1","该用户已存在");
+                return Result.error("-1","该部门已存在");
             }
         }catch (Exception e)
         {
             return Result.error("-1","系统后台出错啦，请联系工作人员");
         }
     }
-    //更新接口
+
+    /**更新接口
+     *
+     * @param Room_info
+     * @return
+     */
     @PutMapping
     public Result<?> update(@RequestBody Room_info Room_info)
     {
-        room_infoMapper.updateById(Room_info);
-        System.out.println("Room_info已更新用户"+Room_info.getId()+"的信息：");
-        return Result.success();
+        try {
+            room_infoMapper.updateById(Room_info);
+            System.out.println("Room_info已更新部门" + Room_info.getId() + "的信息：");
+            return Result.success();
+        }catch (Exception e)
+        {
+            System.out.println(e.toString());
+            return Result.error("-1","请先删除请先删除住院相应住院记录和布草的分布记录");
+        }
     }
 
-    //删除接口
+    /**删除接口
+     *
+     * @param id
+     * @return
+     */
     @DeleteMapping("/{id}")
     public Result<?> delete(@PathVariable String id)
     {
-        room_infoMapper.deleteById(id);
-        System.out.println("Room_info已删除用户"+id+"的信息：");
-        return Result.success();
+        try {
+            room_infoMapper.deleteById(id);
+            System.out.println("Room_info已删除部门" + id + "的信息：");
+            return Result.success();
+        }catch (Exception e)
+        {
+            System.out.println(e.toString());
+            return Result.error("-1","请先删除请先删除住院相应住院记录和布草的分布记录");
+        }
     }
 
-    //分页查询
+    /**分页查询
+     *
+     * @param pageNum 当前页
+     * @param pageSize 每页多少条
+     * @param search 查询关键字
+     * @return
+     */
     @GetMapping
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "10") Integer pageSize,
@@ -87,14 +119,18 @@ public class Room_InfoController {
         LambdaQueryWrapper<Room_info> wrapper = Wrappers.<Room_info>lambdaQuery();
         if(StrUtil.isNotBlank(search))//不为null,则进行模糊匹配
         {
-            wrapper.like(Room_info::getId,search);//eq(a,b)<=>a=b
+            wrapper.like(Room_info::getId,search).or().like(Room_info::getSection,search);//eq(a,b)<=>a=b
         }
         Page<Room_info> Room_info_page=room_infoMapper.selectPage(new Page<>(pageNum,pageSize), wrapper);
 
         return Result.success(Room_info_page);
     }
 
-    //批量查询所属部门接口
+    /**批量查询所属部门接口
+     *
+     * @param ids
+     * @return
+     */
     @GetMapping("/allsection")
     public Result<?> allSections(@RequestBody List<String> ids) {
 
@@ -102,7 +138,11 @@ public class Room_InfoController {
         return Result.success();
     }
 
-    //显示部门信息
+    /**显示部门信息
+     *
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}")
     public Result<?> SelectRoom_Info(@PathVariable String id)
     {
@@ -111,14 +151,22 @@ public class Room_InfoController {
         System.out.println("Room_info已查询到部门"+id+"的信息：");
         return Result.success(room);
     }
-    //无条件查询
+
+    /**无条件查询
+     *
+     * @return
+     */
     @GetMapping("/selectall")
     public Result<?>  selectall(){
         QueryWrapper<Room_info> queryWrapper = new QueryWrapper<>();
         List<Map<String, Object>> list=room_infoMapper.selectMaps(queryWrapper);
         return Result.success(list);
     }
-    //无条件查询
+
+    /**查询出没有分配足够到的布草的病房
+     *
+     * @return
+     */
     @GetMapping("/forbucao")
     public Result<?>  selecforbucao(){
         QueryWrapper<Room_info> queryWrapper = new QueryWrapper<>();
@@ -193,14 +241,15 @@ public class Room_InfoController {
             Room_info.setSection(row.get(1).toString());
             saveList.add(Room_info);
         }
+        Integer num=0;//统计导入成功的记录条数
         for (Room_info Room_info : saveList) {
-
             if(Room_info.getId()!=null)
             {
                 room_infoMapper.insert(Room_info);
+                num=num+1;
             }
         }
-        return Result.success();
+        return Result.success(num);
     }
 
 }

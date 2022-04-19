@@ -34,7 +34,11 @@ public class User_roomController {
     @Resource
     User_roomMapper User_roomMapper;
 
-    //新增接口
+    /**新增接口
+     *
+     * @param user_room
+     * @return
+     */
     @PostMapping
     public Result<?> save(@RequestBody User_room user_room)
     {
@@ -43,12 +47,12 @@ public class User_roomController {
             if(user==null) {
                 User_roomMapper.updatebucao(user_room.getRoomid(),"使用中");
                 User_roomMapper.insert(user_room);
-                System.out.println("User_room已添加用户"+user_room.getUserid()+"的住院信息：");
+                System.out.println("User_room已添加部门"+user_room.getUserid()+"的住院信息：");
                 return Result.success();
             }
             else
             {
-                return Result.error("-1","该用户已存在");
+                return Result.error("-1","该部门已存在");
             }
         }catch (Exception e)
         {
@@ -56,7 +60,12 @@ public class User_roomController {
             return Result.error("-1","系统后台出错啦，请联系工作人员");
         }
     }
-    //更新接口
+
+    /**更新接口
+     *
+     * @param User_room
+     * @return
+     */
     @PutMapping
     public Result<?> update(@RequestBody User_room User_room)
     {
@@ -70,8 +79,15 @@ public class User_roomController {
         }
 
     }
+
+    /**
+     * 病人和病房时一对多的关系，一个病人住一个病房
+     * 所以可以根据病人id查询出病人所在病房
+     * @param userid
+     * @return
+     */
     @GetMapping("/getroomid")
-    public Result<?> delete(@RequestParam String userid)
+    public Result<?> selete(@RequestParam String userid)
     {
 
         try {
@@ -88,7 +104,13 @@ public class User_roomController {
         }
     }
 
-    //删除接口
+    /**删除接口
+     *
+     * @param userid
+     * @param roomid
+     * @param comeTime
+     * @return
+     */
     @DeleteMapping
     public Result<?> delete(@RequestParam String userid,
                             @RequestParam String roomid,
@@ -104,7 +126,7 @@ public class User_roomController {
             return Result.success();
         }catch (Exception e){
             System.out.println(e.toString());
-            return Result.error("-1","后台出错了，请联系开发人员");
+            return Result.error("-1","后台出错了，请先删除订单信息中相关记录");
         }
     }
 
@@ -144,7 +166,7 @@ public class User_roomController {
             return Result.success(User_room_page);
         }
     }
-    //分页查询:面向用户的接口
+    //分页查询:面向部门的接口
     @GetMapping("foruser")
     public Result<?> findPageuser(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "10") Integer pageSize,

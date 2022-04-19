@@ -44,7 +44,7 @@ public class Bucao_userController {
             wrapper.eq("rfno", bucao_user.getRfno()).eq("rfid", bucao_user.getRfid()).eq("user_id",bucao_user.getUserId());
             Bucao_user result=bucao_userMapper.selectOne(wrapper);
             if(result==null) {
-                bucao_userMapper.updatebucao(bucao_user.getRfno(),bucao_user.getRfid(),"使用中");//将用户领取的布草的状态改变为使用中
+                bucao_userMapper.updatebucao(bucao_user.getRfno(),bucao_user.getRfid(),"使用中");//将部门领取的布草的状态改变为使用中
 
                 return Result.success();
             }
@@ -91,7 +91,7 @@ public class Bucao_userController {
             return Result.error("-1","后台出错啦，请联系开发人员");
         }
     }
-    //分页查询:面向用户的接口
+    //分页查询:面向部门的接口
     @GetMapping("foruser")
     public Result<?> findPageuser(@RequestParam(defaultValue = "1") Integer pageNum,
                                   @RequestParam(defaultValue = "10") Integer pageSize,
@@ -176,8 +176,8 @@ public class Bucao_userController {
         List<Bucao_user> all = bucao_userMapper.selectList(null);
         for (Bucao_user Bucao_user : all) {
             Map<String, Object> row1 = new LinkedHashMap<>();
-            row1.put("用户账号", Bucao_user.getUserId());
-            row1.put("用户姓名", Bucao_user.getUserName());
+            row1.put("部门账号", Bucao_user.getUserId());
+            row1.put("部门姓名", Bucao_user.getUserName());
             row1.put("所在病房", Bucao_user.getRoomId());
             row1.put("布草RFID编号", Bucao_user.getRFIDX());
 
@@ -188,7 +188,7 @@ public class Bucao_userController {
         writer.write(list, true);
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
-        String fileName = URLEncoder.encode("布草-用户信息数据表", "UTF-8");
+        String fileName = URLEncoder.encode("布草-部门信息数据表", "UTF-8");
         response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
 
         ServletOutputStream out = response.getOutputStream();

@@ -33,8 +33,8 @@
     <!--    数据展示区-->
     <el-table :data="Bucao_usertable" border stripe style="width: 100%"> <!--显示表格边框和斑马纹-->
 
-      <el-table-column prop="userId" label="用户账号" />
-      <el-table-column prop="userName" label="用户姓名" sortable />
+      <el-table-column prop="userId" label="部门账号" />
+      <el-table-column prop="userName" label="部门姓名" sortable />
       <el-table-column prop="roomId" label="所在病房" sortable />
       <el-table-column prop="rfidx" label="布草RFID编号" />
       <el-table-column fix="right" label="操作" >
@@ -94,7 +94,7 @@
         <el-form-item label="病房号" prop="userId">
           <el-input v-model="roomid" style="width:70%" autocomplete="off" disabled/>
         </el-form-item>
-        <el-form-item label="用户姓名" prop="num">
+        <el-form-item label="部门姓名" prop="num">
           <el-input v-model="user.uname" style="width:70%" autocomplete="off" disabled/>
         </el-form-item>
         <el-form-item label="布草RFID编码" prop="rfidx">
@@ -199,7 +199,7 @@ export default {
     let str = sessionStorage.getItem("user_info") || "{}"
     //类型转换
     this.user = JSON.parse(str)
-    //请求服务端，确认当前登录用户的 合法信息
+    //请求服务端，确认当前登录部门的 合法信息
     request.get("/User_info/"+ this.user.id).then(re=> {
       if (re.code === '1') {
         this.user = re.data

@@ -37,7 +37,11 @@ public class bucao_infoController {
     @Resource
     Bucao_infoMapper bucao_infoMapper;
 
-    //新增接口
+    /**新增接口
+     *
+     * @param bucao_info
+     * @return
+     */
     @PostMapping  //post接口：前台把json数据传过来，通过此接口接收到  并转化成Bucao_info类
     public Result<?> save(@RequestBody Bucao_info bucao_info)
     {
@@ -54,11 +58,16 @@ public class bucao_infoController {
                 return Result.error("-1","该布草已经存在");
             }
         }catch (Exception e){
-            return Result.error("-1",e.toString());
+            System.out.println(e.toString());
+            return Result.error("-1","后台出错了，请联系开发人员");
         }
     }
 
-    //更新接口
+    /**更新接口
+     *
+     * @param bucao_info
+     * @return
+     */
     @PutMapping
     public Result<?> update(@RequestBody Bucao_info bucao_info)
     {
@@ -66,12 +75,17 @@ public class bucao_infoController {
             bucao_infoMapper.update(bucao_info, Wrappers.<Bucao_info>lambdaUpdate().eq(Bucao_info::getRfno, bucao_info.getRfno()).eq(Bucao_info::getRfid, bucao_info.getRfid()));
             return Result.success();
         }catch (Exception e){
-            return Result.error("-1","更新错误");
+            return Result.error("-1","后台出错了，请联系开发人员");
         }
 
     }
 
-    //删除接口
+    /**删除接口
+     *
+     * @param rfno
+     * @param rfid
+     * @return
+     */
     @DeleteMapping
     public Result<?> delete(@RequestParam String rfno,
                             @RequestParam String rfid)
@@ -84,19 +98,28 @@ public class bucao_infoController {
             int rows = bucao_infoMapper.delete(wrapper);
             return Result.success();
         }catch (Exception e){
-            return Result.error("-1",e.toString());
+            System.out.println(e.toString());
+            return Result.error("-1","请先删除布草-用户、布草-病房信息表的相关记录");
         }
     }
 
 
-    //无条件查询
+    /**查询出处于闲置状态的布草
+     *
+     * @return
+     */
     @GetMapping("/selectall")
     public List<Map<String, Object>>  selectall(){
-        QueryWrapper<Bucao_info> queryWrapper = new QueryWrapper<>();
-        List<Map<String, Object>> list=bucao_infoMapper.selectMaps(queryWrapper);
+        //QueryWrapper<Bucao_info> queryWrapper = new QueryWrapper<>();
+        List<Map<String, Object>> list=bucao_infoMapper.selectMaps(Wrappers.<Bucao_info>lambdaUpdate().like(Bucao_info::getState,"闲置"));
         return list;
     }
-    //查询布草类型为病号服且状态为闲置或者入库的布草
+
+    /**查询布草类型为病号服且状态为闲置或者入库的布草
+     *
+     * @param rfid
+     * @return
+     */
     @GetMapping("/foruser")
     public List<Map<String, Object>>  selectforuser(@RequestParam String rfid){
         List<Map<String, Object>> list=bucao_infoMapper.selectbucaoforuser(rfid);
@@ -104,20 +127,32 @@ public class bucao_infoController {
     }
 
 
-    //入库数据统计
+    /**入库数据统计
+     *
+     * @return
+     */
     @GetMapping("/indata")
     public Result<?>  indata(){
         //查询数据库中所有数据月份和数据
         return Result.success(bucao_infoMapper.Indata());
     }
-    //入库数据统计
+
+    /**出库数据统计
+     *
+     * @return
+     */
     @GetMapping("/outdata")
     public Result<?>  echarts(){
         //查询数据库中所有数据月份和数据
         return Result.success(bucao_infoMapper.Outdata());
     }
 
-    //查询一条信息接口
+    /**复合主键，根据复合id查询
+     *
+     * @param rfno
+     * @param rfid
+     * @return
+     */
     @GetMapping("/detail")
     public Result<?> detail(@RequestParam String rfno,
                             @RequestParam String rfid)
@@ -134,7 +169,13 @@ public class bucao_infoController {
         }
     }
 
-    //分页查询
+    /**分页查询
+     *
+     * @param pageNum
+     * @param pageSize
+     * @param search
+     * @return
+     */
     @GetMapping
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "20") Integer pageSize,
@@ -243,7 +284,6 @@ public class bucao_infoController {
         }
         Integer success=0;
         for (Bucao_info bucao_info : saveList) {
-
             if(bucao_info.getRfid()!=null&&bucao_info.getRfno()!=null)
             {
                 bucao_infoMapper.insert(bucao_info);

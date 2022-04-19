@@ -43,7 +43,7 @@ export default {
     //类型转换
     this.user = JSON.parse(str)
 
-    //请求服务端，确认当前登录用户的 合法信息
+    //请求服务端，确认当前登录部门的 合法信息
     request.get("/User_info/" + this.user.id).then(res => {
       if (res.code === '1') {
         this.user = res.data

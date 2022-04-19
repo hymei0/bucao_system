@@ -33,7 +33,10 @@ public class SectionController {
     @Resource
     SectionMapper sectionMapper;
 
-    //与Bucao_info表交互的接口
+    /**与Bucao_info表交互的接口：查询出布草所属所有部门
+     *
+     * @return
+     */
     @GetMapping("/rfid_kinds")
     public List<Map<String, Object>> SeletToRfidKinds()
     {
@@ -42,7 +45,11 @@ public class SectionController {
         return list;
     }
 
-    //新增接口
+    /**新增接口
+     *
+     * @param section
+     * @return
+     */
     @PostMapping
     public Result<?> save(@RequestBody Section section)
     {
@@ -50,37 +57,60 @@ public class SectionController {
             Section user=sectionMapper.selectOne(Wrappers.<Section>lambdaQuery().eq(Section::getId,section.getId()));
             if(user==null) {
                 sectionMapper.insert(section);
-                System.out.println("Section已添加用户"+section.getId()+"信息：");
+                System.out.println("Section已添加部门"+section.getId()+"信息：");
                 return Result.success();
             }
             else
             {
-                return Result.error("-1","该用户已存在");
+                return Result.error("-1","该部门已存在");
             }
         }catch (Exception e)
         {
-            return Result.error("-1","系统后台出错啦，请联系工作人员");
+            return Result.error("-1","系统后台出错啦，请联系开发人员");
         }
     }
-    //更新接口
+
+    /**更新接口
+     *
+     * @param Section
+     * @return
+     */
     @PutMapping
     public Result<?> update(@RequestBody Section Section)
     {
-        sectionMapper.updateById(Section);
-        System.out.println("Section已更新用户"+Section.getId()+"的信息：");
-        return Result.success();
+        try {
+            sectionMapper.updateById(Section);
+            System.out.println("Section已更新部门" + Section.getId() + "的信息：");
+            return Result.success();
+        }catch (Exception e)
+        {
+            System.out.println(e.toString());
+            return Result.error("-1","请先删除布草信息基本表、病房表、RFID标签分类表中的相关记录");
+        }
     }
 
     //删除接口
     @DeleteMapping("/{id}")
     public Result<?> delete(@PathVariable String id)
     {
-        sectionMapper.deleteById(id);
-        System.out.println("Section已删除用户"+id+"的信息：");
-        return Result.success();
+        try {
+            sectionMapper.deleteById(id);
+            System.out.println("Section已删除部门" + id + "的信息：");
+            return Result.success();
+        }catch (Exception e)
+        {
+            System.out.println(e.toString());
+            return  Result.error("-1","请先删除布草信息基本表、病房表、RFID标签分类表中的相关记录");
+        }
     }
 
-    //分页查询
+    /**分页查询
+     *
+     * @param pageNum
+     * @param pageSize
+     * @param search
+     * @return
+     */
     @GetMapping
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "10") Integer pageSize,
@@ -101,12 +131,16 @@ public class SectionController {
         return Result.success(Section_page);
     }
 
-    //显示个人信息
+    /**显示个人信息
+     *
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}")
     public Result<?> SelectPerson_Info(@PathVariable String id)
     {
         sectionMapper.selectById(id);
-        System.out.println("Section已查询到用户"+id+"的信息：");
+        System.out.println("Section已查询到部门"+id+"的信息：");
         return Result.success();
     }
 
@@ -177,13 +211,15 @@ public class SectionController {
             Section.setNa(row.get(1).toString());
             saveList.add(Section);
         }
+        Integer num=0; //统计导入成功的记录条数
         for (Section Section : saveList) {
 
             if(Section.getId()!=null)
             {
                 sectionMapper.insert(Section);
+                num=num+1;
             }
         }
-        return Result.success();
+        return Result.success(num);
     }
 }

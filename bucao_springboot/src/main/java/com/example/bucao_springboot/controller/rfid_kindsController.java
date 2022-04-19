@@ -34,7 +34,11 @@ public class rfid_kindsController {
     @Resource   //将rfid_kindsMapper引入到bucao_infoController中
     RFid_kindsMapper rfid_kindsMapper;
 
-    //新增接口
+    /**新增接口
+     *
+     * @param rfid_kinds
+     * @return
+     */
     @PostMapping
     public Result<?> save(@RequestBody RFid_kinds rfid_kinds)
     {
@@ -49,20 +53,33 @@ public class rfid_kindsController {
             }
         }catch (Exception e){
             System.out.println(e.toString());
-            return Result.error("-1","系统错误，请稍后重试");
+            return Result.error("-1","后台出错了，请联系开发人员");
         }
 
     }
-    //更新接口
+
+    /**更新接口
+     *
+     * @param rfid_kinds
+     * @return
+     */
     @PutMapping
     public Result<?> update(@RequestBody RFid_kinds rfid_kinds)
     {
-
-        rfid_kindsMapper.updateById(rfid_kinds);
-        return Result.success();
-
+        try {
+            rfid_kindsMapper.updateById(rfid_kinds);
+            return Result.success();
+        }catch (Exception e){
+            System.out.println(e.toString());
+            return Result.error("-1","请先删除布草表中的相关记录再做更新");
+        }
     }
-    //通过id查询
+
+    /**通过id查询
+     *
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}")
     public Result<?> SelectRFID_Info(@PathVariable String id)
     {
@@ -71,14 +88,29 @@ public class rfid_kindsController {
         return Result.success(rfid);
     }
 
-    //删除接口
+    /**删除接口
+     *
+     * @param id
+     * @return
+     */
     @DeleteMapping("/{id}")
     public Result<?> delete(@PathVariable String id)
     {
-        rfid_kindsMapper.deleteById(id);
-        return Result.success();
+        System.out.println(id);
+        try {
+            rfid_kindsMapper.deleteById(id);
+            return Result.success();
+        }catch (Exception e){
+            System.out.println(e.toString());
+            return Result.error("-1","请先删除布草基本信息表中的相关记录");
+        }
     }
-    //批量插入
+
+    /**批量插入
+     *
+     * @param rfid_kinds
+     * @return
+     */
     @GetMapping("/insertall")
     public Result<?> Addall(@RequestBody List< RFid_kinds> rfid_kinds){
 
@@ -91,18 +123,32 @@ public class rfid_kindsController {
         }
         return Result.success( rfid_kindsMapper);
     }
-    //查询各种布草的库存
+
+    /**查询各种布草的库存
+     *
+     * @return
+     */
     @GetMapping("/kinds_stocks")
     public Result<?>  kinds_stocks(){
         return Result.success(rfid_kindsMapper.STOCKS());
     }
-    //查询各种布草的库存
+
+    /**查询各种布草的库存
+     *
+     * @return
+     */
     @GetMapping("/section_stocks")
     public Result<?>  kinds_section(){
         return Result.success(rfid_kindsMapper.STOCKS_setion());
     }
 
-    //分页查询
+    /**分页查询
+     *
+     * @param pageNum
+     * @param pageSize
+     * @param search
+     * @return
+     */
     @GetMapping
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "10") Integer pageSize,
@@ -122,7 +168,11 @@ public class rfid_kindsController {
 
         return Result.success(rfid_kinds_page);
     }
-    //与bucao_info表交互的接口
+
+    /**与bucao_info表交互的接口
+     *
+     * @return
+     */
     @GetMapping("/bucaoinfo")
     public List<Map<String, Object>>  SeletTobucaoinfo()
     {
@@ -136,7 +186,6 @@ public class rfid_kindsController {
      * @param ids
      * @return
      */
-
     @PostMapping("/deleteBatch")
     public Result<?> deleteBatch(@RequestBody List<String> ids) {
         rfid_kindsMapper.deleteBatchIds(ids);
@@ -203,12 +252,13 @@ public class rfid_kindsController {
 
             saveList.add(rfid_kinds);
         }
+        Integer num=0;//统计导入成功的记录条数
         for (RFid_kinds rfid_kinds : saveList) {
-            rfid_kindsMapper.insert(rfid_kinds);
+            if(rfid_kinds.getRFNO()!=null) {
+                rfid_kindsMapper.insert(rfid_kinds);
+                num=num+1;
+            }
         }
         return Result.success();
     }
-
-
-
 }

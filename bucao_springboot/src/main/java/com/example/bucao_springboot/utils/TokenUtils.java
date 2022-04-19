@@ -43,7 +43,7 @@ public class TokenUtils {
     }
 
     /**
-     * 获取token中的用户信息
+     * 获取token中的部门信息
      * @return
      */
     public static User_info getUser_info() {

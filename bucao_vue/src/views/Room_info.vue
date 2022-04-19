@@ -211,6 +211,9 @@ export default {
     },
     //编辑按钮事件处理
     handleEdit(row){
+      request.get("/Section/rfid_kinds").then(re=>{
+        this.options=re
+      })
       this.tag='1'
       this.edi=true
       this.form=JSON.parse(JSON.stringify(row))//对表单的数据进行深拷贝

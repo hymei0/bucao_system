@@ -76,14 +76,14 @@ insert into user_info values
  -- 4.Manager_info:管理员信息表
  CREATE TABLE Manager_info(
  id VARCHAR(20) NOT NULL PRIMARY KEY COMMENT'管理员id',
- mname varcharacter(20) not null COMMENT'管理员姓名',  
+ mname varcharacter(20) not null COMMENT'管理员姓名',
  psd varchar(20) COMMENT'管理员密码',
  PRI varcharacter(20) not null COMMENT'权限',                              -- 管理员优先级
  portrait varcharacter(2048) COMMENT'头像',
  telephone VARCHAR(20) COMMENT'电话',
  address varchar(30) COMMENT'地址',
  email  varcharacter(25) COMMENT'邮箱',
- sex char(2) Not null check (sex in('男','女')) COMMENT'性别' -- 用户自定义完整性约束
+ sex char(2) Not null check (sex in('男','女')) COMMENT'性别' -- 部门自定义完整性约束
  );
  insert into manager_info values
  ('0311','何元梅','0311','超级管理员','https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg','17826103075','贵州毕节','3304534355@qq.com','女');
@@ -101,8 +101,8 @@ insert into room_info values
 CREATE TABLE bucao_user(
 RFNO varcharacter(20) NOT NULL  COMMENT'布草类型',
 rfid VARCHAR(20) NOT NULL COMMENT'布草RFID',  -- 参照完整性约束
-user_id varchar(20) NOT NULL COMMENT'用户ID',
-user_name varchar(20) NOT NULL COMMENT'用户姓名',
+user_id varchar(20) NOT NULL COMMENT'部门ID',
+user_name varchar(20) NOT NULL COMMENT'部门姓名',
 room_id varcharacter(20) not null COMMENT'所在病房号',
 constraint rfid_userid primary key(RFNO,rfid,user_id,room_id),
 CONSTRAINT B_RFNO FOREIGN KEY(RFNO,RFID) references BUCAO_INFO(RFNO,RFID),
@@ -130,7 +130,7 @@ insert into bucao_room values
 ('Aclothes','000002','14-0318','住院部','住院部');
 -- user_room表
 CREATE TABLE USER_ROOM(
-USERID VARCHARACTER(20) NOT NULL COMMENT '用户id',
+USERID VARCHARACTER(20) NOT NULL COMMENT '部门id',
 ROOMID VARCHARACTER(20) NOT NULL COMMENT'病房号',
 come_time date not null  COMMENT'入院时间',
 out_time date  COMMENT'出院时间',
@@ -145,7 +145,7 @@ INSERT INTO USER_ROOM VALUES
 -- order表
 CREATE TABLE Order_info(
 orderNo varcharacter(30) not null comment '订单编号',
-USER_ID VARCHARACTER(20) NOT NULL COMMENT '用户id',
+USER_ID VARCHARACTER(20) NOT NULL COMMENT '部门id',
 ROOM_ID VARCHARACTER(20) NOT NULL COMMENT'病房号',
 createtime datetime not null COMMENT'创建时间',
 `subject` varcharacter(20)  COMMENT'订单名称',
@@ -157,4 +157,4 @@ CONSTRAINT PRIMARY KEY(orderNo)
 INSERT INTO Order_info VALUES('202204152148591560810311','0311','14-0318','2022-04-12','医疗费',213.00,'2022-04-12','已支付');
 
 
-	
+

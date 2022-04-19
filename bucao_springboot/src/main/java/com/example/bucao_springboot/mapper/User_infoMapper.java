@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Mapper
 public interface User_infoMapper extends BaseMapper<User_info> {
-    // 查询用户名
+    // 查询部门名
     @Select("select psd from user where uname=#{uname}")
     User_info selectByName(String username);
     //更新密码

@@ -6,7 +6,7 @@
   <div class="User_room" style="padding:10px">
     <!-- 面包屑导航 -->
     <el-breadcrumb prefix-icon="arrow-right-bold " style="width: 100%;margin-top: 10px;margin-left: 10px">
-      <el-breadcrumb-item style="font-size: large; ">用户管理</el-breadcrumb-item>
+      <el-breadcrumb-item style="font-size: large; ">部门管理</el-breadcrumb-item>
       <el-breadcrumb-item style="font-size: large; ">住院信息</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 搜索，切换 -->
@@ -155,7 +155,7 @@ export default {
       form:{},
       user:{},
       psd:'',     //帮里出院手续时需要输密码进行验证
-      flag:true,  //记录当前用户是否已经住院
+      flag:true,  //记录当前部门是否已经住院
       orderform:{},
       paytime:'',        //记录订单生成时间
       edi:false,
@@ -195,7 +195,7 @@ export default {
     let str = sessionStorage.getItem("user_info") || "{}"
     //类型转换
     this.user = JSON.parse(str)
-    //请求服务端，确认当前登录用户的 合法信息
+    //请求服务端，确认当前登录部门的 合法信息
     request.get("/User_info/"+ this.user.id).then(re=> {
       if (re.code === '1') {
         this.user = re.data
@@ -301,7 +301,7 @@ export default {
       return currentDate
     },
 
-//随机生成订单唯一的编号，加上用户的uid，每个用户都有属于自己的唯一uid（让后台去处理），生成随机订单号
+//随机生成订单唯一的编号，加上部门的uid，每个部门都有属于自己的唯一uid（让后台去处理），生成随机订单号
     order_nums(userid) {
       var outTradeNo = ""; //订单号
 
@@ -329,7 +329,7 @@ export default {
       return '';
     },
 
-    //获取用户姓名函数
+    //获取部门姓名函数
     GetUserName(){
       request.get("/User_info/"+this.form.userid).then(res=>{
         this.form.uname=res.data.uname
