@@ -101,16 +101,16 @@ insert into room_info values
 CREATE TABLE bucao_user(
 RFNO varcharacter(20) NOT NULL  COMMENT'布草类型',
 rfid VARCHAR(20) NOT NULL COMMENT'布草RFID',  -- 参照完整性约束
-user_id varchar(20) NOT NULL COMMENT'部门ID',
-user_name varchar(20) NOT NULL COMMENT'部门姓名',
+user_id varchar(20) NOT NULL COMMENT'用户ID',
+user_name varchar(20) NOT NULL COMMENT'用户姓名',
 room_id varcharacter(20) not null COMMENT'所在病房号',
-constraint rfid_userid primary key(RFNO,rfid,user_id,room_id),
+constraint rfid_userid primary key(RFNO,rfid,user_id),
 CONSTRAINT B_RFNO FOREIGN KEY(RFNO,RFID) references BUCAO_INFO(RFNO,RFID),
 CONSTRAINT B_userID FOREIGN KEY(USER_ID) references USER_INFO(ID),
 CONSTRAINT B_ROOMID FOREIGN KEY(ROOM_ID) references ROOM_INFO(ID)
 );
 insert into BUCAO_USER values
-('Aclothes','000002','0311','何元梅','14-0318');
+('Aclothes','000003','0311','何元梅','14-0318');
 
 -- 7.bucao_room:布草与房间绑定
 create table bucao_room(
@@ -130,7 +130,7 @@ insert into bucao_room values
 ('Aclothes','000002','14-0318','住院部','住院部');
 -- user_room表
 CREATE TABLE USER_ROOM(
-USERID VARCHARACTER(20) NOT NULL COMMENT '部门id',
+USERID VARCHARACTER(20) NOT NULL COMMENT '用户id',
 ROOMID VARCHARACTER(20) NOT NULL COMMENT'病房号',
 come_time date not null  COMMENT'入院时间',
 out_time date  COMMENT'出院时间',
@@ -145,13 +145,14 @@ INSERT INTO USER_ROOM VALUES
 -- order表
 CREATE TABLE Order_info(
 orderNo varcharacter(30) not null comment '订单编号',
-USER_ID VARCHARACTER(20) NOT NULL COMMENT '部门id',
+USER_ID VARCHARACTER(20) NOT NULL COMMENT '用户id',
 ROOM_ID VARCHARACTER(20) NOT NULL COMMENT'病房号',
 createtime datetime not null COMMENT'创建时间',
 `subject` varcharacter(20)  COMMENT'订单名称',
 expenses numeric(12,2) check(expenses>=0) COMMENT'应缴费用',
 payTime datetime COMMENT '缴费时间',
 state varcharacter(5) not null,
+CONSTRAINT U_R FOREIGN KEY(USER_ID,ROOM_ID) REFERENCES USER_ROOM(USERID,ROOMID),
 CONSTRAINT PRIMARY KEY(orderNo)
 );
 INSERT INTO Order_info VALUES('202204152148591560810311','0311','14-0318','2022-04-12','医疗费',213.00,'2022-04-12','已支付');

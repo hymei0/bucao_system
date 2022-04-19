@@ -49,7 +49,7 @@ public class User_roomController {
             if(user==null) {
                 User_roomMapper.updatebucao(user_room.getRoomid(),"使用中");
                 User_roomMapper.insert(user_room);
-                System.out.println("User_room已添加部门"+user_room.getUserid()+"的住院信息：");
+                System.out.println("User_room已添加用户"+user_room.getUserid()+"的住院信息：");
                 return Result.success();
             }
             else
