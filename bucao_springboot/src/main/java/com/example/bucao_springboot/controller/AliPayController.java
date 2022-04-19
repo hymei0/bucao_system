@@ -25,6 +25,11 @@ public class AliPayController {
     @Resource
     private OrderMapper orderMapper;
 
+    /**
+     * 支付接口
+     * @param aliPay
+     * @return
+     */
     @GetMapping("/pay")
     public String pay(AliPay aliPay) {
         AlipayTradePagePayResponse response;
@@ -49,7 +54,12 @@ public class AliPayController {
         return response.getBody();
     }
 
-
+    /**
+     * 支付宝异步回调函数
+     * @param request
+     * @return
+     * @throws Exception
+     */
     @PostMapping("/notify")  // 注意这里必须是POST接口
     public String payNotify(HttpServletRequest request) throws Exception {
         if (request.getParameter("trade_status").equals("TRADE_SUCCESS")) {

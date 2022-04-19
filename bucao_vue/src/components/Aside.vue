@@ -32,12 +32,12 @@
       <el-sub-menu index="users">
         <template #title>
           <el-icon><trend-charts /></el-icon>
-          <span style="font-size: medium;font-weight: bold;" >部门管理</span>
+          <span style="font-size: medium;font-weight: bold;" >用户管理</span>
         </template>
         <el-menu-item index="/user_info" style="padding-left: 60px; font-size:small">
           <template #title>
             <el-icon><user /></el-icon>
-            <span style="font-size: small;font-weight: bold;" >部门信息管理</span>
+            <span style="font-size: small;font-weight: bold;" >用户信息管理</span>
           </template>
         </el-menu-item>
         <el-menu-item index="/user_room" style="padding-left: 60px; font-size:small">
@@ -68,7 +68,7 @@
         <el-menu-item index="/bucao_user" style="padding-left: 60px; font-size:small">
           <template #title>
             <el-icon><success-filled /></el-icon>
-            <span style="font-size: small;font-weight: bold;" >布草-部门信息</span>
+            <span style="font-size: small;font-weight: bold;" >布草-用户信息</span>
           </template>
         </el-menu-item>
         <el-menu-item index="/bucao_room" style="padding-left: 60px; font-size:small">
@@ -110,6 +110,12 @@
         <template #title>
           <el-icon><avatar /></el-icon>
           <span style="font-size: medium;font-weight: bold;" >管理员信息</span>
+        </template>
+      </el-menu-item>
+      <el-menu-item index="/developer">
+        <template #title>
+          <el-icon><phone /></el-icon>
+          <span style="font-size: medium;font-weight: bold;" >联系开发人员</span>
         </template>
       </el-menu-item>
 

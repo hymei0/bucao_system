@@ -6,7 +6,7 @@
   <div class="order" style="padding:10px">
     <!-- 面包屑导航 -->
     <el-breadcrumb prefix-icon="arrow-right-bold " style="width: 100%;margin-top: 10px;margin-left: 10px">
-      <el-breadcrumb-item style="font-size: large; ">部门管理</el-breadcrumb-item>
+      <el-breadcrumb-item style="font-size: large; ">用户管理</el-breadcrumb-item>
       <el-breadcrumb-item style="font-size: large; ">订单信息</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 搜索，切换 -->
@@ -40,7 +40,7 @@
       <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column prop="orderno" label="订单号" sortable align= "center" min-width="120%"/> <!--prop:属性名  label:表头的名字-->
       <el-table-column prop="subject" label="订单名" align= "center" min-width="50%"/>
-      <el-table-column prop="userId" label="部门账号" align= "center" min-width="50%"/>
+      <el-table-column prop="userId" label="用户账号" align= "center" min-width="50%"/>
       <el-table-column prop="roomId" label="病房号" align= "center" min-width="50%"/>
       <el-table-column prop="createtime" label="订单创建时间" align= "center" min-width="90%"/>
       <el-table-column prop="expenses" label="应缴费用(￥)"  align= "center" min-width="50%"/>
@@ -104,42 +104,32 @@
           <el-select v-model="form.userId" class="m-2" @change="order_nums(form.userId)"  placeholder="Select" size="large" v-bind:disabled="edi">
             <el-option
                 v-for="item in userIDoptions"
-                :key="item.ID"
-                :label="item.ID"
-                :value="item.ID"
+                :key="item.userid"
+                :label="item.userid"
+                :value="item.userid"
             />
           </el-select>
         </el-form-item>
         <el-form-item label="病房号" prop="roomId">
-          <el-select v-model="form.roomId" class="m-2"   placeholder="Select" size="large" v-bind:disabled="edi">
+          <el-select v-model="form.roomId" class="m-2"  @change="getExpenses" placeholder="Select" size="large" v-bind:disabled="edi">
             <el-option
                 v-for="item in roomoptions"
-                :key="item.id"
-                :label="item.id"
-                :value="item.id"
+                :key="item.roomid"
+                :label="item.roomid"
+                :value="item.roomid"
             />
           </el-select>
+        </el-form-item>
+        <el-form-item label="应缴费用" prop="expenses">
+          <el-input v-model="form.expenses" type="digit"  style="width:70%" disabled/>
         </el-form-item>
         <el-form-item label="订单名称" prop="subject">
           <el-input v-model="form.subject" style="width:70%"/>
         </el-form-item>
         <el-form-item label="创建时间" prop="createtime">
-          <el-date-picker v-model="form.createtime"  type="datetime" value-format="YYYY-MM-DD HH:mm:ss"  placeholder="选择日期" style="width:70%"/>
+          <el-input v-model="form.createtime" type="datetime" style="width:70%" disabled/>
+<!--          <el-date-picker v-model="form.createtime"  type="datetime" value-format="YYYY-MM-DD HH:mm:ss"  placeholder="选择日期" style="width:70%"/>-->
         </el-form-item>
-
-        <el-form-item label="应缴费用" prop="expenses">
-          <el-input v-model="form.expenses" type="digit"  style="width:70%"/>
-        </el-form-item>
-        <el-form-item label="缴费时间" prop="paytime">
-          <el-date-picker
-              v-model="form.paytime"
-              type="datetime"
-              placeholder="选择日期"
-              value-format="YYYY-MM-DD HH:mm:ss"
-              style="width:70%"/>
-        </el-form-item>
-
-
         <el-form-item label="支付状态" prop="state">
           <el-select v-model="form.state" class="m-2"   placeholder="Select" size="large" >
             <el-option
@@ -150,6 +140,17 @@
             />
           </el-select>
         </el-form-item>
+
+
+        <el-form-item label="缴费时间" prop="paytime" v-if="form.state=='已支付'">
+          <el-date-picker
+              v-model="form.paytime"
+              type="datetime"
+              placeholder="选择日期"
+              value-format="YYYY-MM-DD HH:mm:ss"
+              style="width:70%"/>
+        </el-form-item>
+
       </el-form>
       <template #footer>
       <span class="dialog-footer">
@@ -189,6 +190,7 @@ export default {
       dialogVisible:false,
       form:{},
       orderform:{},
+      user_roomform:{},
       edi:false,
       user: {},
       tag:'',   //1表示编辑修改数据，0表示新增数据
@@ -225,7 +227,7 @@ export default {
     this.load()
     let userStr = sessionStorage.getItem("user_info") || "{}"
     this.user = JSON.parse(userStr)
-    // 请求服务端，确认当前登录部门的 合法信息
+    // 请求服务端，确认当前登录用户的 合法信息
     request.get("/User_info/" + this.user.id).then(res => {
       if(res.code === '1'){
         this.user = res.data
@@ -235,6 +237,16 @@ export default {
 
 //方法区
   methods:{
+    getExpenses(){
+      for(var i=0;i<this.roomoptions.length;i++){
+        if(this.form.userId===this.roomoptions[i].userid&&this.form.roomId===this.roomoptions[i].roomid)
+        {
+          this.user_roomform=JSON.parse(JSON.stringify(this.roomoptions[i]))
+          this.form.expenses=this.roomoptions[i].expenses
+          return
+        }
+      }
+    },
     handlebuy(row) {
       // 请求成功跳转沙箱支付的页面
       window.open("http://localhost:9090/alipay/pay?subject=" + row.subject + "&traceNo=" + row.orderno + "&totalAmount=" + row.expenses);
@@ -273,8 +285,15 @@ export default {
       //   })
       // })
     },
-    //随机生成订单唯一的编号，加上部门的uid，每个部门都有属于自己的唯一uid（让后台去处理），生成随机订单号
+    //随机生成订单唯一的编号，加上用户的uid，每个部门都有属于自己的唯一uid（让后台去处理），生成随机订单号
     order_nums(userid) {
+      request.get("/User_room/getRooms",{
+        params:{
+          userid:userid
+        }
+      }).then(re =>{
+        this.roomoptions=re.data
+      })
       var outTradeNo = ""; //订单号
 
       for (var i = 0; i < 6; i++) //6位随机数，用以加在时间戳后面。
@@ -340,14 +359,11 @@ export default {
       this.dialogVisible=true
       this.form={} //清空表单
       this.form.subject='医疗费'
-
+      this.form.createtime=JSON.parse(JSON.stringify(format()))
     },
     //查询
     load(){
-      request.get("/Room_info/selectall" ).then(re =>{
-        this.roomoptions=re.data
-      })
-      request.get("/User_info/selectall" ).then(re =>{
+      request.get("/User_room/fororder" ).then(re =>{
         this.userIDoptions=re.data
       })
       request.get("/Order",  {
@@ -401,7 +417,11 @@ export default {
     /*对话框按钮*/
     save()
     {
-      console.log(this.form)
+      if(this.form.userId==null || this.form.roomId==null || this.form.createtime==null||this.form.state==null)
+      {
+        this.$message.error('表单未填写完整，添加失败')
+        return
+      }
       if(this.tag==='1')//该项记录的主键存在，进行更新操作
       {
         request.put("/Order",this.form).then(res=>{
@@ -428,6 +448,19 @@ export default {
       }
       else  //新增
       {
+         this.user_roomform.expenses=0.00
+        request.put("/User_room",this.user_roomform).then(res=>{
+          if(res.code==='-1')
+          {
+            this.$message({
+              type:"Error",
+              message:"添加失败，请联系开发人员"
+            })
+            this.form={}
+            this.user_roomform={}
+            return
+          }
+        })
         request.post("/Order",this.form).then(res=>{
           console.log(res)
           if(res.code==='1')
@@ -461,7 +494,7 @@ export default {
       try {
         XLSX.utils.sheet_add_aoa(worksheet, [
           // <-- Do nothing in row 4
-          [ "证件号", "病房号","名字", "性别","电话","地址","住院天数","应缴费用"/*F1*/]  // <-- Write "abc" to cell E5
+          [ "证件号", "用户号","名字", "性别","电话","地址","住院天数","应缴费用"/*F1*/]  // <-- Write "abc" to cell E5
         ]);
         XLSX.writeFile(workbook, '订单信息.xlsx')//导出工作表
       } catch(e) {

@@ -9,7 +9,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
+import com.example.bucao_springboot.entity.Bucao_room;
 import com.example.bucao_springboot.entity.Bucao_user;
+import com.example.bucao_springboot.entity.Room_info;
 import com.example.bucao_springboot.entity.User_room;
 import com.example.bucao_springboot.mapper.Bucao_userMapper;
 import com.example.bucao_springboot.mapper.User_roomMapper;
@@ -57,7 +59,7 @@ public class User_roomController {
         }catch (Exception e)
         {
             System.out.println(e.toString());
-            return Result.error("-1","系统后台出错啦，请联系工作人员");
+            return Result.error("-1","系统后台出错啦，请联系开发人员");
         }
     }
 
@@ -70,8 +72,8 @@ public class User_roomController {
     public Result<?> update(@RequestBody User_room User_room)
     {
         try {
-            System.out.println(User_room);
             User_roomMapper.update(User_room.getComeTime(),User_room.getOutTime(),User_room.getExpenses(),User_room.getRoomid(),User_room.getUserid());
+            System.out.println(User_room+"信息更新成功");
             return Result.success();
         }catch (Exception e){
             System.out.println(e.toString());
@@ -81,7 +83,7 @@ public class User_roomController {
     }
 
     /**
-     * 病人和病房时一对多的关系，一个病人住一个病房
+     * 病人和病房时多对多的关系，一个病人住一个病房，一个病人可能多次住院，每次病房不一定一样
      * 所以可以根据病人id查询出病人所在病房
      * @param userid
      * @return
@@ -126,29 +128,70 @@ public class User_roomController {
             return Result.success();
         }catch (Exception e){
             System.out.println(e.toString());
-            return Result.error("-1","后台出错了，请先删除订单信息中相关记录");
+            return Result.error("-1","请先删除订单信息中相关记录");
         }
     }
 
-    //无条件查询
+    /**查询所有记录
+     *
+     * @return
+     */
     @GetMapping("/selectall")
     public Result<?>  selectall(){
         return Result.success(User_roomMapper.GetUser_room());
     }
 
-    //查询未住满的病房号
+    /**
+     * 为新增订单挑选出住院且需要缴费得病人
+     * @return
+     */
+    @GetMapping("/fororder")
+    public  Result<?>ForOrder()
+    {
+        QueryWrapper<User_room> wrapper = new QueryWrapper<>();
+        wrapper.gt("expenses",0.00);
+        List<User_room> list= User_roomMapper.selectList(wrapper);
+        return Result.success(list);
+    }
+
+    /**
+     * 根据userid查询出需要缴费得住院记录:与order表相关
+     * @param userid
+     * @return
+     */
+    @GetMapping("/getRooms")
+    public Result<?> GetRooms(@RequestParam String userid){
+        QueryWrapper<User_room> queryWrapper = new QueryWrapper<>();
+        List<User_room> list=User_roomMapper.selectList(queryWrapper.eq("userid",userid).gt("expenses",0.00));
+        return Result.success(list);
+    }
+
+
+    /**查询未住满的病房号
+     *
+     * @return
+     */
     @GetMapping("/suitableroom")
     public Result<?>  suitableroom(){
         return Result.success(User_roomMapper.Getsuitableroom());
     }
 
-    //查询未办理住院的病人
+    /**查询未办理住院的病人
+     *
+     * @return
+     */
     @GetMapping("/suitableuser")
     public Result<?>  suitableuser(){
         return Result.success(User_roomMapper.Getsuitableuser());
     }
 
-    //分页查询:面向管理员的接口
+    /**分页查询:面向管理员的接口
+     *
+     * @param pageNum
+     * @param pageSize
+     * @param search
+     * @return
+     */
     @GetMapping
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "10") Integer pageSize,
@@ -166,7 +209,15 @@ public class User_roomController {
             return Result.success(User_room_page);
         }
     }
-    //分页查询:面向部门的接口
+
+    /**分页查询:面向用户的接口
+     *
+     * @param pageNum
+     * @param pageSize
+     * @param search
+     * @param userid
+     * @return
+     */
     @GetMapping("foruser")
     public Result<?> findPageuser(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "10") Integer pageSize,

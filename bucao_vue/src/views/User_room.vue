@@ -6,7 +6,7 @@
   <div class="User_room" style="padding:10px">
     <!-- 面包屑导航 -->
     <el-breadcrumb prefix-icon="arrow-right-bold " style="width: 100%;margin-top: 10px;margin-left: 10px">
-      <el-breadcrumb-item style="font-size: large; ">部门管理</el-breadcrumb-item>
+      <el-breadcrumb-item style="font-size: large; ">用户管理</el-breadcrumb-item>
       <el-breadcrumb-item style="font-size: large; ">住院信息</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 搜索，切换 -->
@@ -104,7 +104,7 @@
         <el-form-item label="电 话" prop="telephone">
           <el-input v-model.number="form.telephone"   style="width:70%" disabled/>
         </el-form-item>
-        <el-form-item label="病房号" prop="roomid">
+        <el-form-item label="病房号" prop="roomId">
           <el-select v-model="form.roomid" class="m-2"  placeholder="Select" size="large" v-bind:disabled="edi">
             <el-option
                 v-for="item in roomoptions"
@@ -216,7 +216,6 @@ export default {
       this.orderform.expenses=JSON.parse(JSON.stringify(row.expenses))
       this.orderform.paytime=null
       this.orderform.state="未支付"
-      console.log(this.orderform)
       request.post("/Order",this.orderform).then(res=>{
         this.LOADING("正在创建订单")
         if(res.code==='0') {
@@ -267,7 +266,7 @@ export default {
       return currentDate
     },
 
-//随机生成订单唯一的编号，加上部门的uid，每个部门都有属于自己的唯一uid（让后台去处理），生成随机订单号
+//随机生成订单唯一的编号，加上用户的uid，每个用户都有属于自己的唯一uid（让后台去处理），生成随机订单号
     order_nums(userid) {
       var outTradeNo = ""; //订单号
 
@@ -295,7 +294,7 @@ export default {
       return '';
     },
 
-    //获取部门姓名函数
+    //获取用户姓名函数
     GetUserName(){
       request.get("/User_info/"+this.form.userid).then(res=>{
         this.form.uname=res.data.uname
@@ -460,15 +459,15 @@ export default {
     //数据导出：从前端导出
     handleDownload() {
       var workbook = XLSX.utils.book_new();//新建一个新的工作表
-      var worksheet = XLSX.utils.json_to_sheet(this.User_roomtable,{heard:["userid","roomId","uname","sex","telephone","address",,"days","expenses"]});//从 JS 值数组的数组创建工作表
+      var worksheet = XLSX.utils.json_to_sheet(this.User_roomtable,{heard:["userid","roomId","uname","sex","telephone","comeTime",,"outTime","expenses"]});//从 JS 值数组的数组创建工作表
       XLSX.utils.book_append_sheet(workbook, worksheet, "RFID分类表");//将工作表附加到工作簿
       // let workbook = XLSX.utils.table_to_book(document.getElementById('table'))//通过抓取页面中的 HTML TABLE 创建工作表
       try {
         XLSX.utils.sheet_add_aoa(worksheet, [
           // <-- Do nothing in row 4
-          [ "证件号", "病房号","名字", "性别","电话","地址","住院天数","应缴费用"/*F1*/]  // <-- Write "abc" to cell E5
-        ]);
-        XLSX.writeFile(workbook, '订单信息.xlsx')//导出工作表
+          [ "证件号", "病房号","名字", "性别","联系电话","入院日期","出院日期","应缴费用"/*F1*/]  // <-- Write "abc" to cell E5
+      ]);
+        XLSX.writeFile(workbook, '住院信息.xlsx')//导出工作表
       } catch(e) {
         console.log(e, workbook);
       }

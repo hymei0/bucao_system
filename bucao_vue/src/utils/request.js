@@ -15,7 +15,7 @@
      config.headers['Content-Type'] = 'application/json;charset=utf-8';
 
      // config.headers['token'] = user.token;  // 设置请求头
-     // 取出sessionStorage里面缓存的部门信息
+     // 取出sessionStorage里面缓存的用户信息
      let userJson = sessionStorage.getItem("user_info")
 
          if(!userJson) {

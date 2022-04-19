@@ -20,4 +20,6 @@ public interface Bucao_infoMapper extends BaseMapper<Bucao_info> {
     List<Outdata> Outdata();
     @Select("select * from bucao_info where RFNO like #{rfid}\"%\"and state like '闲置%';")
     List<Map<String, Object>> selectbucaoforuser(String rfid);
+    @Select("select rfno from rfid_kinds where (RFNO=#{rfno} and RFNO not in (select rfno from bucao_info where rfno=#{rfno} and RFID=#{rfid}));")
+    String isValid(String rfno,String rfid);
 }

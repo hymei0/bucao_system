@@ -30,7 +30,7 @@
         <h2 style="text-align: center;padding-bottom: 20px">登 录</h2>
         <div align="center">
           <el-radio-group v-model="form.roles">
-            <el-radio label="user" style="font-size: large">普通部门</el-radio>
+            <el-radio label="user" style="font-size: large">普通用户</el-radio>
             <el-radio label="manager" style="font-size: large">管 理 员</el-radio>
           </el-radio-group>
         </div>
@@ -99,7 +99,7 @@ export default {
       direction1:ArrowLeft,
       direction2:ArrowRight,
       index:0,
-      form:{role:'user'},//默认为普通部门登录
+      form:{role:'user'},//默认为普通用户登录
       validCode:'',//存放自动生成的验证码
       rules :{
         psd: [{ required: true, message: '请输入密码', trigger: 'blur' }],
@@ -110,7 +110,7 @@ export default {
     }
   },
   mounted() {
-    //在登入页删除部门信息
+    //在登入页删除用户信息
     sessionStorage.removeItem("user_info")
     //跟据客户屏幕比例，自动适应
     window.onresize = () => {

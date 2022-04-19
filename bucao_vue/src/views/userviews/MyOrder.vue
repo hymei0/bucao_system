@@ -31,7 +31,7 @@
     <el-table :row-class-name="tableRowClassName" v-model:data="Ordertable" border stripe style="width: 100%" > <!--显示表格边框和斑马纹-->
       <el-table-column prop="orderno" label="订单号" sortable align= "center" min-width="120%"/> <!--prop:属性名  label:表头的名字-->
       <el-table-column prop="subject" label="订单名" align= "center" min-width="50%"/>
-      <el-table-column prop="userId" label="部门账号" align= "center" min-width="50%"/>
+      <el-table-column prop="userId" label="用户账号" align= "center" min-width="50%"/>
       <el-table-column prop="roomId" label="病房号" align= "center" min-width="50%"/>
       <el-table-column prop="createtime" label="订单创建时间" align= "center" min-width="90%"/>
       <el-table-column prop="expenses" label="应缴费用(￥)"  align= "center" min-width="50%"/>
@@ -199,7 +199,7 @@ export default {
     let str = sessionStorage.getItem("user_info") || "{}"
     //类型转换
     this.user = JSON.parse(str)
-    //请求服务端，确认当前登录部门的 合法信息
+    //请求服务端，确认当前登录用户的 合法信息
     request.get("/User_info/"+ this.user.id).then(re=> {
       if (re.code === '1') {
         this.user = re.data
@@ -248,7 +248,7 @@ export default {
       //   })
       // })
     },
-    //随机生成订单唯一的编号，加上部门的uid，每个部门都有属于自己的唯一uid（让后台去处理），生成随机订单号
+    //随机生成订单唯一的编号，加上用户的uid，每个部门都有属于自己的唯一uid（让后台去处理），生成随机订单号
     order_nums(userid) {
       var outTradeNo = ""; //订单号
 

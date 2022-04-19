@@ -251,7 +251,7 @@ export default {
     //excel表格的导入：直接导入到后端
     handleUploadSuccess(res) {
       if (res.code === "1") {
-        this.$message.success("导入成功")
+        this.$message.success("一共成功导入"+res.data+"条数据")
         this.load()
       }
     },
@@ -303,6 +303,7 @@ export default {
 /*对话框按钮*/
     save()
     {
+
       if(this.tag==='1')//该项记录的主键存在，进行更新操作
       {
         request.put("/rfid_kinds",this.form).then(res=>{

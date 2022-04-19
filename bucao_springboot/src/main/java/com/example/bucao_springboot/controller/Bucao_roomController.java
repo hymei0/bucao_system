@@ -41,7 +41,11 @@ public class Bucao_roomController {
     Bucao_userMapper bucao_userMapper;
 
 
-    //新增接口
+    /**新增接口
+     *
+     * @param Bucao_room
+     * @return
+     */
     @PostMapping  //post接口：前台把json数据传过来，通过此接口接收到  并转化成xxx类
     public Result<?> save(@RequestBody Bucao_room Bucao_room)
     {
@@ -61,7 +65,11 @@ public class Bucao_roomController {
         }
     }
 
-    //更新接口
+    /**更新接口
+     *
+     * @param bucao_room
+     * @return
+     */
     @PutMapping
     public Result<?> update(@RequestBody Bucao_room bucao_room)
     {
@@ -73,7 +81,11 @@ public class Bucao_roomController {
         }
 
     }
-    // 查询未使用的病房
+
+    /** 查询未使用的病房
+     *
+     * @return
+     */
     @GetMapping("/rooms")
     public Result<?>rooms()
     {
@@ -81,7 +93,13 @@ public class Bucao_roomController {
         return Result.success(list);
     }
 
-    //删除接口
+    /**删除接口
+     *
+     * @param roomId
+     * @param rfno
+     * @param rfid
+     * @return
+     */
     @DeleteMapping
     public Result<?> delete(@RequestParam String roomId,
                             @RequestParam String rfno,
@@ -102,7 +120,13 @@ public class Bucao_roomController {
         }
     }
 
-    //分页查询
+    /**分页查询：只有管理员界面用到
+     *
+     * @param pageNum
+     * @param pageSize
+     * @param search
+     * @return
+     */
     @GetMapping
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "20") Integer pageSize,
@@ -161,7 +185,7 @@ public class Bucao_roomController {
         for (Bucao_room Bucao_room : all) {
             Map<String, Object> row1 = new LinkedHashMap<>();
             row1.put("病房号", Bucao_room.getRoomId());
-            row1.put("布草RFID编号", Bucao_room.getRFIDX());
+            row1.put("布草RFID编号", Bucao_room.getRfno()+Bucao_room.getRoomId());
 
             list.add(row1);
         }

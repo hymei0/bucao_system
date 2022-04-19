@@ -48,16 +48,16 @@ public class Room_InfoController {
             Room_info user=room_infoMapper.selectOne(Wrappers.<Room_info>lambdaQuery().eq(Room_info::getId,room_info.getId()));
             if(user==null) {
                 room_infoMapper.insert(room_info);
-                System.out.println("Room_info已添加部门"+room_info.getId()+"信息：");
+                System.out.println("Room_info已添加病房"+room_info.getId()+"信息：");
                 return Result.success();
             }
             else
             {
-                return Result.error("-1","该部门已存在");
+                return Result.error("-1","该病房已存在");
             }
         }catch (Exception e)
         {
-            return Result.error("-1","系统后台出错啦，请联系工作人员");
+            return Result.error("-1","系统后台出错啦，请联系开发人员");
         }
     }
 
@@ -71,7 +71,7 @@ public class Room_InfoController {
     {
         try {
             room_infoMapper.updateById(Room_info);
-            System.out.println("Room_info已更新部门" + Room_info.getId() + "的信息：");
+            System.out.println("Room_info已更新病房" + Room_info.getId() + "的信息：");
             return Result.success();
         }catch (Exception e)
         {
@@ -90,12 +90,12 @@ public class Room_InfoController {
     {
         try {
             room_infoMapper.deleteById(id);
-            System.out.println("Room_info已删除部门" + id + "的信息：");
+            System.out.println("Room_info已删除病房" + id + "的信息：");
             return Result.success();
         }catch (Exception e)
         {
             System.out.println(e.toString());
-            return Result.error("-1","请先删除请先删除住院相应住院记录和布草的分布记录");
+            return Result.error("-1","请先删除请先删除相关住院记录和布草分布记录");
         }
     }
 
@@ -126,7 +126,7 @@ public class Room_InfoController {
         return Result.success(Room_info_page);
     }
 
-    /**批量查询所属部门接口
+    /**批量查询所属病房接口
      *
      * @param ids
      * @return
@@ -138,7 +138,7 @@ public class Room_InfoController {
         return Result.success();
     }
 
-    /**显示部门信息
+    /**显示病房信息
      *
      * @param id
      * @return
@@ -148,7 +148,7 @@ public class Room_InfoController {
     {
 
          Room_info room= room_infoMapper.selectById(id);
-        System.out.println("Room_info已查询到部门"+id+"的信息：");
+        System.out.println("Room_info已查询到病房"+id+"的信息：");
         return Result.success(room);
     }
 

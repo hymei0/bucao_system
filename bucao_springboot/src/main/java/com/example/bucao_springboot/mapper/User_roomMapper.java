@@ -36,7 +36,7 @@ public interface User_roomMapper extends BaseMapper<User_room> {
     Page<User_room> findPage1(Page<User_room>page);
 
     /**
-     *
+     * user_room表和user表左连接
      * @return
      */
 
@@ -70,7 +70,7 @@ public interface User_roomMapper extends BaseMapper<User_room> {
     User_room selectById(String userId, String roomId);
 
     /**
-     *面向部门的分页查询，search不为空
+     *面向用户的分页查询，search不为空
      * @param objectPage
      * @param search
      * @param userid
@@ -82,7 +82,7 @@ public interface User_roomMapper extends BaseMapper<User_room> {
     Page<User_room> findPageuser(Page<Object> objectPage, String search, String userid);
 
     /**
-     * 面向部门的分页查询，search为空
+     * 面向用户的分页查询，search为空
      * @param objectPage
      * @param userid
      * @return

@@ -259,6 +259,6 @@ public class rfid_kindsController {
                 num=num+1;
             }
         }
-        return Result.success();
+        return Result.success(num);
     }
 }

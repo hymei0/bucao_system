@@ -14,6 +14,7 @@ import com.example.bucao_springboot.common.Result;
 import com.example.bucao_springboot.entity.Bucao_info;
 import com.example.bucao_springboot.entity.RFid_kinds;
 import com.example.bucao_springboot.mapper.Bucao_infoMapper;
+import org.apache.poi.ss.usermodel.Cell;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -263,33 +264,40 @@ public class bucao_infoController {
      */
     @PostMapping("/import")
     public Result<?> upload(MultipartFile file) throws IOException {
-        InputStream inputStream = file.getInputStream();
-        List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
-        List<Bucao_info> saveList = new ArrayList<>();
-        for (List<Object> row : lists) {
-            Bucao_info bucao_info = new Bucao_info();
-            bucao_info.setRfno(row.get(0).toString());
-            bucao_info.setRfid(row.get(1).toString());
-            bucao_info.setState(row.get(2).toString());
-            bucao_info.setWashtimes(Integer.valueOf((row.get(3).toString())));
-            bucao_info.setIndate(Date.valueOf(DateUtil.format(DateUtil.parse(row.get(4).toString()),"yyyy-MM-dd")));
-            if(row.get(5).toString()==null   ||   row.get(5).toString().equals("")) {
-                bucao_info.setOutdate(null);
-            }else
-            {
-                bucao_info.setOutdate(Date.valueOf(DateUtil.format(DateUtil.parse(row.get(5).toString()), "yyyy-MM-dd")));
+        Integer success=0;
+        try {
+            InputStream inputStream = file.getInputStream();
+            List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
+            List<Bucao_info> saveList = new ArrayList<>();
+            for (List<Object> row : lists) {
+                    Bucao_info bucao_info = new Bucao_info();
+                    bucao_info.setRfno(row.get(0).toString());
+                    bucao_info.setRfid(row.get(1).toString());
+                    bucao_info.setState(row.get(2).toString());
+                    bucao_info.setWashtimes(Integer.valueOf((row.get(3).toString())));
+                    bucao_info.setIndate(Date.valueOf(DateUtil.format(DateUtil.parse(row.get(4).toString()), "yyyy-MM-dd")));
+                    if (row.size()>=6) {
+                        if(!row.get(5).equals("")) {
+                            bucao_info.setOutdate(Date.valueOf(DateUtil.format(DateUtil.parse(row.get(5).toString()), "yyyy-MM-dd")));
+                        } else {
+                            bucao_info.setOutdate(null);
+                        }
+                    }else{
+                    bucao_info.setOutdate(null);
+                }
+                    saveList.add(bucao_info);
             }
 
-            saveList.add(bucao_info);
-        }
-        Integer success=0;
-        for (Bucao_info bucao_info : saveList) {
-            if(bucao_info.getRfid()!=null&&bucao_info.getRfno()!=null)
-            {
-                bucao_infoMapper.insert(bucao_info);
-                System.out.println(bucao_info+"导入成功");
-                success=success+1;
+            for (Bucao_info bucao_info : saveList) {
+                if (bucao_infoMapper.isValid(bucao_info.getRfno(),bucao_info.getRfid())!=null && bucao_info.getRfid() != null) {
+                    bucao_infoMapper.insert(bucao_info);
+                    System.out.println(bucao_info + "导入成功");
+                    success = success + 1;
+                }
             }
+        }catch (Exception e)
+        {
+            System.out.println(e.toString());
         }
         return Result.success(success);
     }

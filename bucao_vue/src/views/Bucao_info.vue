@@ -22,11 +22,6 @@
     <div style="display: flex; margin: 10px 0"  align="left">
       <div style="width: 10%;display: flex" align="left">
         <el-button @click="add" type="primary">新增</el-button>
-        <el-popconfirm title="确定删除吗？" @confirm="deleteBatch">
-          <template #reference>
-            <el-button type="danger" >批量删除</el-button>
-          </template>
-        </el-popconfirm>
       </div>
       <!--    搜索区域-->
       <div style="width: 100%" align="right">
@@ -36,8 +31,7 @@
     </div>
 
     <!--    数据展示区-->
-    <el-table :data="Bucao_infotable" border stripe style="width: 100%" @selection-change="handleSelectionChange"> <!--显示表格边框和斑马纹-->
-      <el-table-column type="selection" width="55"></el-table-column>
+    <el-table :data="Bucao_infotable" border stripe style="width: 100%" > <!--显示表格边框和斑马纹-->
       <el-table-column prop="rfno" label="布草类型" sortable /> <!--prop:属性名  label:表头的名字-->
       <el-table-column prop="rfid" label="RFID编号" sortable />
       <el-table-column prop="state" label="布草状态" />
@@ -233,7 +227,7 @@ export default {
     //excel表格的导入：直接导入到后端
     handleUploadSuccess(res) {
       if (res.code === "1") {
-        this.$message.success("导入成功")
+        this.$message.success("一共成功导入"+res.data+"条数据")
         this.load()
       }
     },
@@ -253,6 +247,11 @@ export default {
     load(){
       request.get("/rfid_kinds/bucaoinfo" ).then(re =>{
         this.options=re
+        for(var i=0;i<this.options.length;i++){
+          if(this.options[i].note==null){
+            this.options[i].note=''
+          }
+        }
       })
       request.get("/Bucao_info",  {
         params:{
@@ -312,7 +311,11 @@ export default {
     /*对话框按钮*/
     save()
     {
-      console.log(this.form)
+      if(this.form.rfid==null || this.form.rfno==null ||this.form.state==null ||this.form.washtimes==null||this.form.indate==null)
+      {
+        this.$message.error('请将表单填写完整')
+        return
+      }
       if(this.tag==='1')//该项记录的主键存在，进行更新操作
       {
         request.put("/Bucao_info",this.form).then(res=>{

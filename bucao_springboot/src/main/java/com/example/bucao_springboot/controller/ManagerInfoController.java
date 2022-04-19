@@ -32,7 +32,11 @@ public class ManagerInfoController {
     @Resource
     ManagerInfoMapper ManagerInfoMapper;
 
-    //登录接口
+    /**登录接口
+     *
+     * @param managerInfo
+     * @return
+     */
     @PostMapping("/login")
     public Result<?> login(@RequestBody ManagerInfo managerInfo)
     {
@@ -46,7 +50,12 @@ public class ManagerInfoController {
         System.out.println("ManagerInfo已登录到"+managerInfo.getId()+"的账户");
         return Result.success(res);
     }
-    //注册接口
+
+    /**注册接口
+     *
+     * @param managerInfo
+     * @return
+     */
     @PostMapping("/register")
     public Result<?> register(@RequestBody ManagerInfo managerInfo)
     {
@@ -65,14 +74,23 @@ public class ManagerInfoController {
             return Result.error("-1","系统错误，请稍后重试");
         }
     }
-    //无条件查询
+
+    /**无条件查询
+     *
+     * @return
+     */
     @GetMapping("/selectall")
     public Result<?>  selectall(){
         QueryWrapper<ManagerInfo> queryWrapper = new QueryWrapper<>();
         List<Map<String, Object>> list=ManagerInfoMapper.selectMaps(queryWrapper);
         return Result.success(list);
     }
-    //新增接口
+
+    /**新增接口
+     *
+     * @param managerInfo
+     * @return
+     */
     @PostMapping
     public Result<?> save(@RequestBody ManagerInfo managerInfo)
     {
@@ -91,10 +109,15 @@ public class ManagerInfoController {
         }catch (Exception e)
         {
             System.out.println(e.toString());
-            return Result.error("-1","系统后台出错啦，请联系工作人员");
+            return Result.error("-1","系统后台出错啦，请联系开发人员");
         }
     }
-    //更新接口
+
+    /**更新接口
+     *
+     * @param ManagerInfo
+     * @return
+     */
     @PutMapping
     public Result<?> update(@RequestBody ManagerInfo ManagerInfo)
     {
@@ -103,7 +126,11 @@ public class ManagerInfoController {
          return Result.success();
     }
 
-    //删除接口
+    /**删除接口
+     *
+     * @param Id
+     * @return
+     */
     @DeleteMapping("/{Id}")
     public Result<?> delete(@PathVariable String Id)
     {
@@ -112,7 +139,13 @@ public class ManagerInfoController {
         return Result.success();
     }
 
-    //分页查询
+    /**分页查询
+     *
+     * @param pageNum
+     * @param pageSize
+     * @param search
+     * @return
+     */
     @GetMapping
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "10") Integer pageSize,
@@ -140,7 +173,11 @@ public class ManagerInfoController {
        }
     }
 
-    //显示个人信息
+    /**显示个人信息
+     *
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}")
     public Result<?> SelectPerson_Info(@PathVariable String id)
     {

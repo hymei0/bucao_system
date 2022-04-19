@@ -52,7 +52,7 @@
         <el-button  type="text"  style="width: 50px;margin-left: 10px" @click="exportdata">下载数据</el-button>
       </div>
     </div>
-    <el-dialog v-model="dialogVisible" title="部门信息管理" width="30%" >
+    <el-dialog v-model="dialogVisible" title="病房信息管理" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">
         <el-form-item label="病房号" prop="id">
           <el-input v-model="form.id" style="width:70%" autocomplete="off" v-bind:disabled="edi"/>

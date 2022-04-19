@@ -6,7 +6,7 @@
   <div class="User_room" style="padding:10px">
     <!-- 面包屑导航 -->
     <el-breadcrumb prefix-icon="arrow-right-bold " style="width: 100%;margin-top: 10px;margin-left: 10px">
-      <el-breadcrumb-item style="font-size: large; ">部门管理</el-breadcrumb-item>
+      <el-breadcrumb-item style="font-size: large; ">用户管理</el-breadcrumb-item>
       <el-breadcrumb-item style="font-size: large; ">住院信息</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 搜索，切换 -->
@@ -155,7 +155,7 @@ export default {
       form:{},
       user:{},
       psd:'',     //帮里出院手续时需要输密码进行验证
-      flag:true,  //记录当前部门是否已经住院
+      flag:true,  //记录当前用户是否已经住院
       orderform:{},
       paytime:'',        //记录订单生成时间
       edi:false,
@@ -195,7 +195,7 @@ export default {
     let str = sessionStorage.getItem("user_info") || "{}"
     //类型转换
     this.user = JSON.parse(str)
-    //请求服务端，确认当前登录部门的 合法信息
+    //请求服务端，确认当前登录用户的 合法信息
     request.get("/User_info/"+ this.user.id).then(re=> {
       if (re.code === '1') {
         this.user = re.data

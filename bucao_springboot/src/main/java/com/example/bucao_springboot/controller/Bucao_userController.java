@@ -35,7 +35,12 @@ public class Bucao_userController {
     //将xxx_infoMapper引入到xxx_infoController中,不太规范，一般是写service类，controller引入service,service引入mapper
     @Resource
     Bucao_userMapper bucao_userMapper;
-    //新增接口
+
+    /**新增接口
+     *
+     * @param bucao_user
+     * @return
+     */
     @PostMapping  //post接口：前台把json数据传过来，通过此接口接收到  并转化成xxx类
     public Result<?> save(@RequestBody Bucao_user bucao_user)
     {
@@ -44,7 +49,8 @@ public class Bucao_userController {
             wrapper.eq("rfno", bucao_user.getRfno()).eq("rfid", bucao_user.getRfid()).eq("user_id",bucao_user.getUserId());
             Bucao_user result=bucao_userMapper.selectOne(wrapper);
             if(result==null) {
-                bucao_userMapper.updatebucao(bucao_user.getRfno(),bucao_user.getRfid(),"使用中");//将部门领取的布草的状态改变为使用中
+                bucao_userMapper.updatebucao(bucao_user.getRfno(),bucao_user.getRfid(),"使用中");//将用户领取的布草的状态改变为使用中
+                bucao_userMapper.insert(bucao_user);
 
                 return Result.success();
             }
@@ -57,7 +63,11 @@ public class Bucao_userController {
         }
     }
 
-    //更新接口
+    /**更新接口
+     *
+     * @param bucao_user
+     * @return
+     */
     @PutMapping
     public Result<?> update(@RequestBody Bucao_user bucao_user)
     {
@@ -71,7 +81,13 @@ public class Bucao_userController {
 
     }
 
-    //删除接口
+    /**删除接口
+     *
+     * @param userId
+     * @param rfno
+     * @param rfid
+     * @return
+     */
     @DeleteMapping
     public Result<?> delete(@RequestParam String userId,
                             @RequestParam String rfno,
@@ -91,7 +107,15 @@ public class Bucao_userController {
             return Result.error("-1","后台出错啦，请联系开发人员");
         }
     }
-    //分页查询:面向部门的接口
+
+    /**分页查询:面向用户的接口
+     *
+     * @param pageNum
+     * @param pageSize
+     * @param search
+     * @param userid
+     * @return
+     */
     @GetMapping("foruser")
     public Result<?> findPageuser(@RequestParam(defaultValue = "1") Integer pageNum,
                                   @RequestParam(defaultValue = "10") Integer pageSize,
@@ -115,13 +139,24 @@ public class Bucao_userController {
             return Result.error("-1","后台出错了，请联系开发人员");
         }
     }
+
+    /**
+     * 选择布草分配不足4件的病人
+     * @return
+     */
     @GetMapping("/forbucao")
     public Result<?> selectforbucao(){
         List<Map<String, Object>> list=bucao_userMapper.selectforbucao();
         return Result.success(list);
     }
 
-    //分页查询:面向管理员的接口
+    /**分页查询:面向管理员的接口
+     *
+     * @param pageNum
+     * @param pageSize
+     * @param search
+     * @return
+     */
     @GetMapping
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "20") Integer pageSize,
@@ -176,10 +211,10 @@ public class Bucao_userController {
         List<Bucao_user> all = bucao_userMapper.selectList(null);
         for (Bucao_user Bucao_user : all) {
             Map<String, Object> row1 = new LinkedHashMap<>();
-            row1.put("部门账号", Bucao_user.getUserId());
-            row1.put("部门姓名", Bucao_user.getUserName());
+            row1.put("用户账号", Bucao_user.getUserId());
+            row1.put("用户姓名", Bucao_user.getUserName());
             row1.put("所在病房", Bucao_user.getRoomId());
-            row1.put("布草RFID编号", Bucao_user.getRFIDX());
+            row1.put("布草RFID编号", Bucao_user.getRfno()+Bucao_user.getRfid());
 
             list.add(row1);
         }
@@ -188,7 +223,7 @@ public class Bucao_userController {
         writer.write(list, true);
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
-        String fileName = URLEncoder.encode("布草-部门信息数据表", "UTF-8");
+        String fileName = URLEncoder.encode("布草-用户信息数据表", "UTF-8");
         response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
 
         ServletOutputStream out = response.getOutputStream();

@@ -108,7 +108,7 @@ public class User_infoController {
         }catch (Exception e)
         {
             System.out.println(e.toString());
-            return Result.error("-1","系统后台出错啦，请联系工作人员");
+            return Result.error("-1","系统后台出错啦，请联系开发人员");
         }
     }
 
@@ -131,7 +131,11 @@ public class User_infoController {
         }
     }
 
-    //删除接口
+    /**删除接口
+     *
+     * @param id
+     * @return
+     */
     @DeleteMapping("/{id}")
     public Result<?> delete(@PathVariable String id)
     {
@@ -266,6 +270,7 @@ public class User_infoController {
             user_info.setTelephone(row.get(4).toString());
             user_info.setAddress(row.get(5).toString());
             user_info.setPsd(row.get(0).toString());
+            user_info.setRoles("user");
             //user_info.setExpenses(Double.parseDouble(row.get(7).toString()));
 
             saveList.add(user_info);

@@ -43,7 +43,11 @@ public class OrderController {
     @Resource
     User_roomMapper User_roomMapper;
 
-    //新增接口
+    /**新增接口
+     *
+     * @param order
+     * @return
+     */
     @PostMapping
     public Result<?> save(@RequestBody Order order)  {
 
@@ -61,21 +65,26 @@ public class OrderController {
 //                order.setCreatetime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date));
 
                 OrderMapper.insert(order);
-                System.out.println("Order已添加部门"+order.getUserId()+"的订单信息：");
+                System.out.println("Order已添加用户"+order.getUserId()+"的订单信息：");
                 System.out.println(order);
                 return Result.success();
             }
             else
             {
-                return Result.error("-1","该部门已存在");
+                return Result.error("-1","该用户已存在");
             }
         }catch (Exception e)
         {
             System.out.println(e.toString());
-            return Result.error("-1","系统后台出错啦，请联系工作人员");
+            return Result.error("-1","系统后台出错啦，请联系开发人员");
         }
     }
-    //更新接口
+
+    /**更新接口
+     *
+     * @param order
+     * @return
+     */
     @PutMapping
     public Result<?> update(@RequestBody Order order)
     {
@@ -89,7 +98,11 @@ public class OrderController {
 
     }
 
-    //删除接口
+    /**删除接口
+     *
+     * @param id
+     * @return
+     */
     @DeleteMapping("/{id}")
     public Result<?> delete(@PathVariable String id)
     {
@@ -102,7 +115,10 @@ public class OrderController {
         }
     }
 
-    //无条件查询
+    /**无条件查询
+     *
+     * @return
+     */
     @GetMapping("/selectall")
     public Result<?>  selectall(){
         QueryWrapper<Order> queryWrapper = new QueryWrapper<>();
@@ -110,17 +126,28 @@ public class OrderController {
         return Result.success(list);
     }
 
+    /**
+     * 支付接口 返回支付连接
+     * @param order
+     * @return
+     */
     @GetMapping("/buy")
     public Result<?> buy(@RequestBody Order order) {
-
-
 
         String payUrl = "http://localhost:9090/alipay/pay?subject=" + order.getSubject() + "&traceNo=" + order.getOrderno() + "&totalAmount=" + order.getExpenses();
 
         // 更新订单，扣减库存
         return Result.success(payUrl);
     }
-    //分页查询:面向部门的接口
+
+    /**分页查询:面向用户的接口
+     *
+     * @param pageNum
+     * @param pageSize
+     * @param search
+     * @param userid
+     * @return
+     */
     @GetMapping("foruser")
     public Result<?> findPageuser(@RequestParam(defaultValue = "1") Integer pageNum,
                                   @RequestParam(defaultValue = "10") Integer pageSize,
@@ -141,7 +168,13 @@ public class OrderController {
         return Result.success(orderpage);
     }
 
-    //分页查询:面向管理员的接口
+    /**分页查询:面向管理员的接口
+     *
+     * @param pageNum
+     * @param pageSize
+     * @param search
+     * @return
+     */
     @GetMapping
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "10") Integer pageSize,
@@ -170,6 +203,7 @@ public class OrderController {
         return Result.success();
     }
 
+
     /**
      * Excel导出
      *
@@ -186,7 +220,7 @@ public class OrderController {
             Map<String, Object> row1 = new LinkedHashMap<>();
             row1.put("订单号", Order.getOrderno());
             row1.put("订单名", Order.getSubject());
-            row1.put("部门编号", Order.getUserId());
+            row1.put("用户编号", Order.getUserId());
             row1.put("病房号", Order.getRoomId());
             row1.put("创建时间",DateUtil.format(Order.getCreatetime(),"yyyy-MM-dd HH:mm:ss"));
             row1.put("应缴费用", Order.getExpenses());
