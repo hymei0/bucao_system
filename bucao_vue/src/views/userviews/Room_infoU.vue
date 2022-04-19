@@ -20,14 +20,6 @@
     </el-row>
     <!--    功能区域-->
     <div style="display: flex; margin: 10px 0"  align="left">
-      <div style="width: 10%;display: flex" align="left">
-        <el-button @click="add" type="primary">新增</el-button>
-        <el-popconfirm title="确定删除吗？" @confirm="deleteBatch">
-          <template #reference>
-            <el-button type="danger" >批量删除</el-button>
-          </template>
-        </el-popconfirm>
-      </div>
       <!--    搜索区域-->
       <div style="width: 100%" align="right">
         <el-input prefix-icon="search" v-model="search"  placeholder="请输入关键字" style="width:15%" clearable/>
@@ -36,21 +28,9 @@
     </div>
 
     <!--    数据展示区-->
-    <el-table :data="Room_infotable" border stripe style="width: 100%" @selection-change="handleSelectionChange"> <!--显示表格边框和斑马纹-->
-      <el-table-column type="selection" width="55"></el-table-column>
+    <el-table :data="Room_infotable" border stripe style="width: 100%"> <!--显示表格边框和斑马纹-->
       <el-table-column prop="id" label="病房号" sortable /> <!--prop:属性名  label:表头的名字-->
       <el-table-column prop="section" label="所属部门" sortable />
-      <el-table-column fix="right" label="操作" >
-        <!--        内容修改区-->
-        <template #default="scope">
-          <el-button  type="text"  @click="handleEdit(scope.row)">编辑</el-button>
-          <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.id)">
-            <template #reference>
-              <el-button  type="danger" >删除</el-button>
-            </template>
-          </el-popconfirm>
-        </template>
-      </el-table-column>
     </el-table>
     <!--    分页-->
     <div style="display: flex">
@@ -64,28 +44,15 @@
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
         >
-
           <!--        添加的的对话框-->
         </el-pagination>
       </div>
       <!--    导入导出-->
       <div style="margin-top: 5px;margin-left: 10px">
-        <el-upload
-            :action=excelUploadUrl
-            :on-success="handleUploadSuccess"
-            :show-file-list=false
-            :limit="1"
-            accept='.xlsx'
-            style="display: inline-block; margin: 0 10px">
-          <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" >导入</el-button>
-
-        </el-upload>
-
-        <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" @click="exportdata">导出</el-button>
-
+        <el-button  type="text"  style="width: 50px;margin-left: 10px" @click="exportdata">下载数据</el-button>
       </div>
     </div>
-    <el-dialog v-model="dialogVisible" title="部门信息管理" width="30%" :before-close="handleClose">
+    <el-dialog v-model="dialogVisible" title="部门信息管理" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">
         <el-form-item label="病房号" prop="id">
           <el-input v-model="form.id" style="width:70%" autocomplete="off" v-bind:disabled="edi"/>

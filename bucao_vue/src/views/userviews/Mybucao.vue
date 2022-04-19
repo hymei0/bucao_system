@@ -41,7 +41,7 @@
         <!--        内容修改区-->
         <template #default="scope">
           <el-button  type="text" style="color:greenyellow" @click="handledetail(scope.row.rfno,scope.row.rfid)">详情</el-button>
-          <el-popconfirm title="请把布草放入回收箱中" @confirm="handleDelete(scope.row.roomId,scope.row.rfno,scope.row.rfid)">
+          <el-popconfirm title="请把布草放入回收箱中" @confirm="handleDelete(scope.row.userId,scope.row.rfno,scope.row.rfid)">
             <template #reference>
               <el-button  type="text" style="color:red;" >归还布草</el-button>
             </template>
@@ -69,6 +69,21 @@
       <div style="margin-top: 5px;margin-left: 10px">
         <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" @click="exportdata">导出</el-button>
       </div>
+    </div>
+    <div style="padding-top: 10%;padding-left: 10px;font-size: small">
+      <h3>提示:</h3>
+      <p style="margin-left: 20px;margin-top: 10px">
+        1.办理领取布草时只能领取病号服类的布草（RFID编码以A开头的布草）。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        2.请把待归还的布草放入布草回收箱然后点击归还布草按钮完成布草的归还回收。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        3.您可以点击详情按钮查看对应布草的详细信息。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        3.您可以点击导出按钮导出数据。
+      </p>
     </div>
     <!--        对话框-->
     <el-dialog v-model="dialogVisible" title="布草分布管理" width="30%" >
@@ -103,7 +118,7 @@
     </el-dialog >
 
     <!--    详情页面的对话框-->
-    <el-dialog v-model="dialogVisible1" title="布草详细信息" width="30%" :before-close="handleClose">
+    <el-dialog v-model="dialogVisible1" title="布草详细信息" width="30%" >
       <el-form :model="form1" label-width="120px" >
         <el-form-item label="布草类型" prop="rfno">
           <el-input v-model="form1.rfno" style="width:70%" autocomplete="off" disabled/>
@@ -242,7 +257,11 @@ export default {
     },
     //查询
     load(){
-      request.get("/Bucao_info/foruser" ).then(re =>{
+      request.get("/Bucao_info/foruser" ,{
+        params:{
+          rfid:'A'
+        }
+      }).then(re =>{
         this.bucaooptions=re
       })
 
@@ -269,10 +288,10 @@ export default {
       this.dialogVisible=true   //打开弹窗
     },
     //删除按钮事件处理
-    handleDelete(roomid,rfno1,rfid1){
+    handleDelete(userid,rfno1,rfid1){
       request.delete("/Bucao_user",{
         params:{
-          roomId:roomid,
+          userId:userid,
           rfno:rfno1,
           rfid:rfid1
         }
@@ -281,7 +300,7 @@ export default {
         {
           this.$message({
             type:"success",
-            message:"删除成功"
+            message:"已成功归还"
           })
         }
         else {

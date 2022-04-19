@@ -18,6 +18,6 @@ public interface Bucao_infoMapper extends BaseMapper<Bucao_info> {
     List<InData> Indata();
     @Select("select DATE_FORMAT(outdate, \"%m\") as month, count(1) as num from bucao_info  where( outdate is true  and year( bucao_info.outdate ) = year( curdate( )))  group by DATE_FORMAT(outdate, \"%m\");")
     List<Outdata> Outdata();
-    @Select("select * from bucao_info where RFNO like 'A%' and state like '闲置%';")
-    List<Map<String, Object>> selectbucaoforuser();
+    @Select("select * from bucao_info where RFNO like #{rfid}\"%\"and state like '闲置%';")
+    List<Map<String, Object>> selectbucaoforuser(String rfid);
 }

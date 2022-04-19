@@ -75,7 +75,7 @@
       </div>
     </div>
     <!--        对话框-->
-    <el-dialog v-model="dialogVisible" title="布草分布管理" width="30%" :before-close="handleClose">
+    <el-dialog v-model="dialogVisible" title="布草分布管理" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">
 
         <el-form-item label="病房号" prop="roomId">
@@ -97,9 +97,9 @@
           <el-select v-model="form.rfidx" class="m-2" @change="GetBucaosection" placeholder="Select" size="large" v-bind:disabled="edi">
             <el-option
                 v-for="item in options"
-                :key="item.rfno+item.rfid"
-                :label="item.rfno+item.rfid"
-                :value="item.rfno+item.rfid"
+                :key="item.RFNO+item.RFID"
+                :label="item.RFNO+item.RFID"
+                :value="item.RFNO+item.RFID"
             />
           </el-select>
         </el-form-item>
@@ -117,7 +117,7 @@
     </el-dialog >
 
 <!--    详情页面的对话框-->
-    <el-dialog v-model="dialogVisible1" title="布草详细信息" width="30%" :before-close="handleClose">
+    <el-dialog v-model="dialogVisible1" title="布草详细信息" width="30%" >
       <el-form :model="form1" label-width="120px" >
         <el-form-item label="布草类型" prop="rfno">
           <el-input v-model="form1.rfno" style="width:70%" autocomplete="off" disabled/>
@@ -238,6 +238,9 @@ export default {
       this.edi=false
       this.dialogVisible=true
       this.form={} //清空表单
+      request.get("/Bucao_room/rooms" ).then(re =>{
+        this.options0=re.data
+      })
     },
     //详情按钮事件处理
     handledetail(id1,id2){
@@ -265,12 +268,14 @@ export default {
     //查询
     load(){
 
-      request.get("/Bucao_info/selectall" ).then(re =>{
+      request.get("/Bucao_info/foruser",{
+        params:{
+          rfid:'B'
+        }
+      } ).then(re =>{
         this.options=re
       })
-      request.get("/Room_info/selectall" ).then(re =>{
-        this.options0=re.data
-      })
+
       request.get("/Bucao_room",  {
         params:{
           pageNum: this.currentPage,

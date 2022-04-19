@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
 import com.example.bucao_springboot.entity.Bucao_user;
 import com.example.bucao_springboot.entity.User_room;
+import com.example.bucao_springboot.mapper.Bucao_userMapper;
 import com.example.bucao_springboot.mapper.User_roomMapper;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,6 +41,7 @@ public class User_roomController {
         try {
             User_room user=User_roomMapper.selectOne(Wrappers.<User_room>lambdaQuery().eq(User_room::getUserid,user_room.getUserid()).eq(User_room::getRoomid,user_room.getRoomid()).eq(User_room::getComeTime,user_room.getComeTime()));
             if(user==null) {
+                User_roomMapper.updatebucao(user_room.getRoomid(),"使用中");
                 User_roomMapper.insert(user_room);
                 System.out.println("User_room已添加用户"+user_room.getUserid()+"的住院信息：");
                 return Result.success();
@@ -77,6 +79,7 @@ public class User_roomController {
             QueryWrapper<User_room> wrapper = new QueryWrapper<>();
 
             wrapper.eq("userid", userid);
+
             User_room ur=User_roomMapper.selectOne(wrapper);
             return Result.success(ur.getRoomid());
         }catch (Exception e){

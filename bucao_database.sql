@@ -52,11 +52,11 @@ primary key(RFNO,RFID),
 CONSTRAINT B_RFID FOREIGN KEY(rfno) REFERENCES rfid_kinds(RFNO)
 );
 insert into bucao_info values
-('Aclothes','000001','闲置',12, '2022-01-12',null),
-('Aclothes','000002','闲置',14,'2022-01-12',null),
-('Aclothes','000003','使用',8,'2022-01-12',null),
+('Aclothes','000001','闲置中',12, '2022-01-12',null),
+('Aclothes','000002','闲置中',14,'2022-01-12',null),
+('Aclothes','000003','使用中',8,'2022-01-12',null),
 ('Bsheet','000003','未知',8,'2022-01-12',null),
-('Aclothes','000004','回收',21,'2022-12-12','2022-04-03');
+('Aclothes','000004','已回收',21,'2022-12-12','2022-04-03');
 
 -- 3.user_info:病人信息表
 CREATE TABLE User_info(
@@ -110,7 +110,7 @@ CONSTRAINT B_userID FOREIGN KEY(USER_ID) references USER_INFO(ID),
 CONSTRAINT B_ROOMID FOREIGN KEY(ROOM_ID) references ROOM_INFO(ID)
 );
 insert into BUCAO_USER values
-('Aclothes','000001','0311','何元梅','14-0318');
+('Aclothes','000002','0311','何元梅','14-0318');
 
 -- 7.bucao_room:布草与房间绑定
 create table bucao_room(

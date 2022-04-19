@@ -97,7 +97,7 @@
 
       </div>
     </div>
-    <el-dialog v-model="dialogVisible" title="用户信息" width="30%" :before-close="handleClose">
+    <el-dialog v-model="dialogVisible" title="用户信息" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">
 
         <el-form-item label="账  号" prop="id">

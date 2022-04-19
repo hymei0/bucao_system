@@ -118,6 +118,13 @@ public class Room_InfoController {
         List<Map<String, Object>> list=room_infoMapper.selectMaps(queryWrapper);
         return Result.success(list);
     }
+    //无条件查询
+    @GetMapping("/forbucao")
+    public Result<?>  selecforbucao(){
+        QueryWrapper<Room_info> queryWrapper = new QueryWrapper<>();
+        List<Map<String, Object>> list=room_infoMapper.selectforbucao();
+        return Result.success(list);
+    }
 
 
     /**批量删除接口:复合主键

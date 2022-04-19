@@ -16,14 +16,6 @@
     </el-row>
 <!--    功能区域-->
     <div style="display: flex; margin: 10px 0"  align="left">
-      <div style="width: 10%;display: flex" align="left">
-        <el-button @click="add" type="primary">新增</el-button>
-        <el-popconfirm title="确定删除吗？" @confirm="deleteBatch">
-          <template #reference>
-            <el-button type="danger" >批量删除</el-button>
-          </template>
-        </el-popconfirm>
-      </div>
 <!--    搜索区域-->
       <div style="width: 100%" align="right">
         <el-input prefix-icon="search" v-model="search"  placeholder="请输入关键字" style="width:15%" clearable select-when-unmatched/>
@@ -34,24 +26,12 @@
 
 <!--    数据展示区-->
     <div id="table">
-    <el-table :data="RFIDtable" border stripe style="width: 100%" @selection-change="handleSelectionChange"> <!--显示表格边框和斑马纹-->
-      <el-table-column type="selection" width="55"></el-table-column>
+    <el-table :data="RFIDtable" border stripe style="width: 100%" > <!--显示表格边框和斑马纹-->
       <el-table-column prop="rfno" label="序列号" sortable /> <!--prop:属性名  label:表头的名字-->
       <el-table-column prop="kind" label="布草类型" />
       <el-table-column prop="stock" label="库存" />
       <el-table-column prop="section" label="所属部门" />
       <el-table-column prop="note" label="备注" />
-      <el-table-column fix="right" label="操作" >
-<!--        内容修改区-->
-        <template #default="scope">
-          <el-button  type="text"  @click="handleEdit(scope.row)">编辑</el-button>
-          <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.rfno)">
-          <template #reference>
-            <el-button  type="danger" >删除</el-button>
-          </template>
-          </el-popconfirm>
-        </template>
-      </el-table-column>
     </el-table>
     </div>
 <!--    分页-->
@@ -70,17 +50,6 @@
       </div>
       <!--    导入导出-->
       <div style="margin-top: 5px;margin-left: 10px;display: flex">
-        <el-upload
-            :action=excelUploadUrl
-            :on-success="handleUploadSuccess"
-            :show-file-list=false
-            :limit="1"
-            accept='.xlsx'
-            style="display: inline-block; margin: 0 10px"
-        >
-          <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" ><el-icon><upload /></el-icon></el-button>
-
-        </el-upload>
 
         <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" @click="exportdata"><el-icon><download /></el-icon></el-button>
 
@@ -89,7 +58,7 @@
 
 
     <!--        添加的的对话框1-->
-    <el-dialog v-model="dialogVisible" title="RFID标签类型" width="30%" :before-close="handleClose">
+    <el-dialog v-model="dialogVisible" title="RFID标签类型" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">
         <el-form-item label="序列号" prop="rfno">
           <el-input v-model="form.rfno" autocomplete="off"  style="width:70%"  v-bind:disabled="edi"/>
@@ -123,7 +92,7 @@
     </el-dialog>
 
     <!--        添加的的对话框2-->
-    <el-dialog v-model="dialogVisible2" title="RFID标签类型" width="30%" :before-close="handleClose">
+    <el-dialog v-model="dialogVisible2" title="RFID标签类型" width="30%" >
 <!--      <el-upload-->
 <!--          name="wlwDeviceFile"-->
 <!--          ref="upload"-->

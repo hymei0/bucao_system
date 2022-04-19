@@ -6,14 +6,6 @@
   <div class="ManagerInfo" style="padding:10px">
     <!--    功能区域-->
     <div style="display: flex; margin: 10px 0"  align="left">
-      <div style="width: 10%;display: flex" align="left">
-        <el-button @click="add" type="primary">新增</el-button>
-        <el-popconfirm title="确定删除吗？" @confirm="deleteBatch">
-          <template #reference>
-            <el-button type="danger" >批量删除</el-button>
-          </template>
-        </el-popconfirm>
-      </div>
       <!--    搜索区域-->
       <div style="width: 100%" align="right">
         <el-input prefix-icon="search" v-model="search"  placeholder="请输入关键字" style="width:15%" clearable/>
@@ -22,11 +14,10 @@
     </div>
 
     <!--    数据展示区-->
-    <el-table :data="Managertable" border stripe style="width: 100%" @selection-change="handleSelectionChange"> <!--显示表格边框和斑马纹-->
-      <el-table-column type="selection" width="55"></el-table-column>
+    <el-table :data="Managertable" border stripe style="width: 100%" > <!--显示表格边框和斑马纹-->
       <el-table-column prop="id" label="账号" sortable /> <!--prop:属性名  label:表头的名字-->
       <el-table-column prop="mname" label="名字" />
-      <el-table-column prop="sex" label="性别" />
+      <el-table-column prop="sex" label="性别" min-width="50%"/>
       <el-table-column prop="pri" label="权限"/>
       <el-table-column prop="portrait" label="头像">
         <template #default="scope">
@@ -39,18 +30,7 @@
       </el-table-column>
       <el-table-column prop="telephone" label="联系电话" />
       <el-table-column prop="address" label="地址" />
-      <el-table-column prop="email" label="邮件" />
-      <el-table-column fix="right" label="操作" >
-        <!--        内容修改区-->
-        <template #default="scope">
-          <el-button  type="text"  @click="handleEdit(scope.row)">编辑</el-button>
-          <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.id)">
-            <template #reference>
-              <el-button  type="text" style="color: red" >删除</el-button>
-            </template>
-          </el-popconfirm>
-        </template>
-      </el-table-column>
+      <el-table-column prop="email" label="邮件" min-width="120%"/>
     </el-table>
     <!--    分页-->
     <div style="display: flex">
@@ -73,7 +53,7 @@
         <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" @click="exportdata">导出</el-button>
       </div>
     </div>
-    <el-dialog v-model="dialogVisible" title="管理员信息" width="30%" :before-close="handleClose">
+    <el-dialog v-model="dialogVisible" title="管理员信息" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">
 
         <el-form-item label="账  号" prop="id">

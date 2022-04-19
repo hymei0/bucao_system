@@ -89,7 +89,7 @@
 
 
     <!--        添加的的对话框1-->
-    <el-dialog v-model="dialogVisible" title="RFID标签类型" width="30%" :before-close="handleClose">
+    <el-dialog v-model="dialogVisible" title="RFID标签类型" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">
         <el-form-item label="序列号" prop="rfno">
           <el-input v-model="form.rfno" autocomplete="off"  style="width:70%"  v-bind:disabled="edi"/>
@@ -123,7 +123,7 @@
     </el-dialog>
 
     <!--        添加的的对话框2-->
-    <el-dialog v-model="dialogVisible2" title="RFID标签类型" width="30%" :before-close="handleClose">
+    <el-dialog v-model="dialogVisible2" title="RFID标签类型" width="30%" >
 <!--      <el-upload-->
 <!--          name="wlwDeviceFile"-->
 <!--          ref="upload"-->

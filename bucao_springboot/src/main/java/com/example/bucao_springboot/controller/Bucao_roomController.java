@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
 import com.example.bucao_springboot.entity.Bucao_room;
 import com.example.bucao_springboot.mapper.Bucao_roomMapper;
+import com.example.bucao_springboot.mapper.Bucao_userMapper;
 import com.example.bucao_springboot.mapper.RFid_kindsMapper;
 import com.example.bucao_springboot.mapper.Room_infoMapper;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +37,8 @@ public class Bucao_roomController {
     //将xxx_infoMapper引入到xxx_infoController中,不太规范，一般是写service类，controller引入service,service引入mapper
     @Resource
     Bucao_roomMapper bucao_roomMapper;
+    @Resource
+    Bucao_userMapper bucao_userMapper;
 
 
     //新增接口
@@ -70,6 +73,13 @@ public class Bucao_roomController {
         }
 
     }
+    // 查询未使用的病房
+    @GetMapping("/rooms")
+    public Result<?>rooms()
+    {
+        List<Map<String, Object>> list=bucao_roomMapper.getrooms();
+        return Result.success(list);
+    }
 
     //删除接口
     @DeleteMapping
@@ -83,6 +93,7 @@ public class Bucao_roomController {
             QueryWrapper<Bucao_room> wrapper = new QueryWrapper<>();
 
             wrapper.eq("rfno", rfno).eq("rfid", rfid).eq("room_id",roomId);
+            bucao_userMapper.updatebucao(rfno,rfid,"已回收"); //归还布草后布草的状态变为已回收
             int rows = bucao_roomMapper.delete(wrapper);
             System.out.println(roomId+","+rfid+rfno+"该记录删除成功");
             return Result.success();
@@ -128,6 +139,7 @@ public class Bucao_roomController {
         for(List<String> id:ids)
         {
             QueryWrapper<Bucao_room> wrapper = new QueryWrapper<>();
+            bucao_userMapper.updatebucao(id.get(0),id.get(1),"已回收"); //归还布草后布草的状态变为已回收
             wrapper.eq("rfno", id.get(0)).eq("rfid", id.get(1)).eq("room_id",id.get(2));
             bucao_roomMapper.delete(wrapper);
         }

@@ -7,9 +7,15 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import java.util.List;
 import java.util.Map;
 
 @Mapper
 public interface Room_infoMapper extends BaseMapper<Room_info> {
-
+    /**
+     * 在bucao_user表中添加记录时过滤掉已经有病人住满的病房：病人办理出院的记录仍然存在，所以要过滤掉已经出院的情况
+     * @return
+     */
+    @Select("select * from room_info where id not in (select roomid from user_room where out_time IS NOT TRUE  group by roomid having count(roomid)>=4);")
+    List<Map<String, Object>> selectforbucao();
 }

@@ -73,7 +73,7 @@
         <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" @click="exportdata">导出</el-button>
       </div>
     </div>
-    <el-dialog v-model="dialogVisible" title="管理员信息" width="30%" :before-close="handleClose">
+    <el-dialog v-model="dialogVisible" title="管理员信息" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">
 
         <el-form-item label="账  号" prop="id">

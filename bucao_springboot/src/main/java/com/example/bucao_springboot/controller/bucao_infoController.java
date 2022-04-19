@@ -88,6 +88,7 @@ public class bucao_infoController {
         }
     }
 
+
     //无条件查询
     @GetMapping("/selectall")
     public List<Map<String, Object>>  selectall(){
@@ -97,8 +98,8 @@ public class bucao_infoController {
     }
     //查询布草类型为病号服且状态为闲置或者入库的布草
     @GetMapping("/foruser")
-    public List<Map<String, Object>>  selectforuser(){
-        List<Map<String, Object>> list=bucao_infoMapper.selectbucaoforuser();
+    public List<Map<String, Object>>  selectforuser(@RequestParam String rfid){
+        List<Map<String, Object>> list=bucao_infoMapper.selectbucaoforuser(rfid);
         return list;
     }
 

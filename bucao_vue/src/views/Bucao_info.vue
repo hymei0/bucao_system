@@ -89,7 +89,7 @@
 
       </div>
     </div>
-    <el-dialog v-model="dialogVisible" title="布草信息管理" width="30%" :before-close="handleClose">
+    <el-dialog v-model="dialogVisible" title="布草信息管理" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">
         <el-form-item label="布草类型" prop="rfno">
           <el-select v-model="form.rfno" class="m-2" placeholder="Select" size="large" v-bind:disabled="edi">

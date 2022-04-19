@@ -85,7 +85,7 @@
 
       </div>
     </div>
-    <el-dialog v-model="dialogVisible" title="部门信息管理" width="30%" :before-close="handleClose">
+    <el-dialog v-model="dialogVisible" title="部门信息管理" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">
         <el-form-item label="部门编号" prop="id">
           <el-input v-model="form.id" style="width:70%" autocomplete="off" v-bind:disabled="edi"/>

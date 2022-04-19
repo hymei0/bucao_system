@@ -28,7 +28,7 @@
     </div>
 
     <!--    数据展示区-->
-    <el-table :row-class-name="tableRowClassName" v-model:data="Ordertable" border stripe style="width: 100%" @selection-change="handleSelectionChange"> <!--显示表格边框和斑马纹-->
+    <el-table :row-class-name="tableRowClassName" v-model:data="Ordertable" border stripe style="width: 100%" > <!--显示表格边框和斑马纹-->
       <el-table-column prop="orderno" label="订单号" sortable align= "center" min-width="120%"/> <!--prop:属性名  label:表头的名字-->
       <el-table-column prop="subject" label="订单名" align= "center" min-width="50%"/>
       <el-table-column prop="userId" label="用户账号" align= "center" min-width="50%"/>

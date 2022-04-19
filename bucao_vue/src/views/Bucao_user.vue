@@ -47,7 +47,7 @@
         <template #default="scope">
           <el-button  type="text" style="color:greenyellow" @click="handledetail(scope.row.rfno,scope.row.rfid)">详情</el-button>
           <el-button  type="text"  @click="handleEdit(scope.row)">编辑</el-button>
-          <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.roomId,scope.row.rfno,scope.row.rfid)">
+          <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.userId,scope.row.rfno,scope.row.rfid)">
             <template #reference>
               <el-button  type="text" style="color: red" >删除</el-button>
             </template>
@@ -77,15 +77,15 @@
       </div>
     </div>
     <!--        对话框-->
-    <el-dialog v-model="dialogVisible" title="布草分布管理" width="30%" :before-close="handleClose">
+    <el-dialog v-model="dialogVisible" title="布草分布管理" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">
         <el-form-item label="病人账号" prop="userId">
-          <el-select v-model="form.userId" class="m-2" placeholder="Select" size="large" v-bind:disabled="edi">
+          <el-select v-model="form.userId" class="m-2" @change="GetUserName" placeholder="Select" size="large" v-bind:disabled="edi">
             <el-option
                 v-for="item in useroptions"
-                :key="item.ID"
-                :label="item.ID"
-                :value="item.ID"
+                :key="item.id"
+                :label="item.id"
+                :value="item.id"
             />
           </el-select>
         </el-form-item>
@@ -100,15 +100,15 @@
           </el-select>
         </el-form-item>
         <el-form-item label="用户姓名" prop="num">
-          <el-input v-model="form.userName" style="width:70%" autocomplete="off" v-bind:disabled="edi"/>
+          <el-input v-model="form.userName" style="width:70%" autocomplete="off" disabled/>
         </el-form-item>
         <el-form-item label="布草RFID编码" prop="rfidx">
           <el-select v-model="form.rfidx" class="m-2" placeholder="Select" size="large" v-bind:disabled="edi">
             <el-option
                 v-for="item in bucaooptions"
-                :key="item.rfno+item.rfid"
-                :label="item.rfno+item.rfid"
-                :value="item.rfno+item.rfid"
+                :key="item.RFNO+item.RFID"
+                :label="item.RFNO+item.RFID"
+                :value="item.RFNO+item.RFID"
             />
           </el-select>
         </el-form-item>
@@ -123,7 +123,7 @@
     </el-dialog >
 
     <!--    详情页面的对话框-->
-    <el-dialog v-model="dialogVisible1" title="布草详细信息" width="30%" :before-close="handleClose">
+    <el-dialog v-model="dialogVisible1" title="布草详细信息" width="30%" >
       <el-form :model="form1" label-width="120px" >
         <el-form-item label="布草类型" prop="rfno">
           <el-input v-model="form1.rfno" style="width:70%" autocomplete="off" disabled/>
@@ -205,6 +205,12 @@ export default {
 
 //方法区
   methods:{
+    //获取用户姓名函数
+    GetUserName(){
+      request.get("/User_info/"+this.form.userId).then(res=>{
+        this.form.userName=res.data.uname
+      })
+    },
     handleSelectionChange(val) {
       this.ids = val.map(v => [v.rfno,v.rfid,v.roomId,v.userId])   // [{id,name}, {id,name}] => [id,id]
     },
@@ -234,6 +240,20 @@ export default {
       this.edi=false
       this.dialogVisible=true
       this.form={} //清空表单
+      request.get("/Bucao_info/foruser" ,{
+        params:{
+          rfid:'A'
+        }
+      }).then(re =>{
+        this.bucaooptions=re
+      })
+      request.get("/Room_info/forbucao" ).then(re =>{
+        this.roomoptions=re.data
+      })
+      request.get("/Bucao_user/forbucao" ).then(re =>{
+        this.useroptions=re.data
+        console.log(this.useroptions)
+      })
     },
     //详情按钮事件处理
     handledetail(id1,id2){
@@ -261,16 +281,7 @@ export default {
     },
     //查询
     load(){
-      request.get("/Bucao_info/selectall" ).then(re =>{
-        this.bucaooptions=re
-      })
-      request.get("/Room_info/selectall" ).then(re =>{
-        this.roomoptions=re.data
-      })
-      request.get("/User_info/selectall" ).then(re =>{
-        this.useroptions=re.data
-        console.log(this.useroptions)
-      })
+
       request.get("/Bucao_user",  {
         params:{
           pageNum: this.currentPage,
@@ -293,10 +304,10 @@ export default {
       this.dialogVisible=true   //打开弹窗
     },
     //删除按钮事件处理
-    handleDelete(roomid,rfno1,rfid1){
+    handleDelete(id,rfno1,rfid1){
       request.delete("/Bucao_user",{
         params:{
-          roomId:roomid,
+          userId:id,
           rfno:rfno1,
           rfid:rfid1
         }

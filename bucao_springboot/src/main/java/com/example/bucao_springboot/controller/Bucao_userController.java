@@ -9,8 +9,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
+import com.example.bucao_springboot.entity.Bucao_info;
 import com.example.bucao_springboot.entity.Bucao_user;
 import com.example.bucao_springboot.entity.User_room;
+import com.example.bucao_springboot.mapper.Bucao_infoMapper;
 import com.example.bucao_springboot.mapper.Bucao_userMapper;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,8 +44,8 @@ public class Bucao_userController {
             wrapper.eq("rfno", bucao_user.getRfno()).eq("rfid", bucao_user.getRfid()).eq("user_id",bucao_user.getUserId());
             Bucao_user result=bucao_userMapper.selectOne(wrapper);
             if(result==null) {
-                bucao_userMapper.updatebucao(bucao_user.getRfno(),bucao_user.getRfid());
-                bucao_userMapper.insert(bucao_user);
+                bucao_userMapper.updatebucao(bucao_user.getRfno(),bucao_user.getRfid(),"使用中");//将用户领取的布草的状态改变为使用中
+
                 return Result.success();
             }
             else{
@@ -71,7 +73,7 @@ public class Bucao_userController {
 
     //删除接口
     @DeleteMapping
-    public Result<?> delete(@RequestParam String UserId,
+    public Result<?> delete(@RequestParam String userId,
                             @RequestParam String rfno,
                             @RequestParam String rfid)
     {
@@ -79,10 +81,10 @@ public class Bucao_userController {
         try {
             // Bucao_user bucao=Bucao_userMapper.selectOne(Wrappers.<Bucao_user>lambdaQuery().eq(Bucao_user::getRfno,Bucao_user.getRfno()).eq(Bucao_user::getRfid,Bucao_user.getRfid()));
             QueryWrapper<Bucao_user> wrapper = new QueryWrapper<>();
-
-            wrapper.eq("rfno", rfno).eq("rfid", rfid).eq("room_id",UserId);
+            wrapper.eq("rfno", rfno).eq("rfid", rfid).eq("user_id",userId);
+            bucao_userMapper.updatebucao(rfno,rfid,"已回收"); //归还布草后布草的状态变为已回收
             int rows = bucao_userMapper.delete(wrapper);
-            System.out.println(UserId+","+rfid+rfno+"该记录删除成功");
+            System.out.println(userId+","+rfid+rfno+"该记录删除成功");
             return Result.success();
         }catch (Exception e){
             System.out.println(e.toString());
@@ -112,6 +114,11 @@ public class Bucao_userController {
             System.out.println(e.toString());
             return Result.error("-1","后台出错了，请联系开发人员");
         }
+    }
+    @GetMapping("/forbucao")
+    public Result<?> selectforbucao(){
+        List<Map<String, Object>> list=bucao_userMapper.selectforbucao();
+        return Result.success(list);
     }
 
     //分页查询:面向管理员的接口
@@ -147,6 +154,7 @@ public class Bucao_userController {
 
         for(List<String> id:ids)
         {
+            bucao_userMapper.updatebucao(id.get(0),id.get(1),"已回收");//对应布草的状态更新为已回收
             QueryWrapper<Bucao_user> wrapper = new QueryWrapper<>();
             wrapper.eq("rfno", id.get(0)).eq("rfid", id.get(1)).eq("room_id",id.get(2));
             bucao_userMapper.delete(wrapper);

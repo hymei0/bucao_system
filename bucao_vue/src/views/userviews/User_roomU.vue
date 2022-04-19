@@ -367,7 +367,7 @@ export default {
     exportdata() {
       location.href = "http://" + "localhost" + ":9090/User_room/export";
     },
-    //添加按钮事件处理
+    //办理住院
     add()
     {
       this.form={} //清空表单
