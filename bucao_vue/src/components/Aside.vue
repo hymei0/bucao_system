@@ -31,7 +31,7 @@
 
       <el-sub-menu index="users">
         <template #title>
-          <el-icon><trend-charts /></el-icon>
+          <el-icon><user-filled /></el-icon>
           <span style="font-size: medium;font-weight: bold;" >用户管理</span>
         </template>
         <el-menu-item index="/user_info" style="padding-left: 60px; font-size:small">

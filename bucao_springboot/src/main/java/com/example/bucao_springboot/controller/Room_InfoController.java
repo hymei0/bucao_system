@@ -230,24 +230,27 @@ public class Room_InfoController {
      */
     @PostMapping("/import")
     public Result<?> upload(MultipartFile file) throws IOException {
-
-        InputStream inputStream = file.getInputStream();
-        List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
-        System.out.println(lists);
-        List<Room_info> saveList = new ArrayList<>();
-        for (List<Object> row : lists) {
-            Room_info Room_info = new Room_info();
-            Room_info.setId(row.get(0).toString());
-            Room_info.setSection(row.get(1).toString());
-            saveList.add(Room_info);
-        }
-        Integer num=0;//统计导入成功的记录条数
-        for (Room_info Room_info : saveList) {
-            if(Room_info.getId()!=null)
-            {
-                room_infoMapper.insert(Room_info);
-                num=num+1;
+        Integer num = 0;//统计导入成功的记录条数
+        try {
+            InputStream inputStream = file.getInputStream();
+            List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
+            System.out.println(lists);
+            List<Room_info> saveList = new ArrayList<>();
+            for (List<Object> row : lists) {
+                Room_info Room_info = new Room_info();
+                Room_info.setId(row.get(0).toString());
+                Room_info.setSection(row.get(1).toString());
+                saveList.add(Room_info);
             }
+            for (Room_info Room_info : saveList) {
+                if (Room_info.getId() != null) {
+                    room_infoMapper.insert(Room_info);
+                    num = num + 1;
+                }
+            }
+        }catch (Exception e)
+        {
+            System.out.println(e.toString());
         }
         return Result.success(num);
     }

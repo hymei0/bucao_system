@@ -256,33 +256,36 @@ public class User_infoController {
      */
     @PostMapping("/import")
     public Result<?> upload(MultipartFile file) throws IOException {
+        Integer success=0;;//统计导入成功的记录条数
+        try {
+            InputStream inputStream = file.getInputStream();
+            List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
+            System.out.println(lists);
+            List<User_info> saveList = new ArrayList<>();
+            for (List<Object> row : lists) {
+                User_info user_info = new User_info();
+                user_info.setID(row.get(0).toString());
+                user_info.setUname(row.get(1).toString());
+                user_info.setSex(row.get(2).toString());
+                user_info.setPortrait(row.get(3).toString());
+                user_info.setTelephone(row.get(4).toString());
+                user_info.setAddress(row.get(5).toString());
+                user_info.setPsd(row.get(0).toString());
+                user_info.setRoles("user");
+                //user_info.setExpenses(Double.parseDouble(row.get(7).toString()));
 
-        InputStream inputStream = file.getInputStream();
-        List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
-        System.out.println(lists);
-        List<User_info> saveList = new ArrayList<>();
-        for (List<Object> row : lists) {
-            User_info user_info = new User_info();
-            user_info.setID(row.get(0).toString());
-            user_info.setUname(row.get(1).toString());
-            user_info.setSex(row.get(2).toString());
-            user_info.setPortrait(row.get(3).toString());
-            user_info.setTelephone(row.get(4).toString());
-            user_info.setAddress(row.get(5).toString());
-            user_info.setPsd(row.get(0).toString());
-            user_info.setRoles("user");
-            //user_info.setExpenses(Double.parseDouble(row.get(7).toString()));
-
-            saveList.add(user_info);
-        }
-        int success=0;
-        for (User_info user_info : saveList) {
-
-            if(user_info.getID()!=null)
-            {
-                user_infoMapper.insert(user_info);
-                success=success+1;
+                saveList.add(user_info);
             }
+            for (User_info user_info : saveList) {
+
+                if (user_info.getID() != null) {
+                    user_infoMapper.insert(user_info);
+                    success = success + 1;
+                }
+            }
+        }catch (Exception e)
+        {
+            System.out.println(e.toString());
         }
         return Result.success(success);
     }

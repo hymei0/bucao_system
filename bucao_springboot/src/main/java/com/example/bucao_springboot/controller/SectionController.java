@@ -200,25 +200,29 @@ public class SectionController {
      */
     @PostMapping("/import")
     public Result<?> upload(MultipartFile file) throws IOException {
-
-        InputStream inputStream = file.getInputStream();
-        List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
-        System.out.println(lists);
-        List<Section> saveList = new ArrayList<>();
-        for (List<Object> row : lists) {
-            Section Section = new Section();
-            Section.setId(row.get(0).toString());
-            Section.setNa(row.get(1).toString());
-            saveList.add(Section);
-        }
-        Integer num=0; //统计导入成功的记录条数
-        for (Section Section : saveList) {
-
-            if(Section.getId()!=null)
-            {
-                sectionMapper.insert(Section);
-                num=num+1;
+        Integer num = 0;//统计导入成功的记录条数
+        try {
+            InputStream inputStream = file.getInputStream();
+            List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
+            System.out.println(lists);
+            List<Section> saveList = new ArrayList<>();
+            for (List<Object> row : lists) {
+                Section Section = new Section();
+                Section.setId(row.get(0).toString());
+                Section.setNa(row.get(1).toString());
+                saveList.add(Section);
             }
+
+            for (Section Section : saveList) {
+
+                if (Section.getId() != null) {
+                    sectionMapper.insert(Section);
+                    num = num + 1;
+                }
+            }
+        }catch (Exception e)
+        {
+            System.out.println(e.toString());
         }
         return Result.success(num);
     }

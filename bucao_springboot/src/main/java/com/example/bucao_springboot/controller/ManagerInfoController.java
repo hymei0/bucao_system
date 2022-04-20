@@ -252,32 +252,37 @@ public class ManagerInfoController {
      */
     @PostMapping("/import")
     public Result<?> upload(MultipartFile file) throws IOException {
+        Integer num = 0;//统计导入成功的记录条数
+        try {
+            InputStream inputStream = file.getInputStream();
+            List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
+            System.out.println(lists);
+            List<ManagerInfo> saveList = new ArrayList<>();
+            for (List<Object> row : lists) {
+                ManagerInfo ManagerInfo = new ManagerInfo();
+                ManagerInfo.setId(row.get(0).toString());
+                ManagerInfo.setMname(row.get(1).toString());
+                ManagerInfo.setSex(row.get(2).toString());
+                ManagerInfo.setPortrait(row.get(3).toString());
+                ManagerInfo.setTelephone(row.get(4).toString());
+                ManagerInfo.setAddress(row.get(5).toString());
+                ManagerInfo.setPsd(row.get(0).toString());
+                //ManagerInfo.setExpenses(Double.parseDouble(row.get(7).toString()));
 
-        InputStream inputStream = file.getInputStream();
-        List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
-        System.out.println(lists);
-        List<ManagerInfo> saveList = new ArrayList<>();
-        for (List<Object> row : lists) {
-            ManagerInfo ManagerInfo = new ManagerInfo();
-            ManagerInfo.setId(row.get(0).toString());
-            ManagerInfo.setMname(row.get(1).toString());
-            ManagerInfo.setSex(row.get(2).toString());
-            ManagerInfo.setPortrait(row.get(3).toString());
-            ManagerInfo.setTelephone(row.get(4).toString());
-            ManagerInfo.setAddress(row.get(5).toString());
-            ManagerInfo.setPsd(row.get(0).toString());
-            //ManagerInfo.setExpenses(Double.parseDouble(row.get(7).toString()));
-
-            saveList.add(ManagerInfo);
-        }
-        for (ManagerInfo ManagerInfo : saveList) {
-
-            if(ManagerInfo.getId()!=null)
-            {
-                ManagerInfoMapper.insert(ManagerInfo);
+                saveList.add(ManagerInfo);
             }
+            for (ManagerInfo ManagerInfo : saveList) {
+
+                if (ManagerInfo.getId() != null) {
+                    ManagerInfoMapper.insert(ManagerInfo);
+                    num=num+1;
+                }
+            }
+        }catch (Exception e)
+        {
+            System.out.println(e.toString());
         }
-        return Result.success();
+        return Result.success(num);
     }
 }
 

@@ -242,23 +242,28 @@ public class Bucao_userController {
      */
     @PostMapping("/import")
     public Result<?> upload(MultipartFile file) throws IOException {
-        InputStream inputStream = file.getInputStream();
-        List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
-        List<Bucao_user> saveList = new ArrayList<>();
-        for (List<Object> row : lists) {
-            Bucao_user Bucao_user = new Bucao_user();
-            Bucao_user.setRfno(row.get(0).toString());
-            Bucao_user.setRfid(row.get(1).toString());
+        Integer num = 0;//统计导入成功的记录条数
+        try {
+            InputStream inputStream = file.getInputStream();
+            List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
+            List<Bucao_user> saveList = new ArrayList<>();
+            for (List<Object> row : lists) {
+                Bucao_user Bucao_user = new Bucao_user();
+                Bucao_user.setRfno(row.get(0).toString());
+                Bucao_user.setRfid(row.get(1).toString());
 
-            saveList.add(Bucao_user);
-        }
-        for (Bucao_user Bucao_user : saveList) {
-            System.out.println(Bucao_user);
-            if(Bucao_user.getRfid()!=null&&Bucao_user.getRfno()!=null)
-            {
-                bucao_userMapper.insert(Bucao_user);
+                saveList.add(Bucao_user);
             }
+            for (Bucao_user Bucao_user : saveList) {
+                System.out.println(Bucao_user);
+                if (Bucao_user.getRfid() != null && Bucao_user.getRfno() != null) {
+                    bucao_userMapper.insert(Bucao_user);
+                    num=num+1;
+                }
+            }
+        }catch (Exception e){
+            System.out.println(e.toString());
         }
-        return Result.success();
+        return Result.success(num);
     }
 }

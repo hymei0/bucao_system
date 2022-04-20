@@ -58,7 +58,7 @@ public class Bucao_roomController {
                 return Result.success();
             }
             else{
-                return Result.error("-1","该记录已存在，如有变更需求请进行修改操作！");
+                return Result.error("-1","该记录已存在");
             }
         }catch (Exception e){
             return Result.error("-1","后台错啦，请联系开发人员");
@@ -77,7 +77,7 @@ public class Bucao_roomController {
             bucao_roomMapper.update(bucao_room, Wrappers.<Bucao_room>lambdaUpdate().eq(Bucao_room::getRfno, bucao_room.getRfno()).eq(Bucao_room::getRfid, bucao_room.getRfid()).eq(Bucao_room::getRoomId, bucao_room.getRoomId()));
             return Result.success();
         }catch (Exception e){
-            return Result.error("-1","更新错误");
+            return Result.error("-1","后台出错啦，请联系开发人员");
         }
 
     }
@@ -213,24 +213,30 @@ public class Bucao_roomController {
      */
     @PostMapping("/import")
     public Result<?> upload(MultipartFile file) throws IOException {
-        InputStream inputStream = file.getInputStream();
-        List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
-        List<Bucao_room> saveList = new ArrayList<>();
-        for (List<Object> row : lists) {
-            Bucao_room Bucao_room = new Bucao_room();
-            Bucao_room.setRfno(row.get(0).toString());
-            Bucao_room.setRfid(row.get(1).toString());
+        Integer num = 0;//统计导入成功的记录条数
+        try {
 
-            saveList.add(Bucao_room);
-        }
-        for (Bucao_room Bucao_room : saveList) {
-            System.out.println(Bucao_room);
-            if(Bucao_room.getRfid()!=null&&Bucao_room.getRfno()!=null)
-            {
-                bucao_roomMapper.insert(Bucao_room);
+            InputStream inputStream = file.getInputStream();
+            List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
+            List<Bucao_room> saveList = new ArrayList<>();
+            for (List<Object> row : lists) {
+                Bucao_room Bucao_room = new Bucao_room();
+                Bucao_room.setRfno(row.get(0).toString());
+                Bucao_room.setRfid(row.get(1).toString());
+
+                saveList.add(Bucao_room);
             }
+            for (Bucao_room Bucao_room : saveList) {
+                System.out.println(Bucao_room);
+                if (Bucao_room.getRfid() != null && Bucao_room.getRfno() != null) {
+                    bucao_roomMapper.insert(Bucao_room);
+                    num=num+1;//统计导入成功的记录条数
+                }
+            }
+        }catch (Exception e){
+            System.out.println(e.toString());
         }
-        return Result.success();
+        return Result.success(num);
     }
 
 }

@@ -343,7 +343,7 @@ export default {
           {
             this.$message({
               type:"success",
-              message:"修改成功"
+              message:res.msg
             })
             this.load()
             this.dialogVisible=false
@@ -370,7 +370,7 @@ export default {
           {
             this.$message({
               type:"success",
-              message:"操作成功"
+              message:res.msg
             })
             this.load()
             this.dialogVisible=false

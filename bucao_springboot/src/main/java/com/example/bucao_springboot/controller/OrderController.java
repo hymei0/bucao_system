@@ -252,40 +252,43 @@ public class OrderController {
      */
     @PostMapping("/import")
     public Result<?> upload(MultipartFile file) throws IOException {
+        Integer num = 0;//统计导入成功的记录条数
+        try {
+            InputStream inputStream = file.getInputStream();
+            List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
+            List<Order> saveList = new ArrayList<>();
+            for (List<Object> row : lists) {
+                Order Order = new Order();
+                Order.setOrderno(row.get(0).toString());
+                Order.setUserId(row.get(1).toString());
+                Order.setRoomId(row.get(2).toString());
+                Order.setExpenses(Double.parseDouble(row.get(6).toString()));
+                Order.setRoomId(row.get(4).toString());
 
-        InputStream inputStream = file.getInputStream();
-        List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
-        List<Order> saveList = new ArrayList<>();
-        for (List<Object> row : lists) {
-            Order Order = new Order();
-            Order.setOrderno(row.get(0).toString());
-            Order.setUserId(row.get(1).toString());
-            Order.setRoomId(row.get(2).toString());
-            Order.setExpenses(Double.parseDouble(row.get(6).toString()));
-            Order.setRoomId(row.get(4).toString());
+                if (row.get(3).toString() == null || row.get(3).toString().equals("")) {
+                    Order.setCreatetime(null);
+                } else {
+                    Order.setCreatetime(Date.valueOf(DateUtil.format(DateUtil.parse(row.get(3).toString()), "yyyy-MM-dd")));
+                }
+                if (row.get(6).toString() == null || row.get(6).toString().equals("")) {
+                    Order.setPaytime(null);
+                } else {
+                    Order.setPaytime(Date.valueOf(DateUtil.format(DateUtil.parse(row.get(6).toString()), "yyyy-MM-dd HH:mm:ss")));
+                }
 
-            if(row.get(3).toString()==null   ||   row.get(3).toString().equals("")) {
-                Order.setCreatetime(null);
-            }else
-            {
-                Order.setCreatetime(Date.valueOf(DateUtil.format(DateUtil.parse(row.get(3).toString()),"yyyy-MM-dd")));
+                saveList.add(Order);
             }
-            if(row.get(6).toString()==null   ||   row.get(6).toString().equals("")) {
-                Order.setPaytime(null);
-            }else
-            {
-                Order.setPaytime(Date.valueOf(DateUtil.format(DateUtil.parse(row.get(6).toString()),"yyyy-MM-dd HH:mm:ss")));
-            }
+            for (Order Order : saveList) {
 
-            saveList.add(Order);
+                if (Order.getOrderno() != null) {
+                    OrderMapper.insert(Order);
+                    num=num+1;
+                }
+            }
+        }catch (Exception e)
+        {
+            System.out.println(e.toString());
         }
-        for (Order Order : saveList) {
-
-            if(Order.getOrderno()!=null)
-            {
-                OrderMapper.insert(Order);
-            }
-        }
-        return Result.success();
+        return Result.success(num);
     }
 }

@@ -199,33 +199,40 @@ public class rfid_kindsController {
      * @throws IOException
      */
     @GetMapping("/export")
-    public void export(HttpServletResponse response) throws IOException {
+    public Result<?> export(HttpServletResponse response) throws IOException {
 
-        List<Map<String, Object>> list = CollUtil.newArrayList();
+        try {
 
-        List<RFid_kinds> all = rfid_kindsMapper.selectList(null);
-        for (RFid_kinds RFid_kinds : all) {
-            Map<String, Object> row1 = new LinkedHashMap<>();
-            row1.put("序列号", RFid_kinds.getRFNO());
-            row1.put("布草类型", RFid_kinds.getKind());
-            row1.put("库存", RFid_kinds.getStock());
-            row1.put("所属部门", RFid_kinds.getSection());
-            row1.put("备注", RFid_kinds.getNote());
-            list.add(row1);
+            List<Map<String, Object>> list = CollUtil.newArrayList();
+
+            List<RFid_kinds> all = rfid_kindsMapper.selectList(null);
+            for (RFid_kinds RFid_kinds : all) {
+                Map<String, Object> row1 = new LinkedHashMap<>();
+                row1.put("序列号", RFid_kinds.getRFNO());
+                row1.put("布草类型", RFid_kinds.getKind());
+                row1.put("库存", RFid_kinds.getStock());
+                row1.put("所属部门", RFid_kinds.getSection());
+                row1.put("备注", RFid_kinds.getNote());
+                list.add(row1);
+            }
+
+            // 2. 写excel
+            ExcelWriter writer = ExcelUtil.getWriter(true);
+            writer.write(list, true);
+
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
+            String fileName = URLEncoder.encode("RFID标签分类数据表", "UTF-8");
+            response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
+
+            ServletOutputStream out = response.getOutputStream();
+            writer.flush(out, true);
+            writer.close();
+            IoUtil.close(System.out);
+            return Result.success("导出成功");
+        }catch (Exception e){
+            System.out.println(e.toString());
+            return Result.error("-1","导出失败");
         }
-
-        // 2. 写excel
-        ExcelWriter writer = ExcelUtil.getWriter(true);
-        writer.write(list, true);
-
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
-        String fileName = URLEncoder.encode("RFID标签分类数据表", "UTF-8");
-        response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
-
-        ServletOutputStream out = response.getOutputStream();
-        writer.flush(out, true);
-        writer.close();
-        IoUtil.close(System.out);
     }
 
     /**
@@ -238,26 +245,32 @@ public class rfid_kindsController {
      */
     @PostMapping("/import")
     public Result<?> upload(MultipartFile file) throws IOException {
-        InputStream inputStream = file.getInputStream();
-        List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
-        List<RFid_kinds> saveList = new ArrayList<>();
-        for (List<Object> row : lists) {
+        Integer num = 0;//统计导入成功的记录条数
+        try {
+            InputStream inputStream = file.getInputStream();
+            List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
+            List<RFid_kinds> saveList = new ArrayList<>();
+            for (List<Object> row : lists) {
 
-            RFid_kinds rfid_kinds = new RFid_kinds();
-            rfid_kinds.setRFNO(row.get(0).toString());
-            rfid_kinds.setKind(row.get(1).toString());
-            rfid_kinds.setStock(Integer.valueOf((row.get(2).toString())));
-            rfid_kinds.setSection(row.get(3).toString());
-            rfid_kinds.setNote(row.get(4).toString());
+                RFid_kinds rfid_kinds = new RFid_kinds();
+                rfid_kinds.setRFNO(row.get(0).toString());
+                rfid_kinds.setKind(row.get(1).toString());
+                rfid_kinds.setStock(Integer.valueOf((row.get(2).toString())));
+                rfid_kinds.setSection(row.get(3).toString());
+                rfid_kinds.setNote(row.get(4).toString());
 
-            saveList.add(rfid_kinds);
-        }
-        Integer num=0;//统计导入成功的记录条数
-        for (RFid_kinds rfid_kinds : saveList) {
-            if(rfid_kinds.getRFNO()!=null) {
-                rfid_kindsMapper.insert(rfid_kinds);
-                num=num+1;
+                saveList.add(rfid_kinds);
             }
+
+            for (RFid_kinds rfid_kinds : saveList) {
+                if (rfid_kinds.getRFNO() != null) {
+                    rfid_kindsMapper.insert(rfid_kinds);
+                    num = num + 1;
+                }
+            }
+        }catch (Exception e)
+        {
+            System.out.println(e.toString());
         }
         return Result.success(num);
     }

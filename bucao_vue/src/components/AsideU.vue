@@ -30,7 +30,7 @@
 
       <el-sub-menu index="users">
         <template #title>
-          <el-icon><trend-charts /></el-icon>
+          <el-icon><user /></el-icon>
           <span style="font-size: medium;font-weight: bold;" >个人订单</span>
         </template>
         <el-menu-item index="/user_roomU" style="padding-left: 60px; font-size:small">

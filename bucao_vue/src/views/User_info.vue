@@ -89,11 +89,11 @@
             :limit="1"
             accept='.xlsx'
             style="display: inline-block; margin: 0 10px">
-          <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" >导入</el-button>
+          <el-button  type="primary" size="small" style="width: 70px;margin-left: 10px" >导入<el-icon class="el-icon--right"><Upload /></el-icon></el-button>
 
         </el-upload>
 
-        <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" @click="exportdata">导出</el-button>
+        <el-button  type="primary" size="small" style="width: 70px;margin-left: 10px" @click="exportdata">导出<el-icon class="el-icon--right"><Download/></el-icon></el-button>
 
       </div>
     </div>
@@ -150,6 +150,7 @@
 import { ref } from 'vue'
 import request from "@/utils/request";
 import {ElMessage} from "element-plus";
+import {Download} from "@element-plus/icons-vue";
 
 const samll = ref(false)
 const background = ref(true)
@@ -158,6 +159,7 @@ const disabled = ref(false)
 export default {
   name: "User_info",
   components: {
+    Download
   },
 
   data(){
