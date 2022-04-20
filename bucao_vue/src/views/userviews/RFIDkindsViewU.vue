@@ -50,13 +50,18 @@
       </div>
       <!--    导入导出-->
       <div style="margin-top: 5px;margin-left: 10px;display: flex">
-
         <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" @click="exportdata"><el-icon><download /></el-icon></el-button>
-
       </div>
     </div>
-
-
+    <div style="padding-top: 6%;padding-left: 5px;font-size: small">
+      <h3>Tips:</h3>
+      <p style="margin-left: 20px;margin-top: 10px">
+        1.此页面为RFID标签信息分类的页面，规定每件布草的RFID号的含义。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        2.序列号由两部分组成：所属类别+具体名称。比如Aclothes表示病号服类（A）的衣服（clothes）。
+      </p>
+    </div>
     <!--        添加的的对话框1-->
     <el-dialog v-model="dialogVisible" title="RFID标签类型" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">

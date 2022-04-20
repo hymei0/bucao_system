@@ -44,7 +44,7 @@
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
         >
-          <!--        添加的的对话框-->
+
         </el-pagination>
       </div>
       <!--    导入导出-->
@@ -52,6 +52,20 @@
         <el-button  type="text"  style="width: 50px;margin-left: 10px" @click="exportdata">下载数据</el-button>
       </div>
     </div>
+    <div style="padding-top: 6%;padding-left: 5px;font-size: small">
+      <h3>Tips:</h3>
+      <p style="margin-left: 20px;margin-top: 10px">
+        1.此页面为病房的基本信息页面。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        2.包括了病房号和所属部门组成。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        3.点击”下载数据“可以下载数据到本地。
+      </p>
+    </div>
+
+    <!--        添加的的对话框-->
     <el-dialog v-model="dialogVisible" title="病房信息管理" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">
         <el-form-item label="病房号" prop="id">

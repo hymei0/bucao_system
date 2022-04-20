@@ -19,16 +19,20 @@
         <el-form  ref="form" :model="form" label-width="100px" :label-position="labelPosition" style="width: 100%;display: flex;padding-bottom: 40px">
           <el-form align="left" style="width: 70%;">
               <el-form-item label="姓 名" prop="uname" >
-                <a>{{form.uname}}</a>
+                <a>{{form.mname}}</a>
               </el-form-item>
               <el-form-item label="账 号" prop="id">
                 <a>{{form.id}}</a>
               </el-form-item>
           </el-form>
           <el-form-item  prop="portrai" align="right" style="margin-right: 0px">
-
-
-
+            <el-tooltip
+                class="box-item"
+                effect="light"
+                content="更换头像"
+                placement="top-start"
+                v-bind:disabled='!edi'
+            >
             <el-upload
                 class="avatar-uploader"
                 :action="filesUploadUrl"
@@ -37,11 +41,11 @@
                 v-bind:disabled='!edi'
                 :before-upload="beforeAvatarUpload"
             >
-              <img v-if="form.portrait" :size="30" :src="form.portrait" style="width: 70px;height: auto;" align="right" class="avatar" title="更换头像"/>
+              <img v-if="form.portrait" :size="40" :src="form.portrait" style="width: 110px;height: auto;" align="right" class="avatar" />
               <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
 
             </el-upload>
-
+            </el-tooltip>
 
           </el-form-item>
         </el-form>
@@ -110,10 +114,15 @@ export default {
 
     load()
     {
-      let str =sessionStorage.getItem("user_info")||"{}"
-      this.form=JSON.parse(str)
-      //初始化头像
-      if(this.form.portrait===null)
+      let userStr = sessionStorage.getItem("user_info") || "{}"
+      this.form = JSON.parse(userStr)
+      // 请求服务端，确认当前登录用户的 合法信息
+      request.get("/ManagerInfo/" + this.form.id).then(res => {
+        if(res.code === '1'){
+          this.form = res.data
+        }
+      })
+      if(this.form.portrait==null)
       {
         this.form.portrait='https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg'
       }

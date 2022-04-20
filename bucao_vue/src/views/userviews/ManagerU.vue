@@ -3,7 +3,21 @@
 
 </style>
 <template>
-  <div class="ManagerInfo" style="padding:10px">
+  <div class="ManagerInfo" style="padding:10px;">
+    <!-- 面包屑导航 -->
+    <el-breadcrumb prefix-icon="arrow-right-bold " style="width: 100%;margin-top: 10px;margin-left: 10px">
+      <el-breadcrumb-item style="font-size: large; ">联系管理员</el-breadcrumb-item>
+      <el-breadcrumb-item style="font-size: large; ">管理员信息</el-breadcrumb-item>
+    </el-breadcrumb>
+    <!-- 搜索，切换 -->
+    <el-row :gutter="23">
+      <el-col :span="18">
+        <el-divider></el-divider>
+
+      </el-col>
+      <el-col :span="6">
+      </el-col>
+    </el-row>
     <!--    功能区域-->
     <div style="display: flex; margin: 10px 0"  align="left">
       <!--    搜索区域-->
@@ -14,7 +28,7 @@
     </div>
 
     <!--    数据展示区-->
-    <el-table :data="Managertable" border stripe style="width: 100%" > <!--显示表格边框和斑马纹-->
+    <el-table :data="Managertable"  stripe style="width: 100%" > <!--显示表格边框和斑马纹-->
       <el-table-column prop="id" label="账号" sortable /> <!--prop:属性名  label:表头的名字-->
       <el-table-column prop="mname" label="名字" />
       <el-table-column prop="sex" label="性别" min-width="50%"/>
@@ -29,8 +43,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="telephone" label="联系电话" />
-      <el-table-column prop="address" label="地址" />
-      <el-table-column prop="email" label="邮件" min-width="120%"/>
+      <el-table-column prop="email" label="邮箱" min-width="120%"/>
     </el-table>
     <!--    分页-->
     <div style="display: flex">
@@ -44,7 +57,6 @@
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
       >
-
         <!--        添加的的对话框-->
         </el-pagination>
       </div>
@@ -90,11 +102,8 @@
         <el-form-item label="电 话" prop="telephone">
           <el-input v-model.number="form.telephone"   style="width:70%"/>
         </el-form-item>
-        <el-form-item label="邮件" prop="days">
+        <el-form-item label="邮件" prop="email">
           <el-input v-model="form.email"   style="width:70%"/>
-        </el-form-item>
-        <el-form-item label="地址" prop="days">
-          <el-input v-model="form.address"   style="width:70%"/>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -166,6 +175,7 @@ export default {
 
 //方法区
   methods:{
+
 
     //文件上传成功回调函数
     filesUploadSuccess(res, uploadFile) {

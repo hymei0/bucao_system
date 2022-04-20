@@ -220,12 +220,14 @@ public class ManagerInfoController {
         List<ManagerInfo> all = ManagerInfoMapper.selectList(null);
         for (ManagerInfo ManagerInfo : all) {
             Map<String, Object> row1 = new LinkedHashMap<>();
-            row1.put("证件号", ManagerInfo.getId());
+            row1.put("账号", ManagerInfo.getId());
             row1.put("姓名", ManagerInfo.getMname());
             row1.put("性别", ManagerInfo.getSex());
+            row1.put("权限",ManagerInfo.getPri());
             row1.put("头像", ManagerInfo.getPortrait());
             row1.put("联系电话", ManagerInfo.getTelephone());
             row1.put("地址", ManagerInfo.getAddress());
+            row1.put("邮箱",ManagerInfo.getEmail());
             list.add(row1);
         }
         // 2. 写excel
@@ -256,16 +258,17 @@ public class ManagerInfoController {
         try {
             InputStream inputStream = file.getInputStream();
             List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
-            System.out.println(lists);
             List<ManagerInfo> saveList = new ArrayList<>();
             for (List<Object> row : lists) {
                 ManagerInfo ManagerInfo = new ManagerInfo();
                 ManagerInfo.setId(row.get(0).toString());
                 ManagerInfo.setMname(row.get(1).toString());
                 ManagerInfo.setSex(row.get(2).toString());
-                ManagerInfo.setPortrait(row.get(3).toString());
-                ManagerInfo.setTelephone(row.get(4).toString());
-                ManagerInfo.setAddress(row.get(5).toString());
+                ManagerInfo.setPri(row.get(3).toString());
+                ManagerInfo.setPortrait(row.get(4).toString());
+                ManagerInfo.setTelephone(row.get(5).toString());
+                ManagerInfo.setAddress(row.get(6).toString());
+                ManagerInfo.setEmail(row.get(7).toString());
                 ManagerInfo.setPsd(row.get(0).toString());
                 //ManagerInfo.setExpenses(Double.parseDouble(row.get(7).toString()));
 

@@ -7,7 +7,7 @@
     <!-- 面包屑导航 -->
     <el-breadcrumb prefix-icon="arrow-right-bold " style="width: 100%;margin-top: 10px;margin-left: 10px">
       <el-breadcrumb-item style="font-size: large; ">系统信息</el-breadcrumb-item>
-      <el-breadcrumb-item style="font-size: large; ">病房信息</el-breadcrumb-item>
+      <el-breadcrumb-item style="font-size: large; ">病房信息管理</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 搜索，切换 -->
     <el-row :gutter="23">
@@ -78,12 +78,21 @@
             accept='.xlsx'
             style="display: inline-block; margin: 0 10px">
           <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" >导入</el-button>
-
         </el-upload>
-
         <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" @click="exportdata">导出</el-button>
-
       </div>
+    </div>
+    <div style="padding-top: 6%;padding-left: 5px;font-size: small">
+      <h3>Tips:</h3>
+      <p style="margin-left: 20px;margin-top: 10px">
+        1.此页面为病房的基本信息页面。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        2.包括了病房号和所属部门组成。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        3.可以对数据进行增删改查等基本操作，此外还支持数据的导入导出功能。
+      </p>
     </div>
     <el-dialog v-model="dialogVisible" title="病房信息管理" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">
@@ -151,6 +160,14 @@ export default {
   },
   created() {
     this.load()
+    let userStr = sessionStorage.getItem("user_info") || "{}"
+    this.user = JSON.parse(userStr)
+    // 请求服务端，确认当前登录用户的 合法信息
+    request.get("/ManagerInfo/" + this.user.id).then(res => {
+      if(res.code === '1'){
+        this.user = res.data
+      }
+    })
   },
 
 //方法区
@@ -176,7 +193,7 @@ export default {
     //excel表格的导入：直接导入到后端
     handleUploadSuccess(res) {
       if (res.code === "1") {
-        this.$message.success("导入成功")
+        this.$message.success("一共成功导入"+res.data+"条数据")
         this.load()
       }
     },
@@ -254,6 +271,11 @@ export default {
     /*对话框按钮*/
     save()
     {
+      if(this.form.id==null || this.form.section==null)
+      {
+        this.$message.error('表单未填写完整，添加失败')
+        return
+      }
       if(this.tag==='1')//该项记录的主键存在，进行更新操作
       {
         request.put("/Room_info",this.form).then(res=>{

@@ -4,9 +4,22 @@
 </style>
 <template>
   <div class="ManagerInfo" style="padding:10px">
+    <!-- 面包屑导航 -->
+    <el-breadcrumb prefix-icon="arrow-right-bold " style="width: 100%;margin-top: 10px;margin-left: 10px">
+      <el-breadcrumb-item style="font-size: large; ">管理员信息</el-breadcrumb-item>
+    </el-breadcrumb>
+    <!-- 搜索，切换 -->
+    <el-row :gutter="23">
+      <el-col :span="18">
+        <el-divider></el-divider>
+
+      </el-col>
+      <el-col :span="6">
+      </el-col>
+    </el-row>
     <!--    功能区域-->
     <div style="display: flex; margin: 10px 0"  align="left">
-      <div style="width: 10%;display: flex" align="left">
+      <div style="width: 10%;display: flex" align="left" v-if="user.pri=='超级管理员'">
         <el-button @click="add" type="primary">新增</el-button>
         <el-popconfirm title="确定删除吗？" @confirm="deleteBatch">
           <template #reference>
@@ -22,8 +35,8 @@
     </div>
 
     <!--    数据展示区-->
-    <el-table :data="Managertable" border stripe style="width: 100%" @selection-change="handleSelectionChange"> <!--显示表格边框和斑马纹-->
-      <el-table-column type="selection" width="55"></el-table-column>
+    <el-table :data="Managertable" stripe style="width: 100%;padding-top: 3%" @selection-change="handleSelectionChange"> <!--显示表格边框和斑马纹-->
+      <el-table-column type="selection" width="55" v-if="user.pri=='超级管理员'"></el-table-column>
       <el-table-column prop="id" label="账号" sortable /> <!--prop:属性名  label:表头的名字-->
       <el-table-column prop="mname" label="名字" />
       <el-table-column prop="sex" label="性别" />
@@ -39,8 +52,8 @@
       </el-table-column>
       <el-table-column prop="telephone" label="联系电话" />
       <el-table-column prop="address" label="地址" />
-      <el-table-column prop="email" label="邮件" />
-      <el-table-column fix="right" label="操作" >
+      <el-table-column prop="email" label="邮箱" min-width="110%"/>
+      <el-table-column fix="right" label="操作" v-if="user.pri=='超级管理员'">
         <!--        内容修改区-->
         <template #default="scope">
           <el-button  type="text"  @click="handleEdit(scope.row)">编辑</el-button>
@@ -82,8 +95,16 @@
         <el-form-item label="姓  名" prop="mname">
           <el-input v-model="form.mname" autocomplete="off"  style="width:70%"/>
         </el-form-item>
-        <el-form-item label="权 限" prop="days">
-          <el-input v-model="form.pri" type="digit"  style="width:70%"/>
+        <el-form-item label="权 限" prop="pri">
+          <el-select v-model="form.pri"  placeholder="Select" size="large">
+            <el-option
+                v-for="item in ['超级管理员','管理员']"
+                :key="item"
+                :label="item"
+                :value="item"
+            />
+          </el-select>
+
         </el-form-item>
         <el-form-item label="头 像" prop="portrait">
           <el-upload
@@ -110,10 +131,10 @@
         <el-form-item label="电 话" prop="telephone">
           <el-input v-model.number="form.telephone"   style="width:70%"/>
         </el-form-item>
-        <el-form-item label="邮件" prop="days">
+        <el-form-item label="邮件" prop="email">
           <el-input v-model="form.email"   style="width:70%"/>
         </el-form-item>
-        <el-form-item label="地址" prop="days">
+        <el-form-item label="地址" prop="address">
           <el-input v-model="form.address"   style="width:70%"/>
         </el-form-item>
       </el-form>
@@ -151,6 +172,7 @@ export default {
       total: 0,
       dialogVisible:false,
       form:{},
+      user:{},
       edi:false,
       tag:'',   //1表示编辑修改数据，0表示新增数据
 //对象区
@@ -171,10 +193,12 @@ export default {
       //表单验证
       rules :{
         id: [{ required: true, message: '请输入证件号', trigger: 'blur' }],
-        pri: [{ required: true, message: '请输入证件号', trigger: 'blur' }],
+        pri: [{ required: true, message: '请输入选择权限', trigger: 'blur' }],
         mname: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
         sex: [{ required: true, message: '请选择性别', trigger: 'blur' }],
         psd: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+        address: [{ required: true, message: '请输入地址', trigger: 'blur' }],
+        email: [{ required: true, message: '请输入邮箱地址', trigger: 'blur' }],
         telephone: [{required: true, message: '请输入电话号码', trigger: 'blur' }]
       }
     }
@@ -182,6 +206,14 @@ export default {
   },
   created() {
     this.load()
+    let userStr = sessionStorage.getItem("user_info") || "{}"
+    this.user = JSON.parse(userStr)
+    // 请求服务端，确认当前登录用户的 合法信息
+    request.get("/ManagerInfo/" + this.user.id).then(res => {
+      if(res.code === '1'){
+        this.user = res.data
+      }
+    })
   },
 
 //方法区
@@ -293,6 +325,11 @@ export default {
     /*对话框按钮*/
     save()
     {
+      if(this.form.id==null || this.form.mname==null || this.form.address==null||this.form.telephone==null||this.form.sex==null||this.form.pri==null)
+      {
+        this.$message.error('表单未填写完整，添加失败')
+        return
+      }
       if(this.tag==='1')//该项记录的主键存在，进行更新操作
       {
         request.put("/ManagerInfo",this.form).then(res=>{

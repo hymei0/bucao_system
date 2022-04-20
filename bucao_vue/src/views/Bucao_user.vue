@@ -75,6 +75,22 @@
         <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" @click="exportdata">导出</el-button>
       </div>
     </div>
+
+    <div style="padding-top: 6%;padding-left: 5px;font-size: small">
+      <h3>提示:</h3>
+      <p style="margin-left: 20px;margin-top: 10px">
+        1.添加布草时只能为病人添加病号服类的布草（RFID编码以A开头的布草）且状态为闲置中的布草。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        2.点击详情按钮可以查看对应布草的详细信息。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        3.涉及到数据库多个基本表的连接所以不支持导入数据功能。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        4.点击导出按钮导出数据。
+      </p>
+    </div>
     <!--        对话框-->
     <el-dialog v-model="dialogVisible" title="布草分布管理" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">
@@ -200,6 +216,14 @@ export default {
   },
   created() {
     this.load()
+    let userStr = sessionStorage.getItem("user_info") || "{}"
+    this.user = JSON.parse(userStr)
+    // 请求服务端，确认当前登录用户的 合法信息
+    request.get("/ManagerInfo/" + this.user.id).then(res => {
+      if(res.code === '1'){
+        this.user = res.data
+      }
+    })
   },
 
 //方法区
@@ -341,6 +365,12 @@ export default {
     /*对话框按钮*/
     save()
     {
+      if(this.form.userId==null || this.form.roomId==null || this.form.rfidx==null)
+      {
+        this.$message.error('表单未填写完整，添加失败')
+        return
+      }
+
       if(this.tag==='1')//该项记录的主键存在，进行更新操作
       {
 

@@ -97,6 +97,21 @@
 
       </div>
     </div>
+    <div style="padding-top: 6%;padding-left: 5px;font-size: small">
+      <h3>Tips:</h3>
+      <p style="margin-left: 20px;margin-top: 10px">
+        1.此页面为系统的病人信息表。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        2.可以进行基本的增删改查等功能，添加用户时密码默认为账号。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        3.支持为用户修改头像等功能，还支持头像的预览功能。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        4.支持数据的导入导出。
+      </p>
+    </div>
     <el-dialog v-model="dialogVisible" title="用户信息" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">
 
@@ -106,7 +121,7 @@
         <el-form-item label="姓  名" prop="uname">
           <el-input v-model="form.uname" autocomplete="off"  style="width:70%"/>
         </el-form-item>
-        <el-form-item label="头 像" prop="portrait">
+        <el-form-item label="头 像:" prop="portrait">
           <el-upload
               class="avatar-uploader"
               :action="filesUploadUrl"
@@ -114,7 +129,7 @@
               :on-success="filesUploadSuccess"
               :before-upload="beforeAvatarUpload"
               style="margin-left: 0px">
-            <img v-if="form.portrait" :src="form.portrait" style="width: 50%;height: auto;margin-left: -100px" align="left" class="avatar" />
+            <img v-if="form.portrait" :src="form.portrait" style="width: 50%;height: auto;margin-left: -90px" align="left" class="avatar" />
             <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
           </el-upload>
         </el-form-item>
@@ -203,6 +218,14 @@ export default {
   },
   created() {
     this.load()
+    let userStr = sessionStorage.getItem("user_info") || "{}"
+    this.user = JSON.parse(userStr)
+    // 请求服务端，确认当前登录用户的 合法信息
+    request.get("/ManagerInfo/" + this.user.id).then(res => {
+      if(res.code === '1'){
+        this.user = res.data
+      }
+    })
   },
 
 //方法区
@@ -316,6 +339,11 @@ export default {
     /*对话框按钮*/
     save()
     {
+      if(this.form.id==null || this.form.uname==null || this.form.address==null||this.form.telephone==null||this.form.sex==null)
+      {
+        this.$message.error('表单未填写完整，添加失败')
+        return
+      }
       if(this.tag==='1')//该项记录的主键存在，进行更新操作
       {
         request.put("/User_info",this.form).then(res=>{

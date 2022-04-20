@@ -86,7 +86,18 @@
 
       </div>
     </div>
-
+    <div style="padding-top: 6%;padding-left: 5px;font-size: small">
+      <h3>Tips:</h3>
+      <p style="margin-left: 20px;margin-top: 10px">
+        1.此页面为RFID标签信息分类的页面，规定每件布草的RFID号的含义。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        2.序列号由两部分组成：所属类别+具体名称。比如Aclothes表示病号服类（A）的衣服（clothes）。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        3.作为管理员你可以对该表进行添加、修改、删除等操作。此外还支持数据的导入导出。
+      </p>
+    </div>
 
     <!--        添加的的对话框1-->
     <el-dialog v-model="dialogVisible" title="RFID标签类型" width="30%" >
@@ -200,6 +211,14 @@ export default {
   },
   created() {
     this.load()
+    let userStr = sessionStorage.getItem("user_info") || "{}"
+    this.user = JSON.parse(userStr)
+    // 请求服务端，确认当前登录用户的 合法信息
+    request.get("/ManagerInfo/" + this.user.id).then(res => {
+      if(res.code === '1'){
+        this.user = res.data
+      }
+    })
   },
 
 //方法区
@@ -303,6 +322,11 @@ export default {
 /*对话框按钮*/
     save()
     {
+      if(this.form.rfno==null || this.form.stock==null || this.form.note==null || this.form.kind ||this.form.section)
+      {
+        this.$message.error('表单未填写完整，添加失败')
+        return
+      }
 
       if(this.tag==='1')//该项记录的主键存在，进行更新操作
       {

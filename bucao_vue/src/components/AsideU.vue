@@ -1,12 +1,12 @@
  <!-- 侧边栏组件 -->
-<template style="background-color: #334157;margin-top: 0px">
+<template style="background-color:rgba(104,128,164,1);margin-top: 0px">
   <div >
     <el-menu
-        style="width: 200px;min-height:calc(100vh + 10px)"
+        style="width: 200px;min-height:calc(100vh - 50px);border-right: 0px;"
         :default-active="path"
         router
         class="el-menu-vertical-demo"
-        background-color="#334157" text-color="#fff" active-text-color="#ffd04b"
+        background-color="#334150" text-color="#fff" active-text-color="#ffd04b"
     >
       <el-menu-item index="/homeU">
         <template #title>
@@ -93,24 +93,13 @@
         </el-menu-item>
       </el-sub-menu>
 
-      <el-sub-menu index="managers">
+      <el-menu-item index="/managerU">
         <template #title>
           <el-icon><headset /></el-icon>
           <span style="font-size: medium;font-weight: bold;" >联系管理员</span>
         </template>
-        <el-menu-item index="/managerU" style="padding-left: 60px; font-size:small">
-          <template #title>
-            <el-icon><grape /></el-icon>
-            <span style="font-size: small;font-weight: bold;" >管理员信息</span>
-          </template>
-        </el-menu-item>
-        <el-menu-item index="/online" style="padding-left: 60px; font-size:small">
-          <template #title>
-            <el-icon><chat-dot-square /></el-icon>
-            <span style="font-size: small;font-weight: bold;" >小智在线</span>
-          </template>
-        </el-menu-item>
-      </el-sub-menu>
+      </el-menu-item>
+
 
     </el-menu>
   </div>

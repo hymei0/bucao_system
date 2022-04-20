@@ -87,13 +87,24 @@
             style="display: inline-block; margin: 0 10px"
         >
           <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" ><el-icon><upload /></el-icon></el-button>
-
         </el-upload>
-
         <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" @click="exportdata"><el-icon><download /></el-icon></el-button>
-
       </div>
-
+    </div>
+    <div style="padding-top: 6%;padding-left: 5px;font-size: small">
+      <h3>Tips:</h3>
+      <p style="margin-left: 20px;margin-top: 10px">
+        1.此页面为系统的订单信息表。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        2.当支付状态为”未支付时“支付功能有效，你可以跳转到支付支付界面禁止缴费，支付不成功状态不会更新。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        3.该表（用户账号，病房号，应缴费用）参照住院信息表，当住院信息表中有用户未缴费时可以添加，添加后住院信息表中的相应状态会自动更新。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        4.订单号随机生成，规则是当前的时间戳加上用户ID，保证其唯一性。
+      </p>
     </div>
     <el-dialog v-model="dialogVisible" title="订单信息" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">
@@ -130,7 +141,7 @@
           <el-input v-model="form.createtime" type="datetime" style="width:70%" disabled/>
 <!--          <el-date-picker v-model="form.createtime"  type="datetime" value-format="YYYY-MM-DD HH:mm:ss"  placeholder="选择日期" style="width:70%"/>-->
         </el-form-item>
-        <el-form-item label="支付状态" prop="state">
+        <el-form-item label="支付状态" prop="state" v-bind:disabled="edi">
           <el-select v-model="form.state" class="m-2"   placeholder="Select" size="large" >
             <el-option
                 v-for="item in Stateoptions"
@@ -228,7 +239,7 @@ export default {
     let userStr = sessionStorage.getItem("user_info") || "{}"
     this.user = JSON.parse(userStr)
     // 请求服务端，确认当前登录用户的 合法信息
-    request.get("/User_info/" + this.user.id).then(res => {
+    request.get("/ManagerInfo/" + this.user.id).then(res => {
       if(res.code === '1'){
         this.user = res.data
       }
@@ -342,7 +353,7 @@ export default {
     //excel表格的导入：直接导入到后端
     handleUploadSuccess(res) {
       if (res.code === "1") {
-        this.$message.success("导入成功")
+        this.$message.success("成功导入"+res.data+"条数据")
         this.load()
       }
     },

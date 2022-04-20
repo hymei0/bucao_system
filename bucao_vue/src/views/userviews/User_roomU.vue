@@ -71,6 +71,21 @@
 
       </div>
     </div>
+    <div style="padding-top: 6%;padding-left: 5px;font-size: small">
+      <h3>Tips:</h3>
+      <p style="margin-left: 20px;margin-top: 10px">
+        1.如果您还没有办理过住院手续，您可以点击办理住院按钮选择合适得病房进行办理。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        2.办理出院前您应该先进行缴费操作，在未缴费的状态下是不能办理出院手续的。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        3.办理出院手续时需要输入您的账号密码。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        3.您可以点击导出按钮导将您在本院的住院信息进行导出。
+      </p>
+    </div>
     <el-dialog v-model="dialogVisible" title="住院信息" width="30%"  v-if="tag==='0'" >
       <el-form :model="form" label-width="120px" :rules="rules">
 

@@ -1,9 +1,9 @@
  <!-- 侧边栏组件 -->
-<template style="background-color: #334157;margin-top: 0px">
+<template style="background-color: #334157;margin-top: 0px;">
   <div >
 
     <el-menu
-        style="width: 200px;min-height:calc(100vh + 10px)"
+        style="width: 200px;min-height:calc(100vh - 50px);border-right: 0px"
         :default-active="path"
         router
         class="el-menu-vertical-demo"
@@ -37,12 +37,12 @@
         <el-menu-item index="/user_info" style="padding-left: 60px; font-size:small">
           <template #title>
             <el-icon><user /></el-icon>
-            <span style="font-size: small;font-weight: bold;" >用户信息管理</span>
+            <span style="font-size: small;font-weight: bold;" >用户信息</span>
           </template>
         </el-menu-item>
         <el-menu-item index="/user_room" style="padding-left: 60px; font-size:small">
           <template #title>
-            <el-icon><shopping-cart-full /></el-icon>
+            <el-icon><rank /></el-icon>
             <span style="font-size: small;font-weight: bold;" >住院信息</span>
           </template>
         </el-menu-item>
@@ -94,13 +94,13 @@
         </el-menu-item>
         <el-menu-item index="/room_info" style="padding-left: 60px; font-size:small">
           <template #title>
-            <el-icon><success-filled /></el-icon>
+            <el-icon><histogram /></el-icon>
             <span style="font-size: small;font-weight: bold;" >病房信息管理</span>
           </template>
         </el-menu-item>
         <el-menu-item index="/section" style="padding-left: 60px; font-size:small">
           <template #title>
-            <el-icon><toilet-paper /></el-icon>
+            <el-icon><compass /></el-icon>
             <span style="font-size: small;font-weight: bold;" >部门信息管理</span>
           </template>
         </el-menu-item>

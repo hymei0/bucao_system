@@ -33,7 +33,7 @@
     <!--    数据展示区-->
     <el-table :data="Bucao_infotable" border stripe style="width: 100%" > <!--显示表格边框和斑马纹-->
       <el-table-column prop="rfno" label="布草类型" sortable /> <!--prop:属性名  label:表头的名字-->
-      <el-table-column prop="rfid" label="RFID编号" sortable />
+      <el-table-column prop="rfid" label="编号" sortable />
       <el-table-column prop="state" label="布草状态" />
       <el-table-column prop="washtimes" label="洗涤次数" />
       <el-table-column prop="indate" label="入库时间" />
@@ -76,12 +76,21 @@
             accept='.xlsx'
             style="display: inline-block; margin: 0 10px">
           <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" >导入</el-button>
-
         </el-upload>
-
         <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" @click="exportdata">导出</el-button>
-
       </div>
+    </div>
+    <div style="padding-top: 6%;padding-left: 5px;font-size: small">
+      <h3>Tips:</h3>
+      <p style="margin-left: 20px;margin-top: 10px">
+        1.此页面为布草的基本信息页面。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        2.每件布草的RFID编号是由布草类型（RFID标签分类表中的序列号）+布草编号组成，该序号具有唯一性。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        3.可以对数据进行增删改查等基本操作，此外还支持数据的导入导出。
+      </p>
     </div>
     <el-dialog v-model="dialogVisible" title="布草信息管理" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">
@@ -202,6 +211,14 @@ export default {
   },
   created() {
     this.load()
+    let userStr = sessionStorage.getItem("user_info") || "{}"
+    this.user = JSON.parse(userStr)
+    // 请求服务端，确认当前登录用户的 合法信息
+    request.get("/ManagerInfo/" + this.user.id).then(res => {
+      if(res.code === '1'){
+        this.user = res.data
+      }
+    })
   },
 
 //方法区

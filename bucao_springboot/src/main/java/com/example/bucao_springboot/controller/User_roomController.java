@@ -89,17 +89,23 @@ public class User_roomController {
      * @return
      */
     @GetMapping("/getroomid")
-    public Result<?> selete(@RequestParam String userid)
+    public Result<?> selecte(@RequestParam String userid)
     {
-
         try {
             // Bucao_user bucao=Bucao_userMapper.selectOne(Wrappers.<Bucao_user>lambdaQuery().eq(Bucao_user::getRfno,Bucao_user.getRfno()).eq(Bucao_user::getRfid,Bucao_user.getRfid()));
             QueryWrapper<User_room> wrapper = new QueryWrapper<>();
 
             wrapper.eq("userid", userid);
 
-            User_room ur=User_roomMapper.selectOne(wrapper);
-            return Result.success(ur.getRoomid());
+            List<User_room> ur=User_roomMapper.selectList(wrapper);
+            if(ur.size()>0)
+            {
+                return Result.success(ur.get(0).getRoomid());
+            }
+            else{
+                return Result.error("-1","登录信息失效");
+            }
+
         }catch (Exception e){
             System.out.println(e.toString());
             return Result.error("-1","后台出错啦，请联系开发人员");

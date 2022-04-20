@@ -262,20 +262,15 @@ public class OrderController {
                 Order.setOrderno(row.get(0).toString());
                 Order.setUserId(row.get(1).toString());
                 Order.setRoomId(row.get(2).toString());
-                Order.setExpenses(Double.parseDouble(row.get(6).toString()));
-                Order.setRoomId(row.get(4).toString());
+                Order.setRoomId(row.get(3).toString());
+                Order.setCreatetime(Date.valueOf(DateUtil.format(DateUtil.parse(row.get(4).toString()), "yyyy-MM-dd")));
+                Order.setExpenses(Double.parseDouble(row.get(5).toString()));
 
-                if (row.get(3).toString() == null || row.get(3).toString().equals("")) {
-                    Order.setCreatetime(null);
-                } else {
-                    Order.setCreatetime(Date.valueOf(DateUtil.format(DateUtil.parse(row.get(3).toString()), "yyyy-MM-dd")));
-                }
-                if (row.get(6).toString() == null || row.get(6).toString().equals("")) {
+                if (row.get(7).toString() == "未支付" ) {
                     Order.setPaytime(null);
                 } else {
                     Order.setPaytime(Date.valueOf(DateUtil.format(DateUtil.parse(row.get(6).toString()), "yyyy-MM-dd HH:mm:ss")));
                 }
-
                 saveList.add(Order);
             }
             for (Order Order : saveList) {

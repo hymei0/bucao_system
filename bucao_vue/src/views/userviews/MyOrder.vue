@@ -67,7 +67,21 @@
       <div style="margin-top: 5px;margin-left: 10px;display: flex">
         <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" @click="exportdata"><el-icon><download /></el-icon></el-button>
       </div>
-
+    </div>
+    <div style="padding-top: 6%;padding-left: 5px;font-size: small">
+      <h3>Tips:</h3>
+      <p style="margin-left: 20px;margin-top: 10px">
+        1.在住院信息页面点击缴费进入此页面。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        2.如果您的订单状态处于未支付，点击支付即可使用支付宝进行支付。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        3.如果您的订单处于已支付状态，您无需进行支付。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        3.点击导出按钮导可以将您在本院的订单报表进行导出。
+      </p>
     </div>
     <el-dialog v-model="dialogVisible" title="订单信息" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">

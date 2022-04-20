@@ -30,7 +30,7 @@
     <!--    数据展示区-->
     <el-table :data="Bucao_infotable" border stripe style="width: 100%" > <!--显示表格边框和斑马纹-->
       <el-table-column prop="rfno" label="布草类型" sortable /> <!--prop:属性名  label:表头的名字-->
-      <el-table-column prop="rfid" label="RFID编号" sortable />
+      <el-table-column prop="rfid" label="编号" sortable />
       <el-table-column prop="state" label="布草状态" />
       <el-table-column prop="washtimes" label="洗涤次数" />
       <el-table-column prop="indate" label="入库时间" />
@@ -57,6 +57,18 @@
       <div style="margin-top: 5px;margin-left: 10px">
         <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" @click="exportdata">导出</el-button>
       </div>
+    </div>
+    <div style="padding-top: 6%;padding-left: 5px;font-size: small">
+      <h3>Tips:</h3>
+      <p style="margin-left: 20px;margin-top: 10px">
+        1.此页面为布草的基本信息页面。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        2.每件布草的RFID编号是由布草类型（RFID标签分类表中的序列号）+布草编号组成，该序号具有唯一性。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        3.点击导出按钮导可以布草的基本信息进行导出。
+      </p>
     </div>
     <el-dialog v-model="dialogVisible" title="布草信息管理" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">

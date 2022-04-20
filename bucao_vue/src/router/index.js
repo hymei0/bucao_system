@@ -82,10 +82,16 @@ const routes = [
         path: '/manager',
         name: 'Manager',
         component: ()=>import("@/views/managerviews/Manager.vue"),
-      },{
+      },
+      {
         path: 'personM',
         name: 'PersonM',
         component: ()=>import("@/views/managerviews/PersonM.vue"),
+      },
+      {
+        path: 'developer',
+        name: 'developer',
+        component: ()=>import("@/views/managerviews/developer.vue"),
       }
     ]
 
@@ -153,7 +159,7 @@ const routes = [
       {
         path:'/person',
         name:'person',
-        component:()=>import("@/views/Person")
+        component:()=>import("@/views/userviews/Person")
       },
     ]
   },

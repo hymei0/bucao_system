@@ -79,8 +79,22 @@
       <div style="margin-top: 5px;margin-left: 10px">
 
         <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" @click="handleDownload">导出</el-button>
-
       </div>
+    </div>
+    <div style="padding-top: 6%;padding-left: 5px;font-size: small">
+      <h3>Tips:</h3>
+      <p style="margin-left: 20px;margin-top: 10px">
+        1.此页面为系统的住院信息表。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        2.可以进行基本的增删改查等功能。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        3.当应缴费用为0时，缴费功能无效。
+      </p>
+      <p style="margin-left: 20px;margin-top: 10px">
+        4.缴费功能有效时，点击缴费会生成待支付订单，跳转相应的订单页面即可进行支付。
+      </p>
     </div>
     <el-dialog v-model="dialogVisible" title="住院信息" width="30%" >
       <el-form :model="form" label-width="120px" :rules="rules">
@@ -121,7 +135,7 @@
         <el-form-item label="出院日期" prop="outTime">
           <el-date-picker v-model="form.outTime"  value-format="YYYY-MM-DD" type="date" placeholder="选择日期" style="width:70%"/>
         </el-form-item>
-        <el-form-item label="应缴费用" prop="days">
+        <el-form-item label="应缴费用" prop="expenses">
           <el-input v-model="form.expenses" type="digit"  style="width:70%"/>
         </el-form-item>
 
@@ -195,13 +209,21 @@ export default {
         roomId: [{ required: true, message: '请选择病房号', trigger: 'blur' }],
         sex: [{ required: true, message: '请选择性别', trigger: 'blur' }],
         comeTime: [{ required: true, message: '请选择入院日期', trigger: 'blur' }],
-        telephone: [{required: true, message: '请输入电话号码', trigger: 'blur' }]
+        expenses: [{required: true, message: '请输入应缴费用', trigger: 'blur' }]
       }
     }
 
   },
   created() {
     this.load()
+    let userStr = sessionStorage.getItem("user_info") || "{}"
+    this.user = JSON.parse(userStr)
+    // 请求服务端，确认当前登录用户的 合法信息
+    request.get("/ManagerInfo/" + this.user.id).then(res => {
+      if(res.code === '1'){
+        this.user = res.data
+      }
+    })
   },
 
 //方法区
@@ -405,7 +427,12 @@ export default {
     /*对话框按钮*/
     save()
     {
-      console.log(this.form)
+      if(this.form.userid==null || this.form.roomid==null || this.form.comeTime==null||this.form.expenses==null)
+      {
+        this.$message.error('表单未填写完整，添加失败')
+        return
+      }
+
       if(this.tag==='1')//该项记录的主键存在，进行更新操作
       {
         request.put("/User_room",this.form).then(res=>{
@@ -432,7 +459,6 @@ export default {
       }
       else  //新增
       {
-        console.log(this.options)
 
         request.post("/User_room",this.form).then(res=>{
           console.log(res)

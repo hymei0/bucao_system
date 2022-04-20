@@ -70,19 +70,19 @@
         <el-button  type="primary" size="small" style="width: 50px;margin-left: 10px" @click="exportdata">导出</el-button>
       </div>
     </div>
-    <div style="padding-top: 10%;padding-left: 10px;font-size: small">
+    <div style="padding-top: 6%;padding-left: 5px;font-size: small">
       <h3>提示:</h3>
       <p style="margin-left: 20px;margin-top: 10px">
-        1.办理领取布草时只能领取病号服类的布草（RFID编码以A开头的布草）。
+        1.办理领取布草时只能领取病号服类的布草（RFID编码以A开头的布草）且状态为闲置中的布草。
       </p>
       <p style="margin-left: 20px;margin-top: 10px">
         2.请把待归还的布草放入布草回收箱然后点击归还布草按钮完成布草的归还回收。
       </p>
       <p style="margin-left: 20px;margin-top: 10px">
-        3.您可以点击详情按钮查看对应布草的详细信息。
+        3.点击详情按钮可以查看对应布草的详细信息。
       </p>
       <p style="margin-left: 20px;margin-top: 10px">
-        3.您可以点击导出按钮导出数据。
+        4.点击导出按钮导出数据到本地。
       </p>
     </div>
     <!--        对话框-->
