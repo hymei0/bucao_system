@@ -101,12 +101,12 @@ insert into room_info values
 -- 6.bucao_user:病人与布草绑定
 CREATE TABLE bucao_user(
 RFNO varcharacter(20) NOT NULL  COMMENT'布草类型',
-rfid VARCHAR(20) NOT NULL COMMENT'布草RFID',  -- 参照完整性约束
+rfid VARCHAR(20) NOT NULL COMMENT'布草RFID',  
 user_id varchar(20) NOT NULL COMMENT'用户ID',
 user_name varchar(20) NOT NULL COMMENT'用户姓名',
 room_id varcharacter(20) not null COMMENT'所在病房号',
 constraint rfid_userid primary key(RFNO,rfid,user_id),
-CONSTRAINT B_RFNO FOREIGN KEY(RFNO,RFID) references BUCAO_INFO(RFNO,RFID),
+CONSTRAINT B_RFNO FOREIGN KEY(RFNO,RFID) references BUCAO_INFO(RFNO,RFID), -- 参照完整性约束
 CONSTRAINT B_userID FOREIGN KEY(USER_ID) references USER_INFO(ID),
 CONSTRAINT B_ROOMID FOREIGN KEY(ROOM_ID) references ROOM_INFO(ID)
 );
