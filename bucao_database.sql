@@ -70,8 +70,8 @@ sex char(2)  check (sex in('男','女')) COMMENT'性别',
 roles varcharacter(15) not null check (roles in('user','manager')) COMMENT'角色'
 );
 insert into user_info values
-('0311','何元梅','https://pcsdata.baidu.com/thumbnail/3671bc1afr2ceee759d8cd47f41c554c?fid=2582736946-16051585-257129878388438&rt=pr&sign=FDTAER-yUdy3dSFZ0SVxtzShv1zcMqd-z2jPzaN4nbJLZBXdeSMuNAv6xtY%3D&expires=2h&chkv=0&chkbd=0&chkpc=&dp-logid=237858569602303990&dp-callid=0&time=1650441600&bus_no=26&size=c300_u300&quality=100&vuk=-&ft=video','0311','17826103075','贵州毕节','女','manager'),
-('6666','张怀旭','https://pcsdata.baidu.com/thumbnail/e2dac5a67jcc7f3dd43a588b12f636e5?fid=2582736946-16051585-152415114891807&rt=pr&sign=FDTAER-yUdy3dSFZ0SVxtzShv1zcMqd-S%2BGhNrYc8zj%2FLm0MLnbMrjD09dk%3D&expires=2h&chkv=0&chkbd=0&chkpc=&dp-logid=237858569602303990&dp-callid=0&time=1650441600&bus_no=26&size=c300_u300&quality=100&vuk=-&ft=video','0311','17826103075','贵州毕节','男','user');
+('0311','何元梅','https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg','0311','17826103075','贵州毕节','女','user'),
+('6666','张怀旭','https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg','0311','17826103075','贵州毕节','男','user');
 
  -- 4.Manager_info:管理员信息表
  CREATE TABLE Manager_info(
@@ -86,7 +86,7 @@ insert into user_info values
  sex char(2) Not null check (sex in('男','女')) COMMENT'性别' -- 部门自定义完整性约束
  );
  insert into manager_info values
- ('0311','何元梅','0311','超级管理员','https://pcsdata.baidu.com/thumbnail/5b6bab1e4i227d19119e56a7eae6864b?fid=2582736946-16051585-925993990056035&rt=pr&sign=FDTAER-yUdy3dSFZ0SVxtzShv1zcMqd-JsOJfeGKNHzHhEaRriPoZ9tuy7Q%3D&expires=2h&chkv=0&chkbd=0&chkpc=&dp-logid=237593366055298667&dp-callid=0&time=1650438000&bus_no=26&size=c300_u300&quality=100&vuk=-&ft=video','17826103075','贵州毕节','3304534355@qq.com','女'),
+ ('0311','何元梅','0311','超级管理员','https://fuss10.elemecdn.com/3/28/bbf893f792f03a54408b3b7a7ebf0jpeg.jpeg','17826103075','贵州毕节','3304534355@qq.com','女'),
  ('0333','吴宇韬','0333','管理员','https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg','17826103075','贵州毕节','3304534355@qq.com','女');
 
 -- 5.room_info: 病房信息表
