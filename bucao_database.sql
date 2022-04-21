@@ -71,7 +71,7 @@ roles varcharacter(15) not null check (roles in('user','manager')) COMMENT'角�
 );
 insert into user_info values
 ('0311','何元梅','https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg','0311','17826103075','贵州毕节','女','user'),
-('6666','张怀旭','https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg','0311','17826103075','贵州毕节','男','user');
+('6666','张怀旭','https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg','6666','17826103075','江苏无锡','男','user');
 
  -- 4.Manager_info:管理员信息表
  CREATE TABLE Manager_info(
@@ -87,7 +87,7 @@ insert into user_info values
  );
  insert into manager_info values
  ('0311','何元梅','0311','超级管理员','https://fuss10.elemecdn.com/3/28/bbf893f792f03a54408b3b7a7ebf0jpeg.jpeg','17826103075','贵州毕节','3304534355@qq.com','女'),
- ('0333','吴宇韬','0333','管理员','https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg','17826103075','贵州毕节','3304534355@qq.com','女');
+ ('0333','吴宇韬','0333','管理员','https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg','17826103075','云南','1033180333@stu.jiangnan.edu.cn','男');
 
 -- 5.room_info: 病房信息表
 create table Room_info(

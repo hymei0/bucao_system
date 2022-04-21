@@ -170,13 +170,13 @@ export default {
 <style scoped>
 .top{
   width: 600px;
-  height: 580px;
+  height: 560px;
   margin-left: 10%;
   margin-top: 15%;
 }
 .img{
   width: 500px;
-  height: 520px;
+  height: auto;
 }
 .left{
   border: aliceblue;
