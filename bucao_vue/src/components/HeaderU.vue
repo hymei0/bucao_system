@@ -49,7 +49,11 @@ export default {
       if (res.code === '1') {
         this.user = res.data
       }
+      if(this.user.portrait===null){
+        this.user.portrait='https://fuss10.elemecdn.com/9/bb/e27858e973f5d7d3904835f46abbdjpeg.jpeg' //系统默认头像
+      }
     })
+
   },
   methods:{
 

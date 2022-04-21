@@ -51,16 +51,14 @@ export default {
             if (re.code === '1') {
               this.user = re.data
             }
+            if(this.user.portrait===null)
+                //默认头像
+            {
+              this.user.portrait='https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+            }
           })
-
-    if(this.user.portrait===null)
-    //默认头像
-    {
-      this.user.portrait='https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
-    }
   },
   methods:{
-
   }
 
 }

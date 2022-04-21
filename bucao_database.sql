@@ -82,7 +82,7 @@ insert into user_info values
  portrait varcharacter(2048) COMMENT'头像',
  telephone VARCHAR(20) COMMENT'电话',
  address varchar(30) COMMENT'地址',
- email  varcharacter(25) COMMENT'邮箱',
+ email  varcharacter(40) COMMENT'邮箱',
  sex char(2) Not null check (sex in('男','女')) COMMENT'性别' -- 部门自定义完整性约束
  );
  insert into manager_info values

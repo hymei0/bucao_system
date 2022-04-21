@@ -29,6 +29,7 @@
         <el-form
             :model="form"
             status-icon
+            ref="form"
             :rules="rules"
             label-width="100px"
             class="demo-ruleForm"
@@ -140,86 +141,74 @@ export default {
       this.validCode = data
     },
     submitForm(){
-      // this.$refs[this.form].validate((valid)=>{
-      //   if(!valid)
-      //    {
-      //      this.$message({
-      //        type:"error",
-      //        message:"输入有误"
-      //      })
-      //    }
-      //  })
-     if (!this.form.validCode) {
-       this.$message.error("请填写验证码")
-       return
-     }
-      if (!this.form.roles) {
-        this.$message.error("请选择角色")
-        return
-      }
-     if(this.form.validCode.toLowerCase() !== this.validCode.toLowerCase()) {
-       this.$message.error("验证码错误")
-       return
-     }
-     console.log(this.form)
-      if(this.form.roles==='user') {
-        request.post("/User_info/login", this.form).then(res => {
-              if (res.code === '1') {
-                sessionStorage.setItem("user_info", JSON.stringify(res.data))
-                //登录成功页面跳转，跳转到主页
-                this.$router.push("/LayoutU")
-                this.$message({
-                  type: "success",
-                  message: "登录成功",
-                })
 
-              } else {
-                this.$message({
-                  type: "error",
-                  message: res.msg
-                })
-              }
-            }
-        ).catch(err => {
-          this.$message.error('登录失败，请稍后再试！')
-        })
-      }else{
-        request.post("/ManagerInfo/login", this.form).then(res => {
-              if (res.code === '1') {
-                sessionStorage.setItem("user_info", JSON.stringify(res.data))
-                //登录成功页面跳转，跳转到主页
-                this.$router.push("/")
+     // if (!this.form.validCode) {
+     //   this.$message.error("请填写验证码")
+     //   return
+     // }
+     //  if (!this.form.roles) {
+     //    this.$message.error("请选择角色")
+     //    return
+     //  }
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          if (this.form.validCode.toLowerCase() !== this.validCode.toLowerCase()) {
+            this.$message.error("验证码错误")
+            return
+          }
+          if (this.form.roles === 'user') {
+            request.post("/User_info/login", this.form).then(res => {
+                  if (res.code === '1') {
+                    sessionStorage.setItem("user_info", JSON.stringify(res.data))
+                    //登录成功页面跳转，跳转到主页
+                    this.$router.push("/LayoutU")
+                    this.$message({
+                      type: "success",
+                      message: "登录成功",
+                    })
 
-                this.$message({
-                  type: "success",
-                  message: "登录成功",
-                })
+                  } else {
+                    this.$message({
+                      type: "error",
+                      message: res.msg
+                    })
+                  }
+                }
+            ).catch(err => {
+              this.$message.error('登录失败，请稍后再试！')
+            })
+          } else {
+            request.post("/ManagerInfo/login", this.form).then(res => {
+                  if (res.code === '1') {
+                    sessionStorage.setItem("user_info", JSON.stringify(res.data))
+                    //登录成功页面跳转，跳转到主页
+                    this.$router.push("/")
 
-              } else {
-                this.$message({
-                  type: "error",
-                  message: res.msg
-                })
-              }
-            }
-        ).catch(err => {
-          this.$message.error('登录失败，请稍后再试！')
-        })
+                    this.$message({
+                      type: "success",
+                      message: "登录成功",
+                    })
 
-      }
+                  } else {
+                    this.$message({
+                      type: "error",
+                      message: res.msg
+                    })
+                  }
+                }
+            ).catch(err => {
+              this.$message.error('登录失败，请稍后再试！')
+            })
+
+          }
+        }
+      })
+
     },
     resetForm(){
          this.form={}
     },
-    //向左切换图片
-    left:function(){
-      this.index--;
 
-    },
-    //向右切换图片
-    right:function(){
-      this.index++;
-    }
   }
 }
 </script>

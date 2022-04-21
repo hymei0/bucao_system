@@ -1,3 +1,4 @@
+
 <template>
   <div style="width: 100%; height: 100vh;overflow: hidden;display: flex">
     <div>
@@ -23,6 +24,7 @@
         <el-form
             :model="form"
             status-icon
+            ref="form"
             :rules="rules"
             label-width="120px"
             class="demo-ruleForm"
@@ -68,136 +70,116 @@
   </div>
 </template>
 
-<script >
+<script>
 import request from "@/utils/request";
-import {ArrowLeft, ArrowRight} from '@element-plus/icons-vue'
 
 export default {
-  name: "register",
-  data(){
-    return{
-      imgArr:[
+  name: "Register",
+
+  data() {
+    return {
+      imgArr: [
         require("../assets/img/布草清点系统.png"),
         require("../assets/img/bucao1.png"),
         require("../assets/img/bucao2.png"),
-        require( "../assets/img/布草洗涤柜.png"),
+        require("../assets/img/布草洗涤柜.png"),
         require("../assets/img/rfid布草回收柜.png")
       ],
-      text:[
+      text: [
         "智能布草清点管理系统",
         "智能布草入柜，整理",
         "布草智能柜应用",
         "RFID布草智能布草处理流程",
         "RFID智能布草回收柜"
       ],
-      direction1:ArrowLeft,
-      direction2:ArrowRight,
-      index:0,
-      form:{
-        uname:'',
-        psd:'',
-        id:'',
-        telephone: '',
-        confirm: ''
-      },
-
-      rules :{
-        uname:[{required:true,message:"请输入姓名",trigger:'blur'}],
-        psd: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-        id: [{ required: true, message: '请输入身份证号或手机号', trigger: 'blur' }],
-        telephone:[{required:true,message:"请输入电话号码",trigger:'blur'},
-          {min: 11, type:'number', message: "请输入11位有效数字", trigger: 'blur'}],
-        confirm:[{required: true, message: '请确认密码', trigger: 'blur'}],
-        sex:[{required:true,message:"请选择性别",trigger:'blur'}]
+      index: 0,
+      form: {},
+      rules: {
+        uname: [{required: true, message: "请输入姓名", trigger: 'blur'}],
+        psd: [{required: true, message: '请输入密码', trigger: 'blur'}],
+        id: [{required: true, message: '请输入身份证号或手机号', trigger: 'blur'}],
+        telephone: [{required: true, message: "请输入电话号码", trigger: 'blur'},
+          {min: 11, type: 'number', message: "请输入11位有效数字", trigger: 'blur'}],
+        confirm: [{required: true, message: '请确认密码', trigger: 'blur'}],
+        sex: [{required: true, message: "请选择性别", trigger: 'blur'}]
       }
     }
   },
+  methods: {
+    submitForm() {
 
-  methods:{
-    submitForm(){
-      this.form.roles='user'
-      if(this.form.psd!==this.form.confirm)
-      {
+      if (this.form.psd !== this.form.confirm) {
         this.$message({
-          type:"error",
-          message:'两次输入的密码不一致'
+          type: "error",
+          message: '2次密码输入不一致！'
         })
         return
       }
-
-      request.post("/User_info/register",this.form).then(res=>
-          {
-            if(res.code==='1')
-            {
-              this.$message({
-                type:"success",
-                message:"注册成功"
-              })
-              //注册成功页面跳转，跳转到登录页面
-              this.$router.push("/login")
-            }
-            else
-            {
-              this.$message({
-                type:"error",
-                message:res.msg
-              })
-            }
-          }
-      ).catch(err=>{
-        this.$message.error('注册失败，请稍后再试！')
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          this.form.roles="user"
+          request.post("/User_info/register", this.form).then(res => {
+                if (res.code === '1') {
+                  this.$message({
+                    type: "success",
+                    message: "注册成功"
+                  })
+                  //注册成功页面跳转，跳转到登录页面
+                  this.$router.push("/login")
+                } else {
+                  this.$message({
+                    type: "error",
+                    message: res.msg
+                  })
+                }
+              }
+          ).catch(err => {
+            this.$message.error('注册失败，请稍后再试！')
+          })
+        }
       })
-
     },
     resetForm(){
       this.form={
-
       }
     },
 
-    //向左切换图片
-    left:function(){
-      this.index--;
-    },
-    //向右切换图片
-    right:function(){
-      this.index++;
-    }
   }
+
 }
 </script>
 
 <style scoped>
 .top{
-  width: 600px;
-  height: 560px;
-  margin-left: 10%;
-  margin-top: 15%;
+width: 600px;
+height: 560px;
+margin-left: 10%;
+margin-top: 15%;
 }
 .img{
-  width: 500px;
-  height: auto;
+width: 500px;
+height: auto;
 }
 .left{
-  border: aliceblue;
-  width: 20px;
-  height: 60px;
+border: aliceblue;
+width: 20px;
+height: 60px;
 }
 .right{
-  width: 20px;
-  border: aliceblue;
-  height: 60px;
+width: 20px;
+border: aliceblue;
+height: 60px;
 }
 #left{
-  width: 45px;
-  height: 45px;
-  margin-left: 11%;
-  margin-top: -50%;
+width: 45px;
+height: 45px;
+margin-left: 11%;
+margin-top: -50%;
 }
 #right{
-  width: 45px;
-  height: 45px;
-  margin-left: 635px;
-  margin-top: -6.55%;
+width: 45px;
+height: 45px;
+margin-left: 635px;
+margin-top: -6.55%;
 }
 </style>
