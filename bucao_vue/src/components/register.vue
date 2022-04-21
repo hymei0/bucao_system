@@ -3,20 +3,13 @@
     <div>
       <el-card class="top">
         <div  align="center">
-          <img class="img" :src="imgArr[index]" alt="">
+          <el-carousel indicator-position="outside" height="450px" @change="(index++)%4" >
+            <el-carousel-item v-for="item in [0,1,2,3,4]" :key="item" :label="text[item]">
+              <img class="img" :src="imgArr[item]" alt="" >
+            </el-carousel-item>
+          </el-carousel>
         </div>
-        <h4 align="center">{{text[index]}}</h4>
       </el-card>
-      <div id="left">
-        <a href="javascript:void(0)" @click="left" v-show='index!=0'>
-          <el-button class="left" plain :icon="direction1"/>
-        </a>
-      </div>
-      <div id="right">
-        <a href="javascript:void(0)" @click="right" v-show='index<imgArr.length-1'>
-          <el-button class="right" plain :icon="direction2"/>
-        </a>
-      </div>
     </div>
 
     <div style="width:100%;margin-top: 100px;margin-left: 180px">
@@ -52,13 +45,13 @@
           </el-form-item>
 
           <el-form-item label="手 机 号" prop="telephone" >
-            <el-input type="digit" style="width: 80%" prefix-icon="cellphone" v-model="form.telephone" autocomplete="off" placeholder="请输入手机号" />
+            <el-input  style="width: 80%" prefix-icon="cellphone" v-model.number="form.telephone" autocomplete="off" placeholder="请输入手机号" />
           </el-form-item>
 
           <el-form-item label="性 别" prop="sex">
             <el-radio-group  style="width: 80%" v-model="form.sex" autocomplete="off">
               <el-radio label="男" style="position: absolute;left: 10px"/>
-              <el-radio label="女" style="position: absolute;right: 80px"/>
+              <el-radio label="女" style="position: absolute;right: 100px"/>
             </el-radio-group>
           </el-form-item>
 
@@ -113,7 +106,7 @@ export default {
         psd: [{ required: true, message: '请输入密码', trigger: 'blur' }],
         id: [{ required: true, message: '请输入身份证号或手机号', trigger: 'blur' }],
         telephone:[{required:true,message:"请输入电话号码",trigger:'blur'},
-          {min: 11, type:'number',max: 11, message: "请输入11位有效数字", trigger: 'blur'}],
+          {min: 11, type:'number', message: "请输入11位有效数字", trigger: 'blur'}],
         confirm:[{required: true, message: '请确认密码', trigger: 'blur'}],
         sex:[{required:true,message:"请选择性别",trigger:'blur'}]
       }
@@ -179,7 +172,7 @@ export default {
   width: 600px;
   height: 580px;
   margin-left: 10%;
-  margin-top: 10%;
+  margin-top: 15%;
 }
 .img{
   width: 500px;

@@ -92,6 +92,11 @@ const routes = [
         path: 'developer',
         name: 'developer',
         component: ()=>import("@/views/managerviews/developer.vue"),
+      },
+      {
+        path: 'password',
+        name: 'Password',
+        component: ()=>import("@/views/managerviews/Password.vue"),
       }
     ]
 
@@ -161,6 +166,11 @@ const routes = [
         name:'person',
         component:()=>import("@/views/userviews/Person")
       },
+      {
+        path: '/passwordU',
+        name: 'PasswordU',
+        component: ()=>import("@/views/userviews/PasswordU.vue"),
+      }
     ]
   },
 

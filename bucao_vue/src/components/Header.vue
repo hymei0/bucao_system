@@ -22,6 +22,7 @@
         <template #dropdown>
           <el-dropdown-menu style="width: 100px">
             <el-dropdown-item @click="$router.push('/personM')">个人信息</el-dropdown-item>
+            <el-dropdown-item @click="$router.push('/password')">修改密码</el-dropdown-item>
             <el-dropdown-item @click="$router.push('/login')" >退出系统</el-dropdown-item>
           </el-dropdown-menu>
         </template>

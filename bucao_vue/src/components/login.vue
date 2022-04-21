@@ -2,22 +2,14 @@
 <div style="width: 100%; height: 100vh;display: flex;overflow: hidden">
   <div>
     <el-card class="top">
-      <div  align="center">
-        <img class="img" :src="imgArr[index]" alt="">
+      <div  align="center" >
+        <el-carousel indicator-position="outside" height="450px" @change="(index++)%4" >
+          <el-carousel-item v-for="item in [0,1,2,3,4]" :key="item" :label="text[item]">
+            <img class="img" :src="imgArr[item]" alt="" >
+          </el-carousel-item>
+        </el-carousel>
       </div>
-      <h4 align="center">{{text[index]}}</h4>
     </el-card>
-      <div id="left">
-        <a href="javascript:void(0)" @click="left" v-show='index!=0'>
-          <el-button class="left" plain :icon="direction1"/>
-        </a>
-      </div>
-      <div id="right">
-        <a href="javascript:void(0)" @click="right" v-show='index<imgArr.length-1'>
-          <el-button class="right" plain :icon="direction2"/>
-        </a>
-      </div>
-
   </div>
   <div>
     <div style="width:85%;margin: 100px 210px">
@@ -43,7 +35,7 @@
             style="padding-top: 20px">
 
           <el-form-item label="账 号" prop="id">
-            <el-input prefix-icon="avatar" v-model="form.id" placeholder="身份证/手机号" style="width: 80%" />
+            <el-input prefix-icon="avatar" v-model="form.id" placeholder="请输入账号" style="width: 80%" />
           </el-form-item>
 
           <el-form-item label="密 码" prop="psd">
@@ -83,16 +75,16 @@ export default {
   data(){
     return{
       imgArr:[
+        require("../assets/img/bucao2.png"),
         require("../assets/img/布草清点系统.png"),
         require("../assets/img/bucao1.png"),
-        require("../assets/img/bucao2.png"),
         require( "../assets/img/布草洗涤柜.png"),
         require("../assets/img/rfid布草回收柜.png")
       ],
       text:[
+          "布草智能柜应用",
           "智能布草清点管理系统",
           "智能布草入柜，整理",
-          "布草智能柜应用",
           "RFID布草智能布草处理流程",
           "RFID智能布草回收柜"
       ],
@@ -238,11 +230,11 @@ export default {
   width: 600px;
   height: 570px;
   margin-left: 15%;
-  margin-top: 10%;
+  margin-top: 15%;
 }
 .img{
   width: 500px;
-  height: 500px;
+  height: auto;
 }
 .left{
   border: aliceblue;
