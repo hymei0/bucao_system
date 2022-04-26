@@ -244,7 +244,6 @@ export default {
         if(res.code==='1')
         {
           this.form1=res.data
-          console.log(this.form1)
         }
         else {
           this.$message({

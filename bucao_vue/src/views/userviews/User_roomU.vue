@@ -265,17 +265,17 @@ export default {
       this.orderform.expenses=JSON.parse(JSON.stringify(row.expenses))
       this.orderform.paytime=null
       this.orderform.state="未支付"
-      console.log(this.orderform)
+
       request.post("/Order",this.orderform).then(res=>{
         this.LOADING("正在创建订单")
-        if(res.code==='0') {
+        if(res.code==='-1') {
           this.$message.error("订单创建失败")
           return
         }else {
-          this.form = row
+          this.form = JSON.parse(JSON.stringify(row))
           this.form.expenses = 0.00
           request.put("/User_room", this.form).then(re => {
-            if (re.code === '0') {
+            if (re.code === '-1') {
               this.$message.error("订单创建失败")
               return
             }

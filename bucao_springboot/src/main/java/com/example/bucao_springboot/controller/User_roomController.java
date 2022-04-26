@@ -179,7 +179,8 @@ public class User_roomController {
      */
     @GetMapping("/suitableroom")
     public Result<?>  suitableroom(){
-        return Result.success(User_roomMapper.Getsuitableroom());
+
+            return Result.success(User_roomMapper.Getsuitableroom());
     }
 
     /**查询未办理住院的病人

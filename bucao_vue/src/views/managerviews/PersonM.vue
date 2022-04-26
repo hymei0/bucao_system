@@ -56,6 +56,9 @@
         <el-form-item label="电 话" prop="telephone">
           <el-input v-model="form.telephone" v-bind:disabled='!edi'></el-input>
         </el-form-item>
+        <el-form-item label="邮 箱" prop="email">
+          <el-input v-model="form.email" v-bind:disabled='!edi'></el-input>
+        </el-form-item>
 
         <el-form-item style="display: flex" >
           <div style="width: 100%" align="center">

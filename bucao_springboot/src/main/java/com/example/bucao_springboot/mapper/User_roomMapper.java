@@ -57,7 +57,7 @@ public interface User_roomMapper extends BaseMapper<User_room> {
      * @param id1
      * @param id2
      */
-    @Update("update user_room set come_time=#{date1},out_time=#{date2},expenses=#{exp} where userid=#{id2} and roomid=#{id1}")
+    @Update("update user_room set out_time=#{date2},expenses=#{exp} where userid=#{id2} and roomid=#{id1} and come_time=#{date1}")
     void update(Date date1, Date date2,Double exp, String id1, String id2);
 
     /**
@@ -95,7 +95,7 @@ public interface User_roomMapper extends BaseMapper<User_room> {
      * 选择没有住满四个人的病房
      * @return
      */
-    @Select("select room_info.id from room_info where room_info.id not in(select roomid from  user_room group by roomid having count(roomid)>=4);")
+    @Select("select room_info.id from room_info where room_info.id not in(select roomid from  user_room group by roomid having count(roomid)>=4) and room_info.section='住院部';")
     List<String> Getsuitableroom();
 
     /**
@@ -112,4 +112,5 @@ public interface User_roomMapper extends BaseMapper<User_room> {
      */
     @Update("update bucao_info set state=#{state} where rfno in (select rfno from bucao_room where room_id=#{roomid} ) and rfid in (select rfid from bucao_room where room_id=#{roomid} );")
     void updatebucao(String roomid, String state);
+
 }

@@ -204,8 +204,7 @@ export default {
         rfno: [{ required: true, message: '请输入序列号', trigger: 'blur' }],
         kind: [{ required: true, message: '请输入布草类型', trigger: 'blur' }],
         stock: [{ required: true, message: '请输入库存', trigger: 'blur' }],
-        section: [{ required: true, message: '请选择所属部门', trigger: 'blur' }],
-        note: [{ required: true, message: '请输入布草名称', trigger: 'blur' }]
+        section: [{ required: true, message: '请选择所属部门', trigger: 'blur' }]
       }
     }
   },
@@ -322,7 +321,8 @@ export default {
 /*对话框按钮*/
     save()
     {
-      if(this.form.rfno==null || this.form.stock==null || this.form.note==null || this.form.kind ||this.form.section)
+      console.log(this.form)
+      if(this.form.rfno==null || this.form.stock==null || this.form.kind==null ||this.form.section==null)
       {
         this.$message.error('表单未填写完整，添加失败')
         return

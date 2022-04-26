@@ -364,7 +364,7 @@ export default {
     },
     //查询
     load(){
-      request.get("/User_room/suitableroom" ).then(re =>{
+      request.get("/User_room/suitableroom").then(re =>{
         this.roomoptions=re.data
       })
       request.get("/User_room/suitableuser" ).then(re =>{

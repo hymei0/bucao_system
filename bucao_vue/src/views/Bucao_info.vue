@@ -108,7 +108,7 @@
           <el-input v-model="form.rfid" style="width:70%" autocomplete="off" v-bind:disabled="edi"/>
         </el-form-item>
         <el-form-item label="状  态" prop="state">
-          <el-select v-model="form.state" class="m-2" placeholder="Select" size="large" v-bind:disabled="edi">
+          <el-select v-model="form.state" class="m-2" placeholder="Select" size="large" >
             <el-option
                 v-for="item in options1"
                 :key="item.label"

@@ -104,15 +104,8 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="病房号" prop="userId">
-          <el-select v-model="form.roomId" class="m-2" placeholder="Select" size="large" v-bind:disabled="edi">
-            <el-option
-                v-for="item in roomoptions"
-                :key="item.id"
-                :label="item.id"
-                :value="item.id"
-            />
-          </el-select>
+        <el-form-item label="病房号" prop="roomId" disabled>
+         <el-input v-model="form.roomId" style="width:70%" autocomplete="off" disabled/>
         </el-form-item>
         <el-form-item label="用户姓名" prop="num">
           <el-input v-model="form.userName" style="width:70%" autocomplete="off" disabled/>
@@ -230,6 +223,13 @@ export default {
   methods:{
     //获取用户姓名函数
     GetUserName(){
+      request.get("/User_room/getroomid" ,{
+        params:{
+          userid:this.user.id
+        }
+      }).then(re =>{
+        this.form.roomId=re.data
+      })
       request.get("/User_info/"+this.form.userId).then(res=>{
         this.form.userName=res.data.uname
       })
@@ -270,6 +270,7 @@ export default {
       }).then(re =>{
         this.bucaooptions=re
       })
+
       request.get("/Room_info/forbucao" ).then(re =>{
         this.roomoptions=re.data
       })

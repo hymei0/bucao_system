@@ -35,7 +35,7 @@
         </template>
         <el-menu-item index="/user_roomU" style="padding-left: 60px; font-size:small">
           <template #title>
-            <el-icon><shopping-cart-full /></el-icon>
+            <el-icon><rank /></el-icon>
             <span style="font-size: small;font-weight: bold;" >住院信息</span>
           </template>
         </el-menu-item>
@@ -70,7 +70,7 @@
       <el-sub-menu index="system-data">
         <template #title>
           <el-icon><location /></el-icon>
-          <span style="font-size: medium;font-weight: bold;" >系统管理</span>
+          <span style="font-size: medium;font-weight: bold;" >系统信息</span>
         </template>
 
         <el-menu-item index="/RFID_kindsU" style="padding-left: 60px; font-size:small">
@@ -81,13 +81,13 @@
         </el-menu-item>
         <el-menu-item index="/room_infoU" style="padding-left: 60px; font-size:small">
           <template #title>
-            <el-icon><success-filled /></el-icon>
+            <el-icon><histogram /></el-icon>
             <span style="font-size: small;font-weight: bold;" >病房信息管理</span>
           </template>
         </el-menu-item>
         <el-menu-item index="/sectionU" style="padding-left: 60px; font-size:small">
           <template #title>
-            <el-icon><toilet-paper /></el-icon>
+            <el-icon><compass /></el-icon>
             <span style="font-size: small;font-weight: bold;" >部门信息管理</span>
           </template>
         </el-menu-item>
