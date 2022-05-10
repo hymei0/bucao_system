@@ -14,12 +14,16 @@ import com.example.bucao_springboot.entity.Bucao_user;
 import com.example.bucao_springboot.entity.User_room;
 import com.example.bucao_springboot.mapper.Bucao_infoMapper;
 import com.example.bucao_springboot.mapper.Bucao_userMapper;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
@@ -30,7 +34,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/Bucao_user")
-
+@Api(tags = "布草-用户管理")
 public class Bucao_userController {
     //将xxx_infoMapper引入到xxx_infoController中,不太规范，一般是写service类，controller引入service,service引入mapper
     @Resource
@@ -41,6 +45,7 @@ public class Bucao_userController {
      * @param bucao_user
      * @return
      */
+    @ApiOperation(value = "新增接口",notes="新增")
     @PostMapping  //post接口：前台把json数据传过来，通过此接口接收到  并转化成xxx类
     public Result<?> save(@RequestBody Bucao_user bucao_user)
     {
@@ -69,6 +74,7 @@ public class Bucao_userController {
      * @return
      */
     @PutMapping
+    @ApiOperation(value = "更新接口",notes="更新")
     public Result<?> update(@RequestBody Bucao_user bucao_user)
     {
         try {
@@ -89,6 +95,7 @@ public class Bucao_userController {
      * @return
      */
     @DeleteMapping
+    @ApiOperation(value = "删除接口",notes="根据复合主键（用户id，布草种类）删除")
     public Result<?> delete(@RequestParam String userId,
                             @RequestParam String rfno,
                             @RequestParam String rfid)
@@ -117,6 +124,7 @@ public class Bucao_userController {
      * @return
      */
     @GetMapping("foruser")
+    @ApiOperation(value = "分页查询接口",notes="面向用户接口")
     public Result<?> findPageuser(@RequestParam(defaultValue = "1") Integer pageNum,
                                   @RequestParam(defaultValue = "10") Integer pageSize,
                                   @RequestParam(defaultValue = "") String search,
@@ -145,6 +153,7 @@ public class Bucao_userController {
      * @return
      */
     @GetMapping("/forbucao")
+    @ApiOperation(value = "查询布草分配不足4件的病人接口",notes="查询布草分配不足4件的病人")
     public Result<?> selectforbucao(){
         List<Map<String, Object>> list=bucao_userMapper.selectforbucao();
         return Result.success(list);
@@ -158,6 +167,7 @@ public class Bucao_userController {
      * @return
      */
     @GetMapping
+    @ApiOperation(value = "分页查询接口",notes="面向管理员的接口")
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "20") Integer pageSize,
                               @RequestParam(defaultValue = "") String search)
@@ -185,6 +195,7 @@ public class Bucao_userController {
      */
 
     @PostMapping("/deleteBatch")
+    @ApiOperation(value = "批量删除接口",notes="根据复合主键批量删除")
     public Result<?> deleteBatch(@RequestBody List<List<String>> ids) {
 
         for(List<String> id:ids)
@@ -204,6 +215,7 @@ public class Bucao_userController {
      * @throws IOException
      */
     @GetMapping("/export")
+    @ApiOperation(value = "excel导出接口",notes="excel导出接口")
     public void export(HttpServletResponse response) throws IOException {
 
         List<Map<String, Object>> list = CollUtil.newArrayList();
@@ -241,7 +253,8 @@ public class Bucao_userController {
      * @throws IOException
      */
     @PostMapping("/import")
-    public Result<?> upload(MultipartFile file) throws IOException {
+    @ApiOperation(value = "excel导入接口",notes="excel导入接口")
+    public Result<?> upload(@ApiParam(value = "选择excel文件") @Valid @RequestPart(value = "file") MultipartFile file) throws IOException {
         Integer num = 0;//统计导入成功的记录条数
         try {
             InputStream inputStream = file.getInputStream();

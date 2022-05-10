@@ -334,7 +334,9 @@ export default {
         this.$message.warning("请选择数据！")
         return
       }
+      console.log(this.ids)
       request.post("/User_room/deleteBatch", this.ids).then(res => {
+
         if (res.code === '1') {
           this.$message.success("批量删除成功")
           this.load()

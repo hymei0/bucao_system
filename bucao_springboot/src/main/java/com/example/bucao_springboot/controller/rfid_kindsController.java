@@ -12,12 +12,16 @@ import com.example.bucao_springboot.common.Result;
 import com.example.bucao_springboot.entity.RFid_kinds;
 import com.example.bucao_springboot.mapper.RFid_kindsMapper;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 
 import java.io.InputStream;
@@ -30,6 +34,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/rfid_kinds")
+@Api(tags = "RFID标签分类信息管理")
 public class rfid_kindsController {
     @Resource   //将rfid_kindsMapper引入到bucao_infoController中
     RFid_kindsMapper rfid_kindsMapper;
@@ -40,6 +45,7 @@ public class rfid_kindsController {
      * @return
      */
     @PostMapping
+    @ApiOperation(value = "新增接口",notes="新增接口")
     public Result<?> save(@RequestBody RFid_kinds rfid_kinds)
     {
         try{
@@ -64,6 +70,7 @@ public class rfid_kindsController {
      * @return
      */
     @PutMapping
+    @ApiOperation(value = "更新接口",notes="更新接口")
     public Result<?> update(@RequestBody RFid_kinds rfid_kinds)
     {
         try {
@@ -81,6 +88,7 @@ public class rfid_kindsController {
      * @return
      */
     @GetMapping("/{id}")
+    @ApiOperation(value = "通过id查询接口",notes="参数: 通过id查询")
     public Result<?> SelectRFID_Info(@PathVariable String id)
     {
         RFid_kinds rfid = rfid_kindsMapper.selectById(id);
@@ -94,6 +102,7 @@ public class rfid_kindsController {
      * @return
      */
     @DeleteMapping("/{id}")
+    @ApiOperation(value = "删除接口",notes="根据id删除")
     public Result<?> delete(@PathVariable String id)
     {
         System.out.println(id);
@@ -111,17 +120,22 @@ public class rfid_kindsController {
      * @param rfid_kinds
      * @return
      */
-    @GetMapping("/insertall")
+    @PostMapping("/insertall")
+    @ApiOperation(value = "批量插入接口",notes="参数: RFid标签分类表实体类列表")
     public Result<?> Addall(@RequestBody List< RFid_kinds> rfid_kinds){
-
-        for(RFid_kinds rf:rfid_kinds)
-        {
-            if(rf.getRFNO()!=null)
-            {
-                rfid_kindsMapper.insert(rf);
+        Integer sucess=0;
+        try {
+            for (RFid_kinds rf : rfid_kinds) {
+                if (rf.getRFNO() != null) {
+                    rfid_kindsMapper.insert(rf);
+                    sucess=sucess+1;
+                }
             }
+
+        }catch (Exception e){
+            System.out.println(e.toString());
         }
-        return Result.success( rfid_kindsMapper);
+        return Result.success(sucess);
     }
 
     /**查询各种布草的库存
@@ -129,15 +143,17 @@ public class rfid_kindsController {
      * @return
      */
     @GetMapping("/kinds_stocks")
+    @ApiOperation(value = "查询各种布草的库存接口",notes="查询各种布草的库存")
     public Result<?>  kinds_stocks(){
         return Result.success(rfid_kindsMapper.STOCKS());
     }
 
-    /**查询各种布草的库存
+    /**查询各部门布草的库存
      *
      * @return
      */
     @GetMapping("/section_stocks")
+    @ApiOperation(value = "查询各部门布草的库存接口",notes="查询各部门布草的库存")
     public Result<?>  kinds_section(){
         return Result.success(rfid_kindsMapper.STOCKS_setion());
     }
@@ -150,6 +166,7 @@ public class rfid_kindsController {
      * @return
      */
     @GetMapping
+    @ApiOperation(value = "分页查询接口",notes="分页查询接口")
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "10") Integer pageSize,
                               @RequestParam(defaultValue = "") String search)
@@ -174,11 +191,17 @@ public class rfid_kindsController {
      * @return
      */
     @GetMapping("/bucaoinfo")
+    @ApiOperation(value = "查询所有记录",notes="与bucao_info表交互的接口")
     public List<Map<String, Object>>  SeletTobucaoinfo()
     {
-        QueryWrapper<RFid_kinds> queryWrapper = new QueryWrapper<>();
-        List<Map<String, Object>> list=rfid_kindsMapper.selectMaps(queryWrapper);
-        return list;
+        try {
+            QueryWrapper<RFid_kinds> queryWrapper = new QueryWrapper<>();
+            List<Map<String, Object>> list = rfid_kindsMapper.selectMaps(queryWrapper);
+            return list;
+        }catch (Exception e){
+            System.out.println(e.toString());
+            return null;
+        }
     }
 
     /**批量删除接口
@@ -187,6 +210,7 @@ public class rfid_kindsController {
      * @return
      */
     @PostMapping("/deleteBatch")
+    @ApiOperation(value = "批量删除接口",notes="根据id集合批量删除")
     public Result<?> deleteBatch(@RequestBody List<String> ids) {
         rfid_kindsMapper.deleteBatchIds(ids);
         return Result.success();
@@ -199,6 +223,7 @@ public class rfid_kindsController {
      * @throws IOException
      */
     @GetMapping("/export")
+    @ApiOperation(value = "excel文件导出接口",notes="excel文件导出")
     public Result<?> export(HttpServletResponse response) throws IOException {
 
         try {
@@ -244,7 +269,8 @@ public class rfid_kindsController {
      * @throws IOException
      */
     @PostMapping("/import")
-    public Result<?> upload(MultipartFile file) throws IOException {
+    @ApiOperation(value = "excel文件导入接口",notes="excel文件导入")
+    public Result<?> upload(@ApiParam(value = "选择excel文件") @Valid @RequestPart(value = "file") MultipartFile file) throws IOException {
         Integer num = 0;//统计导入成功的记录条数
         try {
             InputStream inputStream = file.getInputStream();

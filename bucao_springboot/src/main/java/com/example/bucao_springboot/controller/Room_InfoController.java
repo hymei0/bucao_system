@@ -14,12 +14,16 @@ import com.example.bucao_springboot.entity.Bucao_info;
 import com.example.bucao_springboot.entity.Room_info;
 import com.example.bucao_springboot.entity.Room_info;
 import com.example.bucao_springboot.mapper.Room_infoMapper;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
@@ -30,7 +34,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/Room_info")
-
+@Api(tags = "病房信息管理")
 public class Room_InfoController {
     //将xxxx_infoMapper引入到xxxx_infoController中,不太规范，一般是写service类，controller引入service,service引入mapper
     @Resource
@@ -42,6 +46,7 @@ public class Room_InfoController {
      * @return
      */
     @PostMapping
+    @ApiOperation(value = "新增接口",notes="参数：病房实体类")
     public Result<?> save(@RequestBody Room_info room_info)
     {
         try {
@@ -67,6 +72,7 @@ public class Room_InfoController {
      * @return
      */
     @PutMapping
+    @ApiOperation(value = "更新接口",notes="参数：病房实体类")
     public Result<?> update(@RequestBody Room_info Room_info)
     {
         try {
@@ -86,6 +92,7 @@ public class Room_InfoController {
      * @return
      */
     @DeleteMapping("/{id}")
+    @ApiOperation(value = "删除接口",notes="根据id删除")
     public Result<?> delete(@PathVariable String id)
     {
         try {
@@ -107,6 +114,7 @@ public class Room_InfoController {
      * @return
      */
     @GetMapping
+    @ApiOperation(value = "分页查询",notes="分页查询")
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "10") Integer pageSize,
                               @RequestParam(defaultValue = "") String search)
@@ -131,11 +139,10 @@ public class Room_InfoController {
      * @param ids
      * @return
      */
-    @GetMapping("/allsection")
+    @PostMapping("/allsection")
+    @ApiOperation(value = "批量查询所属病房接口",notes="根据病房id的集合批量查询")
     public Result<?> allSections(@RequestBody List<String> ids) {
-
-        room_infoMapper.selectBatchIds(ids);
-        return Result.success();
+        return Result.success(room_infoMapper.selectBatchIds(ids));
     }
 
     /**显示病房信息
@@ -144,6 +151,7 @@ public class Room_InfoController {
      * @return
      */
     @GetMapping("/{id}")
+    @ApiOperation(value = "查询病房信息接口",notes="根据病房id查询")
     public Result<?> SelectRoom_Info(@PathVariable String id)
     {
 
@@ -157,6 +165,7 @@ public class Room_InfoController {
      * @return
      */
     @GetMapping("/selectall")
+    @ApiOperation(value = "查询所有病房接口",notes="无条件查询")
     public Result<?>  selectall(){
         QueryWrapper<Room_info> queryWrapper = new QueryWrapper<>();
         List<Map<String, Object>> list=room_infoMapper.selectMaps(queryWrapper);
@@ -168,6 +177,7 @@ public class Room_InfoController {
      * @return
      */
     @GetMapping("/forbucao")
+    @ApiOperation(value = "查询出没有分配足够到的布草的病房",notes="查询出没有分配足够到的布草的病房")
     public Result<?>  selecforbucao(){
         QueryWrapper<Room_info> queryWrapper = new QueryWrapper<>();
         List<Map<String, Object>> list=room_infoMapper.selectforbucao();
@@ -175,13 +185,14 @@ public class Room_InfoController {
     }
 
 
-    /**批量删除接口:复合主键
+    /**批量删除接口
      *
      * @param ids
      * @return
      */
-
+    @ApiOperation(value = "批量删除接口",notes="根据病房id集合批量删除")
     @PostMapping("/deleteBatch")
+
     public Result<?> deleteBatch(@RequestBody List<String> ids) {
 
         room_infoMapper.deleteBatchIds(ids);
@@ -195,6 +206,7 @@ public class Room_InfoController {
      * @throws IOException
      */
     @GetMapping("/export")
+    @ApiOperation(value = "excel文件导出接口",notes="excel文件导出")
     public void export(HttpServletResponse response) throws IOException {
 
         List<Map<String, Object>> list = CollUtil.newArrayList();
@@ -229,7 +241,8 @@ public class Room_InfoController {
      * @throws IOException
      */
     @PostMapping("/import")
-    public Result<?> upload(MultipartFile file) throws IOException {
+    @ApiOperation(value = "excel文件导入接口",notes="excel文件导入")
+    public Result<?> upload(@ApiParam(value = "选择excel文件") @Valid @RequestPart(value = "file") MultipartFile file) throws IOException {
         Integer num = 0;//统计导入成功的记录条数
         try {
             InputStream inputStream = file.getInputStream();

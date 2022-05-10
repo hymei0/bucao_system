@@ -14,6 +14,9 @@ import com.example.bucao_springboot.common.Result;
 import com.example.bucao_springboot.entity.Bucao_info;
 import com.example.bucao_springboot.entity.RFid_kinds;
 import com.example.bucao_springboot.mapper.Bucao_infoMapper;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.poi.ss.usermodel.Cell;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
@@ -32,7 +36,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/Bucao_info")
-
+@Api(tags = "布草信息管理")
 public class bucao_infoController {
     //将Bucao_infoMapper引入到bucao_infoController中,不太规范，一般是写service类，controller引入service,service引入mapper
     @Resource
@@ -44,6 +48,7 @@ public class bucao_infoController {
      * @return
      */
     @PostMapping  //post接口：前台把json数据传过来，通过此接口接收到  并转化成Bucao_info类
+    @ApiOperation(value = "新增接口",notes="新增")
     public Result<?> save(@RequestBody Bucao_info bucao_info)
     {
 
@@ -70,6 +75,7 @@ public class bucao_infoController {
      * @return
      */
     @PutMapping
+    @ApiOperation(value = "更新接口",notes="更新病房")
     public Result<?> update(@RequestBody Bucao_info bucao_info)
     {
         try {
@@ -88,6 +94,7 @@ public class bucao_infoController {
      * @return
      */
     @DeleteMapping
+    @ApiOperation(value = "删除接口",notes="根据复合主键删除")
     public Result<?> delete(@RequestParam String rfno,
                             @RequestParam String rfid)
     {
@@ -110,6 +117,7 @@ public class bucao_infoController {
      * @return
      */
     @GetMapping("/selectall")
+    @ApiOperation(value = "查询出处于闲置状态的布草接口",notes="查询出处于闲置状态的布草")
     public List<Map<String, Object>>  selectall(){
         //QueryWrapper<Bucao_info> queryWrapper = new QueryWrapper<>();
         List<Map<String, Object>> list=bucao_infoMapper.selectMaps(Wrappers.<Bucao_info>lambdaUpdate().like(Bucao_info::getState,"闲置"));
@@ -122,9 +130,10 @@ public class bucao_infoController {
      * @return
      */
     @GetMapping("/foruser")
-    public List<Map<String, Object>>  selectforuser(@RequestParam String rfid){
+    @ApiOperation(value = "查询布草类型为'rfid'且状态为闲置的布草接口",notes="查询布草类型为'rfid'且状态为闲置的布草")
+    public Result<?>  selectforuser(@RequestParam String rfid){
         List<Map<String, Object>> list=bucao_infoMapper.selectbucaoforuser(rfid);
-        return list;
+        return Result.success(list);
     }
 
 
@@ -133,6 +142,7 @@ public class bucao_infoController {
      * @return
      */
     @GetMapping("/indata")
+    @ApiOperation(value = "布草入库数据统计接口",notes="布草入库数据统计")
     public Result<?>  indata(){
         //查询数据库中所有数据月份和数据
         return Result.success(bucao_infoMapper.Indata());
@@ -143,6 +153,7 @@ public class bucao_infoController {
      * @return
      */
     @GetMapping("/outdata")
+    @ApiOperation(value = "布草出库是据统计接口",notes="布草出库数据统计")
     public Result<?>  echarts(){
         //查询数据库中所有数据月份和数据
         return Result.success(bucao_infoMapper.Outdata());
@@ -155,6 +166,7 @@ public class bucao_infoController {
      * @return
      */
     @GetMapping("/detail")
+    @ApiOperation(value = "根据复合id查询接口",notes="根据复合id查询")
     public Result<?> detail(@RequestParam String rfno,
                             @RequestParam String rfid)
     {
@@ -178,6 +190,7 @@ public class bucao_infoController {
      * @return
      */
     @GetMapping
+    @ApiOperation(value = "分页查询接口",notes="分页查询")
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "20") Integer pageSize,
                               @RequestParam(defaultValue = "") String search)
@@ -206,6 +219,7 @@ public class bucao_infoController {
      */
 
     @PostMapping("/deleteBatch")
+    @ApiOperation(value = "批量删除接口",notes="根据复合id集合批量删除")
     public Result<?> deleteBatch(@RequestBody List<List<String>> ids) {
 
         for(List<String> id:ids)
@@ -224,6 +238,7 @@ public class bucao_infoController {
      * @throws IOException
      */
     @GetMapping("/export")
+    @ApiOperation(value = "excel导出接口",notes="excel导出接口")
     public void export(HttpServletResponse response) throws IOException {
 
         List<Map<String, Object>> list = CollUtil.newArrayList();
@@ -263,7 +278,8 @@ public class bucao_infoController {
      * @throws IOException
      */
     @PostMapping("/import")
-    public Result<?> upload(MultipartFile file) throws IOException {
+    @ApiOperation(value = "excel导入接口",notes="excel导入接口")
+    public Result<?> upload(@ApiParam(value = "选择excel文件") @Valid @RequestPart(value = "file") MultipartFile file) throws IOException {
         Integer success=0;
         try {
             InputStream inputStream = file.getInputStream();

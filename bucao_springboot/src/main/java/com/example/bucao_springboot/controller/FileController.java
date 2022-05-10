@@ -4,17 +4,22 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.example.bucao_springboot.common.Result;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.util.List;
 
 @RestController
+@Api(tags = "文件上传和下载")
 @RequestMapping("/files")
 public class FileController{
     //获取端口号
@@ -29,8 +34,9 @@ public class FileController{
      * @return
      * @throws IOException
      */
+    @ApiOperation(value = "文件上传接口",notes="文件上传")
     @PostMapping("/upload")
-    public Result<?>upload(MultipartFile file) throws IOException {
+    public Result<?>upload(@ApiParam(value = "选择excel文件") @Valid @RequestPart(value = "file") MultipartFile file) throws IOException {
         String originalFilename = file.getOriginalFilename();  // 获取源文件的名称
         // 定义文件的唯一标识（前缀）
         String flag = IdUtil.fastSimpleUUID();
@@ -48,6 +54,7 @@ public class FileController{
      * @param response
      */
     @GetMapping("/{flag}")
+    @ApiOperation(value = "文件下载接口",notes="文件下载")
     public void getFiles(@PathVariable String flag, HttpServletResponse response) {
         OutputStream os;  // 新建一个输出流对象
         String basePath = System.getProperty("user.dir") + "/bucao_springboot/src/main/resources/files/";  // 定于文件上传的根路径

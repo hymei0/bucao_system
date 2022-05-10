@@ -13,12 +13,16 @@ import com.example.bucao_springboot.common.Result;
 import com.example.bucao_springboot.entity.Section;
 import com.example.bucao_springboot.entity.Section;
 import com.example.bucao_springboot.mapper.SectionMapper;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
@@ -29,6 +33,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/Section")
+@Api(tags = "部门信息管理")
 public class SectionController {
     @Resource
     SectionMapper sectionMapper;
@@ -38,6 +43,7 @@ public class SectionController {
      * @return
      */
     @GetMapping("/rfid_kinds")
+    @ApiOperation(value = "查询所有部门接口",notes="与Bucao_info表交互的接口：查询出布草所属所有部门")
     public List<Map<String, Object>> SeletToRfidKinds()
     {
         QueryWrapper<Section> queryWrapper = new QueryWrapper<>();
@@ -51,6 +57,7 @@ public class SectionController {
      * @return
      */
     @PostMapping
+    @ApiOperation(value = "新增接口",notes="新增，参数：部门实体类")
     public Result<?> save(@RequestBody Section section)
     {
         try {
@@ -76,6 +83,7 @@ public class SectionController {
      * @return
      */
     @PutMapping
+    @ApiOperation(value = "更新接口",notes="参数：部门实体类")
     public Result<?> update(@RequestBody Section Section)
     {
         try {
@@ -91,6 +99,7 @@ public class SectionController {
 
     //删除接口
     @DeleteMapping("/{id}")
+    @ApiOperation(value = "删除接口",notes="根据id删除")
     public Result<?> delete(@PathVariable String id)
     {
         try {
@@ -112,6 +121,7 @@ public class SectionController {
      * @return
      */
     @GetMapping
+    @ApiOperation(value = "分页查询接口",notes="分页查询接口")
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "10") Integer pageSize,
                               @RequestParam(defaultValue = "") String search)
@@ -131,12 +141,13 @@ public class SectionController {
         return Result.success(Section_page);
     }
 
-    /**显示个人信息
+    /**显示部门信息
      *
      * @param id
      * @return
      */
     @GetMapping("/{id}")
+    @ApiOperation(value = "根据id查询部门",notes="根据id查询部门信息")
     public Result<?> SelectPerson_Info(@PathVariable String id)
     {
         sectionMapper.selectById(id);
@@ -145,13 +156,14 @@ public class SectionController {
     }
 
 
-    /**批量删除接口:复合主键
+    /**批量删除接口
      *
      * @param ids
      * @return
      */
 
     @PostMapping("/deleteBatch")
+    @ApiOperation(value = "批量删除接口",notes="根据id的集合删除")
     public Result<?> deleteBatch(@RequestBody List<String> ids) {
 
         sectionMapper.deleteBatchIds(ids);
@@ -165,6 +177,7 @@ public class SectionController {
      * @throws IOException
      */
     @GetMapping("/export")
+    @ApiOperation(value = "excel文件导出接口",notes="excel文件导出")
     public void export(HttpServletResponse response) throws IOException {
 
         List<Map<String, Object>> list = CollUtil.newArrayList();
@@ -199,7 +212,8 @@ public class SectionController {
      * @throws IOException
      */
     @PostMapping("/import")
-    public Result<?> upload(MultipartFile file) throws IOException {
+    @ApiOperation(value = "excel文件导入接口",notes="excel文件导入")
+    public Result<?> upload(@ApiParam(value = "选择excel文件") @Valid @RequestPart(value = "file") MultipartFile file) throws IOException {
         Integer num = 0;//统计导入成功的记录条数
         try {
             InputStream inputStream = file.getInputStream();

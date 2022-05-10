@@ -14,6 +14,9 @@ import com.example.bucao_springboot.mapper.Bucao_roomMapper;
 import com.example.bucao_springboot.mapper.Bucao_userMapper;
 import com.example.bucao_springboot.mapper.RFid_kindsMapper;
 import com.example.bucao_springboot.mapper.Room_infoMapper;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
@@ -32,7 +36,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/Bucao_room")
-
+@Api(tags = "布草-病房管理")
 public class Bucao_roomController {
     //将xxx_infoMapper引入到xxx_infoController中,不太规范，一般是写service类，controller引入service,service引入mapper
     @Resource
@@ -47,6 +51,7 @@ public class Bucao_roomController {
      * @return
      */
     @PostMapping  //post接口：前台把json数据传过来，通过此接口接收到  并转化成xxx类
+    @ApiOperation(value = "新增接口",notes="新增")
     public Result<?> save(@RequestBody Bucao_room Bucao_room)
     {
         try{
@@ -71,6 +76,7 @@ public class Bucao_roomController {
      * @return
      */
     @PutMapping
+    @ApiOperation(value = "更新接口",notes="更新")
     public Result<?> update(@RequestBody Bucao_room bucao_room)
     {
         try {
@@ -87,6 +93,7 @@ public class Bucao_roomController {
      * @return
      */
     @GetMapping("/rooms")
+    @ApiOperation(value = "查询未住满的病房接口",notes="查询未住满的病房")
     public Result<?>rooms()
     {
         List<Map<String, Object>> list=bucao_roomMapper.getrooms();
@@ -101,6 +108,7 @@ public class Bucao_roomController {
      * @return
      */
     @DeleteMapping
+    @ApiOperation(value = "删除接口",notes="删除布草病房分配记录")
     public Result<?> delete(@RequestParam String roomId,
                             @RequestParam String rfno,
                             @RequestParam String rfid)
@@ -128,6 +136,7 @@ public class Bucao_roomController {
      * @return
      */
     @GetMapping
+    @ApiOperation(value = "分页查询接口",notes="分页查询")
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "20") Integer pageSize,
                               @RequestParam(defaultValue = "") String search)
@@ -158,6 +167,7 @@ public class Bucao_roomController {
      */
 
     @PostMapping("/deleteBatch")
+    @ApiOperation(value = "批量删除接口",notes="批量删除")
     public Result<?> deleteBatch(@RequestBody List<List<String>> ids) {
 
         for(List<String> id:ids)
@@ -177,6 +187,7 @@ public class Bucao_roomController {
      * @throws IOException
      */
     @GetMapping("/export")
+    @ApiOperation(value = "excel导出接口",notes="excel导出接口")
     public void export(HttpServletResponse response) throws IOException {
 
         List<Map<String, Object>> list = CollUtil.newArrayList();
@@ -212,7 +223,8 @@ public class Bucao_roomController {
      * @throws IOException
      */
     @PostMapping("/import")
-    public Result<?> upload(MultipartFile file) throws IOException {
+    @ApiOperation(value = "excel导入接口",notes="excel导入接口")
+    public Result<?> upload(@ApiParam(value = "选择excel文件") @Valid @RequestPart(value = "file") MultipartFile file) throws IOException {
         Integer num = 0;//统计导入成功的记录条数
         try {
 

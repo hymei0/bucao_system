@@ -17,12 +17,16 @@ import com.example.bucao_springboot.entity.User_room;
 import com.example.bucao_springboot.mapper.OrderMapper;
 import com.example.bucao_springboot.mapper.Room_infoMapper;
 import com.example.bucao_springboot.mapper.User_roomMapper;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
@@ -36,6 +40,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/Order")
+@Api(tags = "订单信息管理")
 public class OrderController {
     @Resource
     OrderMapper OrderMapper;
@@ -49,6 +54,7 @@ public class OrderController {
      * @return
      */
     @PostMapping
+    @ApiOperation(value = "新增订单接口",notes="新增")
     public Result<?> save(@RequestBody Order order)  {
 
 //        SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -86,6 +92,7 @@ public class OrderController {
      * @return
      */
     @PutMapping
+    @ApiOperation(value = "更新接口",notes="更新订单接口")
     public Result<?> update(@RequestBody Order order)
     {
         try {
@@ -104,6 +111,7 @@ public class OrderController {
      * @return
      */
     @DeleteMapping("/{id}")
+    @ApiOperation(value = "删除接口",notes="根据订单编号删除订单信息")
     public Result<?> delete(@PathVariable String id)
     {
         try {
@@ -120,6 +128,7 @@ public class OrderController {
      * @return
      */
     @GetMapping("/selectall")
+    @ApiOperation(value = "查询所有订单",notes="无条件查询")
     public Result<?>  selectall(){
         QueryWrapper<Order> queryWrapper = new QueryWrapper<>();
         List<Map<String, Object>> list=OrderMapper.selectMaps(queryWrapper);
@@ -131,12 +140,11 @@ public class OrderController {
      * @param order
      * @return
      */
-    @GetMapping("/buy")
+    @PostMapping("/buy")
+    @ApiOperation(value = "支付接口",notes="返回支付链接")
     public Result<?> buy(@RequestBody Order order) {
 
         String payUrl = "http://localhost:9090/alipay/pay?subject=" + order.getSubject() + "&traceNo=" + order.getOrderno() + "&totalAmount=" + order.getExpenses();
-
-        // 更新订单，扣减库存
         return Result.success(payUrl);
     }
 
@@ -149,6 +157,7 @@ public class OrderController {
      * @return
      */
     @GetMapping("foruser")
+    @ApiOperation(value = "分页查询接口",notes="面向用户")
     public Result<?> findPageuser(@RequestParam(defaultValue = "1") Integer pageNum,
                                   @RequestParam(defaultValue = "10") Integer pageSize,
                                   @RequestParam(defaultValue = "") String search,
@@ -176,6 +185,7 @@ public class OrderController {
      * @return
      */
     @GetMapping
+    @ApiOperation(value = "分页查询接口",notes="面向管理员")
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "10") Integer pageSize,
                               @RequestParam(defaultValue = "") String search)
@@ -190,13 +200,14 @@ public class OrderController {
         return Result.success(orderpage);
     }
 
-    /**批量删除接口:复合主键
+    /**批量删除接口
      *
      * @param ids
      * @return
      */
 
     @PostMapping("/deleteBatch")
+    @ApiOperation(value = "批量插入接口",notes="根据Id集合批量删除")
     public Result<?> deleteBatch(@RequestBody List<String> ids) {
 
         OrderMapper.deleteBatchIds(ids);
@@ -211,6 +222,7 @@ public class OrderController {
      * @throws IOException
      */
     @GetMapping("/export")
+    @ApiOperation(value = "excel导出接口",notes="excel导出接口")
     public void export(HttpServletResponse response) throws IOException {
 
         List<Map<String, Object>> list = CollUtil.newArrayList();
@@ -251,7 +263,8 @@ public class OrderController {
      * @throws IOException
      */
     @PostMapping("/import")
-    public Result<?> upload(MultipartFile file) throws IOException {
+    @ApiOperation(value = "excel导入接口",notes="excel导入接口")
+    public Result<?> upload(@ApiParam(value = "选择excel文件") @Valid @RequestPart(value = "file") MultipartFile file) throws IOException {
         Integer num = 0;//统计导入成功的记录条数
         try {
             InputStream inputStream = file.getInputStream();

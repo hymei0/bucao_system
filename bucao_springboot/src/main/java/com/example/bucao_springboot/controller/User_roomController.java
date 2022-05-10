@@ -15,6 +15,10 @@ import com.example.bucao_springboot.entity.Room_info;
 import com.example.bucao_springboot.entity.User_room;
 import com.example.bucao_springboot.mapper.Bucao_userMapper;
 import com.example.bucao_springboot.mapper.User_roomMapper;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +36,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/User_room")
+@Api(tags = "住院信息管理")
 public class User_roomController {
     @Resource
     User_roomMapper User_roomMapper;
@@ -42,6 +47,7 @@ public class User_roomController {
      * @return
      */
     @PostMapping
+    @ApiOperation(value = "新增接口",notes="参数：用户-病房实体类")
     public Result<?> save(@RequestBody User_room user_room)
     {
         try {
@@ -54,7 +60,7 @@ public class User_roomController {
             }
             else
             {
-                return Result.error("-1","该部门已存在");
+                return Result.error("-1","该记录已存在");
             }
         }catch (Exception e)
         {
@@ -68,6 +74,7 @@ public class User_roomController {
      * @param User_room
      * @return
      */
+    @ApiOperation(value = "更新接口",notes="参数：用户-病房信息实体类")
     @PutMapping
     public Result<?> update(@RequestBody User_room User_room)
     {
@@ -89,10 +96,13 @@ public class User_roomController {
      * @return
      */
     @GetMapping("/getroomid")
+    @ApiOperation(value = "查询出病人所在病房",notes="根据病人id查询出病人所在病房")
     public Result<?> selecte(@RequestParam String userid)
     {
         try {
+
             // Bucao_user bucao=Bucao_userMapper.selectOne(Wrappers.<Bucao_user>lambdaQuery().eq(Bucao_user::getRfno,Bucao_user.getRfno()).eq(Bucao_user::getRfid,Bucao_user.getRfid()));
+
             QueryWrapper<User_room> wrapper = new QueryWrapper<>();
 
             wrapper.eq("userid", userid);
@@ -120,6 +130,7 @@ public class User_roomController {
      * @return
      */
     @DeleteMapping
+    @ApiOperation(value = "删除接口",notes="根据病人id、病房id、住院时间删除住院记录")
     public Result<?> delete(@RequestParam String userid,
                             @RequestParam String roomid,
                             @RequestParam Date comeTime)
@@ -143,6 +154,7 @@ public class User_roomController {
      * @return
      */
     @GetMapping("/selectall")
+    @ApiOperation(value = "查询所有住院记录",notes="查询所有住院记录")
     public Result<?>  selectall(){
         return Result.success(User_roomMapper.GetUser_room());
     }
@@ -152,6 +164,7 @@ public class User_roomController {
      * @return
      */
     @GetMapping("/fororder")
+    @ApiOperation(value = "查询所有的需要缴费的病人",notes="为新增订单挑选出住院且需要缴费得病人")
     public  Result<?>ForOrder()
     {
         QueryWrapper<User_room> wrapper = new QueryWrapper<>();
@@ -166,6 +179,7 @@ public class User_roomController {
      * @return
      */
     @GetMapping("/getRooms")
+    @ApiOperation(value = "查询出某个用户需要缴费的住院记录",notes="根据userid查询出需要缴费得住院记录:与order表相关")
     public Result<?> GetRooms(@RequestParam String userid){
         QueryWrapper<User_room> queryWrapper = new QueryWrapper<>();
         List<User_room> list=User_roomMapper.selectList(queryWrapper.eq("userid",userid).gt("expenses",0.00));
@@ -178,6 +192,7 @@ public class User_roomController {
      * @return
      */
     @GetMapping("/suitableroom")
+    @ApiOperation(value = "查询未住满病人的病房号",notes="每个病房只能住四人")
     public Result<?>  suitableroom(){
 
             return Result.success(User_roomMapper.Getsuitableroom());
@@ -188,6 +203,7 @@ public class User_roomController {
      * @return
      */
     @GetMapping("/suitableuser")
+    @ApiOperation(value = "查询当前未办理住院的病人",notes="查询当前未办理住院的病人")
     public Result<?>  suitableuser(){
         return Result.success(User_roomMapper.Getsuitableuser());
     }
@@ -200,6 +216,7 @@ public class User_roomController {
      * @return
      */
     @GetMapping
+    @ApiOperation(value = "分页查询：面向管理员",notes="分页查询：面向管理员")
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "10") Integer pageSize,
                               @RequestParam(defaultValue = "") String search)
@@ -226,10 +243,14 @@ public class User_roomController {
      * @return
      */
     @GetMapping("foruser")
+    @ApiOperation(value = "分页查询：面向用户",notes="分页查询：面向用户")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userid",value = "用户id",required = true)
+    })
     public Result<?> findPageuser(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "10") Integer pageSize,
                               @RequestParam(defaultValue = "") String search,
-                                  @RequestParam(defaultValue = "") String userid)
+                                  @RequestParam(defaultValue = "",required = true) String userid)
     //参数：pageNum：当前页，pageSize:每页多少条 search:查询关键字
     {
 
@@ -250,15 +271,21 @@ public class User_roomController {
      * @param ids
      * @return
      */
-
+    @ApiOperation(value = "批量删除接口",notes="根据复合主键删除：userid,roomid,coomTime")
     @PostMapping("/deleteBatch")
     public Result<?> deleteBatch(@RequestBody List<List<String>> ids) {
 
         for(List<String> id:ids)
         {
-            QueryWrapper<User_room> wrapper = new QueryWrapper<>();
-            wrapper.eq("userid", id.get(0)).eq("roomid", id.get(1)).eq("come_time", id.get(2));
-            User_roomMapper.delete(wrapper);
+            try {
+                QueryWrapper<User_room> wrapper = new QueryWrapper<>();
+                wrapper.eq("userid", id.get(0)).eq("roomid", id.get(1)).eq("come_time", id.get(2));
+                User_roomMapper.delete(wrapper);
+            }catch (Exception e)
+            {
+                System.out.println(e.toString());
+                return Result.error("-1","请删除"+id.get(0)+"、"+id.get(1)+"、"+id.get(2)+"相关的订单记录");
+            }
         }
         return Result.success();
     }
@@ -270,6 +297,7 @@ public class User_roomController {
      * @throws IOException
      */
     @GetMapping("/export")
+    @ApiOperation(value = "excel文件导出接口",notes="excel文件导出")
     public void export(HttpServletResponse response) throws IOException {
 
         List<Map<String, Object>> list = CollUtil.newArrayList();

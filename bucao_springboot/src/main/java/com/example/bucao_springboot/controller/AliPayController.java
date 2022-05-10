@@ -6,6 +6,10 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.bucao_springboot.controller.entity.AliPay;
 import com.example.bucao_springboot.entity.Order;
 import com.example.bucao_springboot.mapper.OrderMapper;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +24,7 @@ import java.util.Map;
 // http:/y7zhhi.natappfree.cc/alipay/notyfy
 @RestController
 @RequestMapping("/alipay")
+@Api(tags = "支付宝支付接口")
 public class AliPayController {
 
     @Resource
@@ -31,6 +36,12 @@ public class AliPayController {
      * @return
      */
     @GetMapping("/pay")
+    @ApiOperation(value = "支付接口",notes="支付接口")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = " aliPay.traceNo",value = "订单号",required = true),
+            @ApiImplicitParam(name = "aliPay.subject",value = "交易名称",required = true),
+            @ApiImplicitParam(name = " aliPay.totalAmount",value = "总金额",required = true)
+    })
     public String pay(AliPay aliPay) {
         AlipayTradePagePayResponse response;
         try {
@@ -61,6 +72,7 @@ public class AliPayController {
      * @throws Exception
      */
     @PostMapping("/notify")  // 注意这里必须是POST接口
+    @ApiOperation(value = "支付宝异步回调函数",notes="支付宝异步回调函数")
     public String payNotify(HttpServletRequest request) throws Exception {
         if (request.getParameter("trade_status").equals("TRADE_SUCCESS")) {
             System.out.println("=========支付宝异步回调========");

@@ -20,7 +20,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "/Bucao_user","/Bucao_user/**","/Order","/Order/**",
                         "/User_info/**", "/User_info","/Room_info","/Room_info/**",
                         "/Section","/Section/**","/User_room","/User_room/**",
-                        "/imserver/**", "/files/**","/Bucao_info",
+                        "/imserver/**", "/files/**","/Bucao_info","/swagger-ui/**","/swagger-ui/","/v3/api-docs",
                         "/alipay/**", "/doc.html", "/webjars/**", "/swagger-resources/**"
                 );
 

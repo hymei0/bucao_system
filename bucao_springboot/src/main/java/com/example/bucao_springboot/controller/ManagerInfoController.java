@@ -12,12 +12,16 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
 import com.example.bucao_springboot.entity.ManagerInfo;
 import com.example.bucao_springboot.mapper.ManagerInfoMapper;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
@@ -28,6 +32,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/ManagerInfo")
+@Api(tags = "管理员信息管理")
 public class ManagerInfoController {
     @Resource
     ManagerInfoMapper ManagerInfoMapper;
@@ -38,6 +43,7 @@ public class ManagerInfoController {
      * @return
      */
     @PostMapping("/login")
+    @ApiOperation(value = "登录接口",notes="登录接口")
     public Result<?> login(@RequestBody ManagerInfo managerInfo)
     {
 
@@ -57,6 +63,7 @@ public class ManagerInfoController {
      * @return
      */
     @PostMapping("/register")
+    @ApiOperation(value = "注册接口",notes="注册接口")
     public Result<?> register(@RequestBody ManagerInfo managerInfo)
     {
         try{
@@ -80,6 +87,7 @@ public class ManagerInfoController {
      * @return
      */
     @GetMapping("/selectall")
+    @ApiOperation(value = "查询所有管理员",notes="无条件查询")
     public Result<?>  selectall(){
         QueryWrapper<ManagerInfo> queryWrapper = new QueryWrapper<>();
         List<Map<String, Object>> list=ManagerInfoMapper.selectMaps(queryWrapper);
@@ -92,6 +100,7 @@ public class ManagerInfoController {
      * @return
      */
     @PostMapping
+    @ApiOperation(value = "新增接口",notes="新增接口")
     public Result<?> save(@RequestBody ManagerInfo managerInfo)
     {
         try {
@@ -119,6 +128,7 @@ public class ManagerInfoController {
      * @return
      */
     @PutMapping
+    @ApiOperation(value = "更新接口",notes="更新接口")
     public Result<?> update(@RequestBody ManagerInfo ManagerInfo)
     {
          ManagerInfoMapper.updateById(ManagerInfo);
@@ -132,6 +142,7 @@ public class ManagerInfoController {
      * @return
      */
     @DeleteMapping("/{Id}")
+    @ApiOperation(value = "删除接口",notes="删除接口")
     public Result<?> delete(@PathVariable String Id)
     {
         ManagerInfoMapper.deleteById(Id);
@@ -147,6 +158,7 @@ public class ManagerInfoController {
      * @return
      */
     @GetMapping
+    @ApiOperation(value = "分页查询接口",notes="分页查询接口")
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "10") Integer pageSize,
                               @RequestParam(defaultValue = "") String search)
@@ -179,6 +191,7 @@ public class ManagerInfoController {
      * @return
      */
     @GetMapping("/{id}")
+    @ApiOperation(value = "显示个人信息接口",notes="根据id查询管理员个人信息")
     public Result<?> SelectPerson_Info(@PathVariable String id)
     {
         ManagerInfo user=ManagerInfoMapper.selectById(id);
@@ -193,13 +206,14 @@ public class ManagerInfoController {
     }
 
 
-    /**批量删除接口:复合主键
+    /**批量删除接口
      *
      * @param Ids
      * @return
      */
 
     @PostMapping("/deleteBatch")
+    @ApiOperation(value = "批量删除接口",notes="根据id集合批量删除")
     public Result<?> deleteBatch(@RequestBody List<String> Ids) {
 
        ManagerInfoMapper.deleteBatchIds(Ids);
@@ -213,6 +227,7 @@ public class ManagerInfoController {
      * @throws IOException
      */
     @GetMapping("/export")
+    @ApiOperation(value = "excel导出接口",notes="excel导出接口")
     public void export(HttpServletResponse response) throws IOException {
 
         List<Map<String, Object>> list = CollUtil.newArrayList();
@@ -253,7 +268,8 @@ public class ManagerInfoController {
      * @throws IOException
      */
     @PostMapping("/import")
-    public Result<?> upload(MultipartFile file) throws IOException {
+    @ApiOperation(value = "excel导入接口",notes="excel导入接口")
+    public Result<?> upload(@ApiParam(value = "选择excel文件") @Valid @RequestPart(value = "file") MultipartFile file) throws IOException {
         Integer num = 0;//统计导入成功的记录条数
         try {
             InputStream inputStream = file.getInputStream();

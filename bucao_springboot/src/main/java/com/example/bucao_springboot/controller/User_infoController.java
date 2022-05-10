@@ -11,6 +11,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
 import com.example.bucao_springboot.entity.User_info;
 import com.example.bucao_springboot.mapper.User_infoMapper;
+import io.swagger.annotations.*;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
@@ -27,7 +30,9 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+
 @RequestMapping("/User_info")
+@Api(tags = "用户信息管理")
 public class User_infoController {
     @Resource
     User_infoMapper user_infoMapper;
@@ -37,12 +42,13 @@ public class User_infoController {
      * @param user_info
      * @return
      */
+
     @PostMapping("/login")
+    @ApiOperation(value = "用户登录接口",notes="传入的参数：实体类，其中密码和用户id不能为空")
     public Result<?> login(@RequestBody User_info user_info)
     {
 
         User_info res=user_infoMapper.selectOne(Wrappers.<User_info>lambdaQuery().eq(User_info::getID,user_info.getID()).eq(User_info::getPsd,user_info.getPsd()));
-
         if(res == null)
         {
             return Result.error("-1","用户名或密码错误");
@@ -57,6 +63,7 @@ public class User_infoController {
      * @return
      */
     @PostMapping("/register")
+    @ApiOperation(value = "用户注册接口")
     public Result<?> register(@RequestBody User_info user_info)
     {
         try{
@@ -80,6 +87,7 @@ public class User_infoController {
      * @return
      */
     @GetMapping("/selectall")
+    @ApiOperation(value = "查询所有用户",notes="查询所有用户")
     public Result<?>  selectall(){
         QueryWrapper<User_info> queryWrapper = new QueryWrapper<>();
         List<Map<String, Object>> list=user_infoMapper.selectMaps(queryWrapper);
@@ -92,6 +100,7 @@ public class User_infoController {
      * @return
      */
     @PostMapping
+    @ApiOperation(value = "添加用户接口",notes="添加用户")
     public Result<?> save(@RequestBody User_info user_info)
     {
         try {
@@ -119,16 +128,23 @@ public class User_infoController {
      * @return
      */
     @PutMapping
+    @ApiOperation(value = "用户信息更新接口",notes="更新用户信息")
     public Result<?> update(@RequestBody User_info user_info)
     {
-        try {
-            user_infoMapper.updateById(user_info);
-            System.out.println("User_info已更新用户" + user_info.getID() + "的信息：");
-            return Result.success();
-        }catch (Exception e)
+        User_info user=user_infoMapper.selectOne(Wrappers.<User_info>lambdaQuery().eq(User_info::getID,user_info.getID()));
+        if(user==null)
         {
-            System.out.println(e.toString());
-            return  Result.error("-1","后台出错了，请联系开发人员");
+            return  Result.error("-1","该用户不存在");
+        }
+        else {
+            try {
+                user_infoMapper.updateById(user_info);
+                System.out.println("User_info已更新用户" + user_info.getID() + "的信息：");
+                return Result.success();
+            } catch (Exception e) {
+                System.out.println(e.toString());
+                return Result.error("-1", "后台出错了，请联系开发人员");
+            }
         }
     }
 
@@ -138,6 +154,7 @@ public class User_infoController {
      * @return
      */
     @DeleteMapping("/{id}")
+    @ApiOperation(value = "删除用户信息接口",notes="根据用户id删除用户信息")
     public Result<?> delete(@PathVariable String id)
     {
         try {
@@ -158,6 +175,7 @@ public class User_infoController {
      * @return
      */
     @GetMapping
+    @ApiOperation(value = "用户信息分页查找")
     public Result<?> findPage(@RequestParam(defaultValue = "1") Integer pageNum,
                               @RequestParam(defaultValue = "10") Integer pageSize,
                               @RequestParam(defaultValue = "") String search)
@@ -166,11 +184,16 @@ public class User_infoController {
         // Page<Object> page= new Page<>(pageNum,pageSize);//分页对象
 
         // LambdaQueryWrapper<RFid_kinds> qw = Wrappers.<User>lambdaQuery().like(User::getName, "张").and(u -> u.lt(User::getAge, 40).or().isNotNull(User::getEmail));
-
+        if(pageNum<1){
+            return Result.error("-1","pageNum不能小于1");
+        }
+        if(pageSize<1){
+            return Result.error("-1","pageSize不能小于1");
+        }
         LambdaQueryWrapper<User_info> wrapper = Wrappers.<User_info>lambdaQuery();
         if(StrUtil.isNotBlank(search))//不为null,则进行模糊匹配
         {
-            wrapper.like(User_info::getID,search);//eq(a,b)<=>a=b
+            wrapper.like(User_info::getID,search).or().like(User_info::getTelephone,search).or().like(User_info::getAddress,search).or().like(User_info::getSex,search).or().like(User_info::getUname,search);//eq(a,b)<=>a=b
         }
         Page<User_info> user_info_page=user_infoMapper.selectPage(new Page<>(pageNum,pageSize), wrapper);
 
@@ -183,6 +206,7 @@ public class User_infoController {
      * @return
      */
     @GetMapping("/{id}")
+    @ApiOperation(value = "查询个人信息",notes="通过用户的id查找用户信息")
     public Result<?> SelectPerson_Info(@PathVariable String id)
     {
 
@@ -203,12 +227,12 @@ public class User_infoController {
      * @param ids
      * @return
      */
-
+    @ApiOperation(value = "批量删除接口",notes="通过用户的id集合删除用户信息")
     @PostMapping("/deleteBatch")
     public Result<?> deleteBatch(@RequestBody List<String> ids) {
 
        user_infoMapper.deleteBatchIds(ids);
-        return Result.success();
+       return Result.success();
     }
 
     /**
@@ -218,33 +242,40 @@ public class User_infoController {
      * @throws IOException
      */
     @GetMapping("/export")
-    public void export(HttpServletResponse response) throws IOException {
+    @ApiOperation(value = "Excel文件导出接口",notes="excel文件导出")
+    public Result<?> export(HttpServletResponse response) throws IOException {
 
-        List<Map<String, Object>> list = CollUtil.newArrayList();
+        try {
+            List<Map<String, Object>> list = CollUtil.newArrayList();
+            List<User_info> all = user_infoMapper.selectList(null);
+            for (User_info user_info : all) {
+                Map<String, Object> row1 = new LinkedHashMap<>();
+                row1.put("证件号", user_info.getID());
+                row1.put("姓名", user_info.getUname());
+                row1.put("性别", user_info.getSex());
+                row1.put("头像", user_info.getPortrait());
+                row1.put("联系电话", user_info.getTelephone());
+                row1.put("地址", user_info.getAddress());
+                list.add(row1);
+            }
+            // 2. 写excel
+            ExcelWriter writer = ExcelUtil.getWriter(true);
+            writer.write(list, true);
 
-        List<User_info> all = user_infoMapper.selectList(null);
-        for (User_info user_info : all) {
-            Map<String, Object> row1 = new LinkedHashMap<>();
-            row1.put("证件号", user_info.getID());
-            row1.put("姓名", user_info.getUname());
-            row1.put("性别", user_info.getSex());
-            row1.put("头像", user_info.getPortrait());
-            row1.put("联系电话", user_info.getTelephone());
-            row1.put("地址", user_info.getAddress());
-            list.add(row1);
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
+            String fileName = URLEncoder.encode("用户信息数据表", "UTF-8");
+            response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
+
+            ServletOutputStream out = response.getOutputStream();
+            writer.flush(out, true);
+            writer.close();
+            IoUtil.close(System.out);
+            return Result.success();
+        }catch (Exception e){
+            System.out.println(e.toString());
+            return Result.error("-1","导出失败");
         }
-        // 2. 写excel
-        ExcelWriter writer = ExcelUtil.getWriter(true);
-        writer.write(list, true);
 
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
-        String fileName = URLEncoder.encode("用户信息数据表", "UTF-8");
-        response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
-
-        ServletOutputStream out = response.getOutputStream();
-        writer.flush(out, true);
-        writer.close();
-        IoUtil.close(System.out);
     }
 
     /**
@@ -256,7 +287,8 @@ public class User_infoController {
      * @throws IOException
      */
     @PostMapping("/import")
-    public Result<?> upload(MultipartFile file) throws IOException {
+    @ApiOperation(value = "excel文件导入接口",notes="excel文件导入")
+    public Result<?> upload(@ApiParam(value = "选择excel文件") @Valid @RequestPart(value = "file") MultipartFile file) throws IOException {
         Integer success=0;;//统计导入成功的记录条数
         try {
             InputStream inputStream = file.getInputStream();
