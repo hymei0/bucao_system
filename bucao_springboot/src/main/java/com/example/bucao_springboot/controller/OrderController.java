@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
+import com.example.bucao_springboot.common.excelconfig;
 import com.example.bucao_springboot.entity.Order;
 import com.example.bucao_springboot.entity.RFid_kinds;
 import com.example.bucao_springboot.entity.User_room;
@@ -61,8 +62,14 @@ public class OrderController {
 //        String date=sdf.format(System.currentTimeMillis()).toString();
 //        order.setCreatetime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date));
 //        System.out.println(order);
-
-
+        if(order.getExpenses()<0)
+        {
+            return Result.error("-1","应缴费用应大于等于0");
+        }
+        User_room user_room=User_roomMapper.selectOne(Wrappers.<User_room>lambdaQuery().eq(User_room::getUserid,order.getUserId()).eq(User_room::getRoomid,order.getRoomId()).eq(User_room::getExpenses,order.getExpenses()).gt(User_room::getExpenses,0));
+        if(user_room==null){
+           return Result.error("-1","未找到订单相关的住院记录");
+        }
         try {
             Order order1=OrderMapper.selectOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderno,order.getOrderno()));
             if(order1==null) {
@@ -71,13 +78,15 @@ public class OrderController {
 //                order.setCreatetime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date));
 
                 OrderMapper.insert(order);
+                user_room.setExpenses(0.00);
+                User_roomMapper.update(user_room.getComeTime(),user_room.getOutTime(),user_room.getExpenses(),user_room.getRoomid(),user_room.getUserid());
                 System.out.println("Order已添加用户"+order.getUserId()+"的订单信息：");
                 System.out.println(order);
                 return Result.success();
             }
             else
             {
-                return Result.error("-1","该用户已存在");
+                return Result.error("-1","该订单已存在");
             }
         }catch (Exception e)
         {
@@ -95,6 +104,15 @@ public class OrderController {
     @ApiOperation(value = "更新接口",notes="更新订单接口")
     public Result<?> update(@RequestBody Order order)
     {
+        Order order1=OrderMapper.selectById(order.getOrderno());
+        if(order1==null)
+        {
+            return Result.error("-1","该订单不存在");
+        }
+        if(order.getExpenses()<0)
+        {
+            return Result.error("-1","应缴费用应大于等于0");
+        }
         try {
             OrderMapper.updateById(order);
             return Result.success();
@@ -114,6 +132,11 @@ public class OrderController {
     @ApiOperation(value = "删除接口",notes="根据订单编号删除订单信息")
     public Result<?> delete(@PathVariable String id)
     {
+        Order order1=OrderMapper.selectById(id);
+        if(order1==null)
+        {
+            return Result.error("-1","该订单不存在");
+        }
         try {
             int rows=OrderMapper.deleteById(id);
             //int rows = OrderMapper.delete1(userid,roomid);
@@ -143,7 +166,11 @@ public class OrderController {
     @PostMapping("/buy")
     @ApiOperation(value = "支付接口",notes="返回支付链接")
     public Result<?> buy(@RequestBody Order order) {
-
+        Order order1=OrderMapper.selectById(order.getOrderno());
+        if(order1==null)
+        {
+            return Result.error("-1","该订单不存在");
+        }
         String payUrl = "http://localhost:9090/alipay/pay?subject=" + order.getSubject() + "&traceNo=" + order.getOrderno() + "&totalAmount=" + order.getExpenses();
         return Result.success(payUrl);
     }
@@ -164,14 +191,24 @@ public class OrderController {
                                   @RequestParam String userid)
     //参数：pageNum：当前页，pageSize:每页多少条 search:查询关键字
     {
+        if(pageNum<1){
+            return Result.error("-1","pageNum不能小于1");
+        }
+        if(pageSize<1){
+            return Result.error("-1","pageSize不能小于1");
+        }
         LambdaQueryWrapper<Order> wrapper = Wrappers.<Order>lambdaQuery();
 
         if(StrUtil.isNotBlank(search))//不为null,则进行模糊匹配
         {
-            wrapper.like(Order::getOrderno,search).eq(Order::getUserId, userid);
+            wrapper.eq(Order::getUserId, userid).like(Order::getOrderno,search).or().like(Order::getOrderno,search).or().like(Order::getState,search).or().like(Order::getSubject,search);;
         }
         else{
             wrapper.eq(Order::getUserId, userid);
+        }
+        if(OrderMapper.selectOne(wrapper)==null)
+        {
+            return Result.error("-1","未找到账号为"+userid+"用户的订单信息");
         }
         Page<Order> orderpage=OrderMapper.selectPage(new Page<>(pageNum,pageSize), wrapper);
         return Result.success(orderpage);
@@ -191,10 +228,16 @@ public class OrderController {
                               @RequestParam(defaultValue = "") String search)
     //参数：pageNum：当前页，pageSize:每页多少条 search:查询关键字
     {
+        if(pageNum<1){
+            return Result.error("-1","pageNum不能小于1");
+        }
+        if(pageSize<1){
+            return Result.error("-1","pageSize不能小于1");
+        }
         LambdaQueryWrapper<Order> wrapper = Wrappers.<Order>lambdaQuery();
         if(StrUtil.isNotBlank(search))//不为null,则进行模糊匹配
         {
-            wrapper.like(Order::getOrderno,search);//eq(a,b)<=>a=b
+            wrapper.like(Order::getOrderno,search).or().like(Order::getOrderno,search).or().like(Order::getUserId,search).or().like(Order::getState,search).or().like(Order::getSubject,search);//eq(a,b)<=>a=b
         }
         Page<Order> orderpage=OrderMapper.selectPage(new Page<>(pageNum,pageSize), wrapper);
         return Result.success(orderpage);
@@ -207,11 +250,21 @@ public class OrderController {
      */
 
     @PostMapping("/deleteBatch")
-    @ApiOperation(value = "批量插入接口",notes="根据Id集合批量删除")
+    @ApiOperation(value = "批量删除接口",notes="根据Id集合批量删除")
     public Result<?> deleteBatch(@RequestBody List<String> ids) {
-
-        OrderMapper.deleteBatchIds(ids);
-        return Result.success();
+        Integer suncess=0;
+        try {
+            for (int i = 0; i < ids.size(); i++) {
+                if (OrderMapper.selectById(ids.get(i)) != null) {
+                    OrderMapper.deleteById(ids.get(i));
+                    suncess++;
+                }
+            }
+        }catch (Exception e)
+        {
+            System.out.println(e.toString());
+        }
+        return Result.success(suncess);
     }
 
 
@@ -266,36 +319,46 @@ public class OrderController {
     @ApiOperation(value = "excel导入接口",notes="excel导入接口")
     public Result<?> upload(@ApiParam(value = "选择excel文件") @Valid @RequestPart(value = "file") MultipartFile file) throws IOException {
         Integer num = 0;//统计导入成功的记录条数
-        try {
-            InputStream inputStream = file.getInputStream();
-            List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
-            List<Order> saveList = new ArrayList<>();
-            for (List<Object> row : lists) {
-                Order Order = new Order();
-                Order.setOrderno(row.get(0).toString());
-                Order.setUserId(row.get(1).toString());
-                Order.setRoomId(row.get(2).toString());
-                Order.setRoomId(row.get(3).toString());
-                Order.setCreatetime(Date.valueOf(DateUtil.format(DateUtil.parse(row.get(4).toString()), "yyyy-MM-dd")));
-                Order.setExpenses(Double.parseDouble(row.get(5).toString()));
 
-                if (row.get(7).toString() == "未支付" ) {
-                    Order.setPaytime(null);
-                } else {
-                    Order.setPaytime(Date.valueOf(DateUtil.format(DateUtil.parse(row.get(6).toString()), "yyyy-MM-dd HH:mm:ss")));
-                }
-                saveList.add(Order);
-            }
-            for (Order Order : saveList) {
+        excelconfig ex = new excelconfig();
+        if (ex.getFileType(file.getOriginalFilename())==false) {
+            return Result.error("-1", "请导入excel文件");
+        } else {
+            try {
+                InputStream inputStream = file.getInputStream();
+                List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
+                List<Order> saveList = new ArrayList<>();
+                for (List<Object> row : lists) {
+                    System.out.println(row);
+                    Order Order = new Order();
+                    Order.setOrderno(row.get(0).toString());
+                    Order.setSubject(row.get(1).toString());
+                    Order.setUserId(row.get(2).toString());
+                    Order.setRoomId(row.get(3).toString());
+                    Order.setState(row.get(7).toString());
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Order.setCreatetime(format.parse(row.get(4).toString()));
+                    Order.setExpenses(Double.parseDouble(row.get(5).toString()));
 
-                if (Order.getOrderno() != null) {
-                    OrderMapper.insert(Order);
-                    num=num+1;
+                    if (row.get(7).toString() == "未支付") {
+                        Order.setPaytime(null);
+                    } else {
+                        Order.setPaytime(format.parse(row.get(6).toString()));
+                    }
+
+                    saveList.add(Order);
                 }
+                for (Order Order : saveList) {
+                    User_room user_room=User_roomMapper.selectOne(Wrappers.<User_room>lambdaQuery().eq(User_room::getUserid,Order.getUserId()).eq(User_room::getRoomid,Order.getRoomId()).eq(User_room::getExpenses,Order.getExpenses()).gt(User_room::getExpenses,0));
+                    Order order=OrderMapper.selectById(Order.getOrderno());
+                    if (Order.getOrderno() != null&& user_room!=null&&order==null) {
+                        OrderMapper.insert(Order);
+                        num = num + 1;
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println(e.toString());
             }
-        }catch (Exception e)
-        {
-            System.out.println(e.toString());
         }
         return Result.success(num);
     }

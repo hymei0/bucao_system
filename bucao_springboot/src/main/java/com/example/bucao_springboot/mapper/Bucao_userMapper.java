@@ -25,6 +25,6 @@ public interface Bucao_userMapper extends BaseMapper<Bucao_user> {
      * 选择布草分配不足4件的病人
      * @return
      */
-    @Select("select * from user_info where id in(select user_id from bucao_user group by user_id having count(user_id)<4)")
+    @Select("select * from user_room where userid not in(select user_id from bucao_user group by user_id having count(user_id)>=4);")
     List<Map<String, Object>> selectforbucao();
 }

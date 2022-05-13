@@ -21,9 +21,12 @@ public interface User_roomMapper extends BaseMapper<User_room> {
      * @param search
      * @return
      */
+
     @Select("SELECT `user_room`.* ,user_info.uname , user_info.sex ,user_info.telephone from `user_room`\n" +
-            " left join user_info  on user_info.id = user_room.userid where user_room.userid like concat('%',#{search}, '%')\n"+
-            "or user_room.roomid like concat('%',#{search}, '%')")
+            "            left join user_info  on user_info.id = user_room.userid where user_room.userid like concat('%',#{search}, '%')\n" +
+            "            or user_room.roomid like concat('%',#{search}, '%') or user_info.uname like concat('%',#{search}, '%')\n" +
+            "            or user_info.sex like concat('%',#{search}, '%') or user_info.telephone like concat('%',#{search}, '%')\n" )
+
     Page<User_room> findPage(Page<User_room>page, String search);
 
     /**
@@ -78,7 +81,9 @@ public interface User_roomMapper extends BaseMapper<User_room> {
      */
     @Select("SELECT `user_room`.* ,user_info.uname , user_info.sex ,user_info.telephone from `user_room`\n" +
             " left join user_info  on user_info.id = user_room.userid where( user_room.userid like concat('%',#{search}, '%')\n"+
-            "or user_room.roomid like concat('%',#{search}, '%'))and user_room.userid=#{userid} ")
+            "or user_room.roomid like concat('%',#{search}, '%'))and user_room.userid=#{userid} \n" +
+            "or user_info.uname like concat('%',#{search}, '%')\n"+
+            "or user_info.sex like concat('%',#{search}, '%')or user_info.telephone like concat('%',#{search}, '%')\n")
     Page<User_room> findPageuser(Page<Object> objectPage, String search, String userid);
 
     /**

@@ -9,11 +9,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
-import com.example.bucao_springboot.entity.Bucao_room;
-import com.example.bucao_springboot.entity.Bucao_user;
-import com.example.bucao_springboot.entity.Room_info;
-import com.example.bucao_springboot.entity.User_room;
+import com.example.bucao_springboot.entity.*;
 import com.example.bucao_springboot.mapper.Bucao_userMapper;
+import com.example.bucao_springboot.mapper.Room_infoMapper;
+import com.example.bucao_springboot.mapper.User_infoMapper;
 import com.example.bucao_springboot.mapper.User_roomMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -40,6 +39,10 @@ import java.util.Map;
 public class User_roomController {
     @Resource
     User_roomMapper User_roomMapper;
+    @Resource
+    User_infoMapper user_infoMapper;
+    @Resource
+    Room_infoMapper Room_infoMapper;
 
     /**新增接口
      *
@@ -50,6 +53,14 @@ public class User_roomController {
     @ApiOperation(value = "新增接口",notes="参数：用户-病房实体类")
     public Result<?> save(@RequestBody User_room user_room)
     {
+        if(user_infoMapper.selectById(user_room.getUserid())==null)
+        {
+            return Result.error("-1","用户信息中并未找到账号为"+user_room.getUserid()+"的用户");
+        }
+        if(Room_infoMapper.selectById(user_room.getRoomid())==null)
+        {
+            return Result.error("-1","病房信息中并未找到编号为"+user_room.getRoomid()+"的病房");
+        }
         try {
             User_room user=User_roomMapper.selectOne(Wrappers.<User_room>lambdaQuery().eq(User_room::getUserid,user_room.getUserid()).eq(User_room::getRoomid,user_room.getRoomid()).eq(User_room::getComeTime,user_room.getComeTime()));
             if(user==null) {
@@ -71,16 +82,21 @@ public class User_roomController {
 
     /**更新接口
      *
-     * @param User_room
+     * @param user_room
      * @return
      */
     @ApiOperation(value = "更新接口",notes="参数：用户-病房信息实体类")
     @PutMapping
-    public Result<?> update(@RequestBody User_room User_room)
+    public Result<?> update(@RequestBody User_room user_room)
     {
+        User_room user_room1=User_roomMapper.selectOne(Wrappers.<User_room>lambdaQuery().eq(User_room::getUserid,user_room.getUserid()).eq(User_room::getRoomid,user_room.getRoomid()).eq(User_room::getComeTime,user_room.getComeTime()));
+        if(user_room1==null)
+        {
+            return Result.error("-1","该记录不存在");
+        }
         try {
-            User_roomMapper.update(User_room.getComeTime(),User_room.getOutTime(),User_room.getExpenses(),User_room.getRoomid(),User_room.getUserid());
-            System.out.println(User_room+"信息更新成功");
+            User_roomMapper.update(user_room.getComeTime(),user_room.getOutTime(),user_room.getExpenses(),user_room.getRoomid(),user_room.getUserid());
+            System.out.println(user_room+"信息更新成功");
             return Result.success();
         }catch (Exception e){
             System.out.println(e.toString());
@@ -113,7 +129,7 @@ public class User_roomController {
                 return Result.success(ur.get(0).getRoomid());
             }
             else{
-                return Result.error("-1","登录信息失效");
+                return Result.error("-1","未查询到该用户相关的住院信息");
             }
 
         }catch (Exception e){
@@ -135,6 +151,11 @@ public class User_roomController {
                             @RequestParam String roomid,
                             @RequestParam Date comeTime)
     {
+        User_room user_room1=User_roomMapper.selectOne(Wrappers.<User_room>lambdaQuery().eq(User_room::getUserid,userid).eq(User_room::getRoomid,roomid).eq(User_room::getComeTime,comeTime));
+        if(user_room1==null)
+        {
+            return Result.error("-1","该记录不存在");
+        }
         try {
             // Bucao_info bucao=bucao_infoMapper.selectOne(Wrappers.<Bucao_info>lambdaQuery().eq(Bucao_info::getRfno,bucao_info.getRfno()).eq(Bucao_info::getRfid,bucao_info.getRfid()));
             QueryWrapper<User_room> wrapper = new QueryWrapper<>();
@@ -170,6 +191,13 @@ public class User_roomController {
         QueryWrapper<User_room> wrapper = new QueryWrapper<>();
         wrapper.gt("expenses",0.00);
         List<User_room> list= User_roomMapper.selectList(wrapper);
+        for(User_room ur:list)
+        {
+            User_info user=user_infoMapper.selectById(ur.getUserid());
+            ur.setSex(user.getSex());
+            ur.setUname(user.getUname());
+            ur.setTelephone(user.getTelephone());
+        }
         return Result.success(list);
     }
 
@@ -183,6 +211,13 @@ public class User_roomController {
     public Result<?> GetRooms(@RequestParam String userid){
         QueryWrapper<User_room> queryWrapper = new QueryWrapper<>();
         List<User_room> list=User_roomMapper.selectList(queryWrapper.eq("userid",userid).gt("expenses",0.00));
+        for(User_room ur:list)
+        {
+            User_info user=user_infoMapper.selectById(ur.getUserid());
+            ur.setSex(user.getSex());
+            ur.setUname(user.getUname());
+            ur.setTelephone(user.getTelephone());
+        }
         return Result.success(list);
     }
 
@@ -222,7 +257,12 @@ public class User_roomController {
                               @RequestParam(defaultValue = "") String search)
     //参数：pageNum：当前页，pageSize:每页多少条 search:查询关键字
     {
-
+        if(pageNum<1){
+            return Result.error("-1","pageNum不能小于1");
+        }
+        if(pageSize<1){
+            return Result.error("-1","pageSize不能小于1");
+        }
         if(StrUtil.isNotBlank(search))//不为null,则进行模糊匹配
         {
             Page<User_room> User_room_page=User_roomMapper.findPage(new Page<>(pageNum,pageSize),search);
@@ -254,6 +294,16 @@ public class User_roomController {
     //参数：pageNum：当前页，pageSize:每页多少条 search:查询关键字
     {
 
+        if(pageNum<1){
+            return Result.error("-1","pageNum不能小于1");
+        }
+        if(pageSize<1){
+            return Result.error("-1","pageSize不能小于1");
+        }
+        if(user_infoMapper.selectById(userid)==null)
+        {
+            return Result.error("-1",userid+"用户不存在");
+        }
         if(StrUtil.isNotBlank(search))//不为null,则进行模糊匹配
         {
             Page<User_room> User_room_page=User_roomMapper.findPageuser(new Page<>(pageNum,pageSize),search,userid);
@@ -274,20 +324,21 @@ public class User_roomController {
     @ApiOperation(value = "批量删除接口",notes="根据复合主键删除：userid,roomid,coomTime")
     @PostMapping("/deleteBatch")
     public Result<?> deleteBatch(@RequestBody List<List<String>> ids) {
-
+        Integer success=0;
         for(List<String> id:ids)
         {
             try {
                 QueryWrapper<User_room> wrapper = new QueryWrapper<>();
                 wrapper.eq("userid", id.get(0)).eq("roomid", id.get(1)).eq("come_time", id.get(2));
                 User_roomMapper.delete(wrapper);
+                success++;
             }catch (Exception e)
             {
                 System.out.println(e.toString());
-                return Result.error("-1","请删除"+id.get(0)+"、"+id.get(1)+"、"+id.get(2)+"相关的订单记录");
+                // return Result.error("-1","请删除"+id.get(0)+"、"+id.get(1)+"、"+id.get(2)+"相关的订单记录");
             }
         }
-        return Result.success();
+        return Result.success(success);
     }
 
     /**

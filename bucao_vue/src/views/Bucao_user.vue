@@ -98,9 +98,9 @@
           <el-select v-model="form.userId" class="m-2" @change="GetUserName" placeholder="Select" size="large" v-bind:disabled="edi">
             <el-option
                 v-for="item in useroptions"
-                :key="item.id"
-                :label="item.id"
-                :value="item.id"
+                :key="item.USERID"
+                :label="item.USERID"
+                :value="item.USERID"
             />
           </el-select>
         </el-form-item>
@@ -268,9 +268,9 @@ export default {
           rfid:'A'
         }
       }).then(re =>{
-        this.bucaooptions=re
+        this.bucaooptions=re.data
+        console.log(this.bucaooptions)
       })
-
       request.get("/Room_info/forbucao" ).then(re =>{
         this.roomoptions=re.data
       })

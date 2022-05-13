@@ -36,8 +36,13 @@ public class FileController{
      */
     @ApiOperation(value = "文件上传接口",notes="文件上传")
     @PostMapping("/upload")
-    public Result<?>upload(@ApiParam(value = "选择excel文件") @Valid @RequestPart(value = "file") MultipartFile file) throws IOException {
+    public Result<?>upload(@ApiParam(value = "选择文件") @Valid @RequestPart(value = "file") MultipartFile file) throws IOException {
         String originalFilename = file.getOriginalFilename();  // 获取源文件的名称
+        if(originalFilename.equals(""))
+        {
+            return Result.error("-1","请上传文件");
+        }
+
         // 定义文件的唯一标识（前缀）
         String flag = IdUtil.fastSimpleUUID();
         //获取项目路径
@@ -55,11 +60,12 @@ public class FileController{
      */
     @GetMapping("/{flag}")
     @ApiOperation(value = "文件下载接口",notes="文件下载")
-    public void getFiles(@PathVariable String flag, HttpServletResponse response) {
+    public Result<?> getFiles(@PathVariable String flag, HttpServletResponse response) {
         OutputStream os;  // 新建一个输出流对象
         String basePath = System.getProperty("user.dir") + "/bucao_springboot/src/main/resources/files/";  // 定于文件上传的根路径
         List<String> fileNames = FileUtil.listFileNames(basePath);  // 获取所有的文件名称
         String fileName = fileNames.stream().filter(name -> name.contains(flag)).findAny().orElse("");  // 找到跟参数一致的文件
+
         try {
             if (StrUtil.isNotEmpty(fileName)) {
                 response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
@@ -69,9 +75,13 @@ public class FileController{
                 os.write(bytes);
                 os.flush();
                 os.close();
+                return  Result.success();
+            }else {
+                return Result.error("-1","该文件不存在");
             }
         } catch (Exception e) {
             System.out.println("文件下载失败");
+            return Result.error("-1","读取文件时出错");
         }
     }
 

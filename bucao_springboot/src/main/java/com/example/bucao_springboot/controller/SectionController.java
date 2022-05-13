@@ -10,9 +10,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
+import com.example.bucao_springboot.common.excelconfig;
+import com.example.bucao_springboot.entity.RFid_kinds;
 import com.example.bucao_springboot.entity.Section;
 import com.example.bucao_springboot.entity.Section;
-import com.example.bucao_springboot.mapper.SectionMapper;
+import com.example.bucao_springboot.mapper.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -38,6 +40,7 @@ public class SectionController {
     @Resource
     SectionMapper sectionMapper;
 
+
     /**与Bucao_info表交互的接口：查询出布草所属所有部门
      *
      * @return
@@ -61,8 +64,8 @@ public class SectionController {
     public Result<?> save(@RequestBody Section section)
     {
         try {
-            Section user=sectionMapper.selectOne(Wrappers.<Section>lambdaQuery().eq(Section::getId,section.getId()));
-            if(user==null) {
+            Section section1=sectionMapper.selectOne(Wrappers.<Section>lambdaQuery().eq(Section::getId,section.getId()));
+            if(section1==null) {
                 sectionMapper.insert(section);
                 System.out.println("Section已添加部门"+section.getId()+"信息：");
                 return Result.success();
@@ -73,6 +76,7 @@ public class SectionController {
             }
         }catch (Exception e)
         {
+            System.out.println(e.toString());
             return Result.error("-1","系统后台出错啦，请联系开发人员");
         }
     }
@@ -86,6 +90,11 @@ public class SectionController {
     @ApiOperation(value = "更新接口",notes="参数：部门实体类")
     public Result<?> update(@RequestBody Section Section)
     {
+        Section section=sectionMapper.selectById(Section.getId());
+        if(section==null)
+        {
+            return Result.error("-1","该部门不存在");
+        }
         try {
             sectionMapper.updateById(Section);
             System.out.println("Section已更新部门" + Section.getId() + "的信息：");
@@ -102,6 +111,11 @@ public class SectionController {
     @ApiOperation(value = "删除接口",notes="根据id删除")
     public Result<?> delete(@PathVariable String id)
     {
+        Section section=sectionMapper.selectById(id);
+        if(section==null)
+        {
+            return Result.error("-1","该部门不存在");
+        }
         try {
             sectionMapper.deleteById(id);
             System.out.println("Section已删除部门" + id + "的信息：");
@@ -130,18 +144,23 @@ public class SectionController {
         // Page<Object> page= new Page<>(pageNum,pageSize);//分页对象
 
         // LambdaQueryWrapper<RFid_kinds> qw = Wrappers.<User>lambdaQuery().like(User::getName, "张").and(u -> u.lt(User::getAge, 40).or().isNotNull(User::getEmail));
-
+        if(pageNum<1){
+            return Result.error("-1","pageNum不能小于1");
+        }
+        if(pageSize<1){
+            return Result.error("-1","pageSize不能小于1");
+        }
         LambdaQueryWrapper<Section> wrapper = Wrappers.<Section>lambdaQuery();
         if(StrUtil.isNotBlank(search))//不为null,则进行模糊匹配
         {
-            wrapper.like(Section::getId,search);//eq(a,b)<=>a=b
+            wrapper.like(Section::getId,search).or().like(Section::getNa,search);//eq(a,b)<=>a=b
         }
         Page<Section> Section_page=sectionMapper.selectPage(new Page<>(pageNum,pageSize), wrapper);
 
         return Result.success(Section_page);
     }
 
-    /**显示部门信息
+    /**通过id查询部门信息
      *
      * @param id
      * @return
@@ -150,9 +169,14 @@ public class SectionController {
     @ApiOperation(value = "根据id查询部门",notes="根据id查询部门信息")
     public Result<?> SelectPerson_Info(@PathVariable String id)
     {
-        sectionMapper.selectById(id);
-        System.out.println("Section已查询到部门"+id+"的信息：");
-        return Result.success();
+        Section section=sectionMapper.selectById(id);
+        if(section==null)
+        {
+            return Result.error("-1","该部门不存在");
+        }else {
+            System.out.println("Section已查询到部门" + id + "的信息：");
+            return Result.success(section);
+        }
     }
 
 
@@ -165,9 +189,19 @@ public class SectionController {
     @PostMapping("/deleteBatch")
     @ApiOperation(value = "批量删除接口",notes="根据id的集合删除")
     public Result<?> deleteBatch(@RequestBody List<String> ids) {
-
-        sectionMapper.deleteBatchIds(ids);
-        return Result.success();
+        Integer suncess=0;
+        try {
+            for (int i = 0; i < ids.size(); i++) {
+                if (sectionMapper.selectById(ids.get(i)) != null&&sectionMapper.selectUniqueSection(ids.get(i)).size()>0) {
+                    sectionMapper.deleteById(ids.get(i));
+                    suncess++;
+                }
+            }
+        }catch (Exception e)
+        {
+            System.out.println(e.toString());
+        }
+        return Result.success(suncess);
     }
 
     /**
@@ -215,28 +249,32 @@ public class SectionController {
     @ApiOperation(value = "excel文件导入接口",notes="excel文件导入")
     public Result<?> upload(@ApiParam(value = "选择excel文件") @Valid @RequestPart(value = "file") MultipartFile file) throws IOException {
         Integer num = 0;//统计导入成功的记录条数
-        try {
-            InputStream inputStream = file.getInputStream();
-            List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
-            System.out.println(lists);
-            List<Section> saveList = new ArrayList<>();
-            for (List<Object> row : lists) {
-                Section Section = new Section();
-                Section.setId(row.get(0).toString());
-                Section.setNa(row.get(1).toString());
-                saveList.add(Section);
-            }
-
-            for (Section Section : saveList) {
-
-                if (Section.getId() != null) {
-                    sectionMapper.insert(Section);
-                    num = num + 1;
+        excelconfig ex = new excelconfig();
+        if (ex.getFileType(file.getOriginalFilename())==false) {
+            return Result.error("-1", "请导入excel文件");
+        } else {
+            try {
+                InputStream inputStream = file.getInputStream();
+                List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
+                List<Section> saveList = new ArrayList<>();
+                for (List<Object> row : lists) {
+                    Section Section = new Section();
+                    Section.setId(row.get(0).toString());
+                    Section.setNa(row.get(1).toString());
+                    saveList.add(Section);
                 }
+
+                for (Section Section : saveList) {
+                    Section section=sectionMapper.selectById(Section.getId());
+                    if(section==null&&Section.getId() != null&&sectionMapper.selectByNa(Section.getNa()).size()==0)
+                    {
+                        sectionMapper.insert(Section);
+                        num = num + 1;
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println(e.toString());
             }
-        }catch (Exception e)
-        {
-            System.out.println(e.toString());
         }
         return Result.success(num);
     }

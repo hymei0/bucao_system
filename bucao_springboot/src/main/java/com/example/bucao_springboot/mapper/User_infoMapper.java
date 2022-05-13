@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -19,4 +20,9 @@ public interface User_infoMapper extends BaseMapper<User_info> {
     @Update("update user set psd = #{newPass} where id = #{userId}")
     int updatePass(Map<String, Object> map);
 
+    //查询没有办理住院和领取布草的用户
+    @Select("select id from user_info where id not in\n" +
+            "(select DISTINCT userid from user_room)\n" +
+            "and id not in(select DISTINCT user_id from bucao_user) and id=#{s}")
+    List<String> selectUniqueuser(String s);
 }

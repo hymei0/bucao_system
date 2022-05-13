@@ -10,6 +10,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
+import com.example.bucao_springboot.common.excelconfig;
+import com.example.bucao_springboot.entity.ManagerInfo;
 import com.example.bucao_springboot.entity.ManagerInfo;
 import com.example.bucao_springboot.mapper.ManagerInfoMapper;
 import io.swagger.annotations.Api;
@@ -51,7 +53,7 @@ public class ManagerInfoController {
 
         if(res == null)
         {
-            return Result.error("-1","管理员名或密码错误");
+            return Result.error("-1","账号或密码错误");
         }
         System.out.println("ManagerInfo已登录到"+managerInfo.getId()+"的账户");
         return Result.success(res);
@@ -113,7 +115,7 @@ public class ManagerInfoController {
             }
             else
             {
-                return Result.error("-1","该管理员已存在");
+                return Result.error("-1","账号或号码已存在");
             }
         }catch (Exception e)
         {
@@ -124,15 +126,20 @@ public class ManagerInfoController {
 
     /**更新接口
      *
-     * @param ManagerInfo
+     * @param managerInfo
      * @return
      */
     @PutMapping
     @ApiOperation(value = "更新接口",notes="更新接口")
-    public Result<?> update(@RequestBody ManagerInfo ManagerInfo)
+    public Result<?> update(@RequestBody ManagerInfo managerInfo)
     {
-         ManagerInfoMapper.updateById(ManagerInfo);
-         System.out.println("ManagerInfo已更新管理员"+ManagerInfo.getId()+"的信息：");
+        ManagerInfo user=ManagerInfoMapper.selectOne(Wrappers.<ManagerInfo>lambdaQuery().eq(ManagerInfo::getId,managerInfo.getId()).or().eq(ManagerInfo::getTelephone,managerInfo.getTelephone()));
+        if(user==null)
+        {
+            return  Result.error("-1","该管理员账号不存在");
+        }
+        ManagerInfoMapper.updateById(managerInfo);
+         System.out.println("ManagerInfo已更新管理员"+managerInfo.getId()+"的信息：");
          return Result.success();
     }
 
@@ -145,6 +152,11 @@ public class ManagerInfoController {
     @ApiOperation(value = "删除接口",notes="删除接口")
     public Result<?> delete(@PathVariable String Id)
     {
+        ManagerInfo user=ManagerInfoMapper.selectOne(Wrappers.<ManagerInfo>lambdaQuery().eq(ManagerInfo::getId,Id));
+        if(user==null)
+        {
+            return  Result.error("-1","该管理员账号不存在");
+        }
         ManagerInfoMapper.deleteById(Id);
         System.out.println("ManagerInfo已删除管理员"+Id+"的信息：");
         return Result.success();
@@ -167,14 +179,18 @@ public class ManagerInfoController {
         // Page<Object> page= new Page<>(pageNum,pageSize);//分页对象
 
         // LambdaQueryWrapper<RFId_kinds> qw = Wrappers.<User>lambdaQuery().like(User::getName, "张").and(u -> u.lt(User::getAge, 40).or().isNotNull(User::getEmail));
-       System.out.println(pageNum) ;
-       System.out.println(pageSize);
-       System.out.println(search);
+        if(pageNum<1){
+            return Result.error("-1","pageNum不能小于1");
+        }
+        if(pageSize<1){
+            return Result.error("-1","pageSize不能小于1");
+        }
         try {
            LambdaQueryWrapper<ManagerInfo> wrapper = Wrappers.<ManagerInfo>lambdaQuery();
            if (StrUtil.isNotBlank(search))//不为null,则进行模糊匹配
            {
-               wrapper.like(ManagerInfo::getId, search);//eq(a,b)<=>a=b
+               // wrapper.like(ManagerInfo::getId, search);//eq(a,b)<=>a=b
+               wrapper.like(ManagerInfo::getId,search).or().like(ManagerInfo::getTelephone,search).or().like(ManagerInfo::getAddress,search).or().like(ManagerInfo::getSex,search).or().like(ManagerInfo::getMname,search).or().like(ManagerInfo::getEmail,search).or().like(ManagerInfo::getPri,search);
            }
            Page<ManagerInfo> ManagerInfo_page = ManagerInfoMapper.selectPage(new Page<>(pageNum, pageSize), wrapper);
 
@@ -215,9 +231,19 @@ public class ManagerInfoController {
     @PostMapping("/deleteBatch")
     @ApiOperation(value = "批量删除接口",notes="根据id集合批量删除")
     public Result<?> deleteBatch(@RequestBody List<String> Ids) {
-
-       ManagerInfoMapper.deleteBatchIds(Ids);
-        return Result.success();
+        Integer suncess=0;
+        try {
+            for (int i = 0; i < Ids.size(); i++) {
+                if (ManagerInfoMapper.selectById(Ids.get(i)) != null) {
+                    ManagerInfoMapper.deleteById(Ids.get(i));
+                    suncess++;
+                }
+            }
+        }catch (Exception e)
+        {
+            System.out.println(e.toString());
+        }
+        return Result.success(suncess);
     }
 
     /**
@@ -271,35 +297,39 @@ public class ManagerInfoController {
     @ApiOperation(value = "excel导入接口",notes="excel导入接口")
     public Result<?> upload(@ApiParam(value = "选择excel文件") @Valid @RequestPart(value = "file") MultipartFile file) throws IOException {
         Integer num = 0;//统计导入成功的记录条数
-        try {
-            InputStream inputStream = file.getInputStream();
-            List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
-            List<ManagerInfo> saveList = new ArrayList<>();
-            for (List<Object> row : lists) {
-                ManagerInfo ManagerInfo = new ManagerInfo();
-                ManagerInfo.setId(row.get(0).toString());
-                ManagerInfo.setMname(row.get(1).toString());
-                ManagerInfo.setSex(row.get(2).toString());
-                ManagerInfo.setPri(row.get(3).toString());
-                ManagerInfo.setPortrait(row.get(4).toString());
-                ManagerInfo.setTelephone(row.get(5).toString());
-                ManagerInfo.setAddress(row.get(6).toString());
-                ManagerInfo.setEmail(row.get(7).toString());
-                ManagerInfo.setPsd(row.get(0).toString());
-                //ManagerInfo.setExpenses(Double.parseDouble(row.get(7).toString()));
+        excelconfig ex = new excelconfig();
+        if (ex.getFileType(file.getOriginalFilename())==false) {
+            return Result.error("-1", "请导入excel文件");
+        } else {
+            try {
+                InputStream inputStream = file.getInputStream();
+                List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
+                List<ManagerInfo> saveList = new ArrayList<>();
+                for (List<Object> row : lists) {
+                    ManagerInfo ManagerInfo = new ManagerInfo();
+                    ManagerInfo.setId(row.get(0).toString());
+                    ManagerInfo.setMname(row.get(1).toString());
+                    ManagerInfo.setSex(row.get(2).toString());
+                    ManagerInfo.setPri(row.get(3).toString());
+                    ManagerInfo.setPortrait(row.get(4).toString());
+                    ManagerInfo.setTelephone(row.get(5).toString());
+                    ManagerInfo.setAddress(row.get(6).toString());
+                    ManagerInfo.setEmail(row.get(7).toString());
+                    ManagerInfo.setPsd(row.get(0).toString());
+                    //ManagerInfo.setExpenses(Double.parseDouble(row.get(7).toString()));
 
-                saveList.add(ManagerInfo);
-            }
-            for (ManagerInfo ManagerInfo : saveList) {
-
-                if (ManagerInfo.getId() != null) {
-                    ManagerInfoMapper.insert(ManagerInfo);
-                    num=num+1;
+                    saveList.add(ManagerInfo);
                 }
+                for (ManagerInfo ManagerInfo : saveList) {
+                    ManagerInfo manager=ManagerInfoMapper.selectById(ManagerInfo.getId());
+                    if (ManagerInfo.getId() != null&&manager==null) {
+                        ManagerInfoMapper.insert(ManagerInfo);
+                        num = num + 1;
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println(e.toString());
             }
-        }catch (Exception e)
-        {
-            System.out.println(e.toString());
         }
         return Result.success(num);
     }

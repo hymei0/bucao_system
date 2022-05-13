@@ -1,5 +1,6 @@
 package com.example.bucao_springboot.controller;
 
+import ch.qos.logback.core.util.FileUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
@@ -9,11 +10,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
+import com.example.bucao_springboot.common.excelconfig;
+import com.example.bucao_springboot.entity.Bucao_info;
 import com.example.bucao_springboot.entity.Bucao_room;
-import com.example.bucao_springboot.mapper.Bucao_roomMapper;
-import com.example.bucao_springboot.mapper.Bucao_userMapper;
-import com.example.bucao_springboot.mapper.RFid_kindsMapper;
-import com.example.bucao_springboot.mapper.Room_infoMapper;
+import com.example.bucao_springboot.entity.RFid_kinds;
+import com.example.bucao_springboot.mapper.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -43,6 +44,13 @@ public class Bucao_roomController {
     Bucao_roomMapper bucao_roomMapper;
     @Resource
     Bucao_userMapper bucao_userMapper;
+    @Resource
+    Bucao_infoMapper Bucao_infoMapper;
+    @Resource
+    Room_infoMapper Room_infoMapper;
+    @Resource
+    RFid_kindsMapper RFid_kindsMapper;
+
 
 
     /**新增接口
@@ -54,6 +62,22 @@ public class Bucao_roomController {
     @ApiOperation(value = "新增接口",notes="新增")
     public Result<?> save(@RequestBody Bucao_room Bucao_room)
     {
+        if(Room_infoMapper.selectById(Bucao_room.getRoomId())==null)
+        {
+            return Result.error("-1","病房信息中并未找到编号为"+Bucao_room.getRoomId()+"的病房");
+        }
+        if(Bucao_infoMapper.selectOne(Wrappers.<Bucao_info>lambdaQuery().eq(Bucao_info::getRfno,Bucao_room.getRfno()).eq(Bucao_info::getRfid,Bucao_room.getRfid()))==null)
+        {
+            return Result.error("-1","布草信息中并未找到RFID编号为"+Bucao_room.getRfno()+Bucao_room.getRfid()+"的布草");
+        }
+        if(!RFid_kindsMapper.selectById(Bucao_room.getRfno()).getSection().equals(Bucao_room.getBucaoSection()))
+        {
+            return Result.error("-1","布草"+Bucao_room.getRfno()+Bucao_room.getRfid()+"应属于"+RFid_kindsMapper.selectById(Bucao_room.getRfno()).getSection());
+        }
+        if(!Room_infoMapper.selectById(Bucao_room.getRoomId()).getSection().equals(Bucao_room.getRoomSection()))
+        {
+            return Result.error("-1","病房"+Bucao_room.getRoomId()+"应属于"+Room_infoMapper.selectById(Bucao_room.getRoomId()).getSection());
+        }
         try{
             QueryWrapper<Bucao_room> wrapper=new QueryWrapper<>();
             wrapper.eq("rfno", Bucao_room.getRfno()).eq("rfid", Bucao_room.getRfid()).eq("room_id",Bucao_room.getRoomId());
@@ -119,10 +143,15 @@ public class Bucao_roomController {
             QueryWrapper<Bucao_room> wrapper = new QueryWrapper<>();
 
             wrapper.eq("rfno", rfno).eq("rfid", rfid).eq("room_id",roomId);
-            bucao_userMapper.updatebucao(rfno,rfid,"已回收"); //归还布草后布草的状态变为已回收
-            int rows = bucao_roomMapper.delete(wrapper);
-            System.out.println(roomId+","+rfid+rfno+"该记录删除成功");
-            return Result.success();
+            if(bucao_roomMapper.selectOne(wrapper)==null)
+            {
+                return Result.error("-1","该记录不存在");
+            }else {
+                bucao_userMapper.updatebucao(rfno, rfid, "已回收"); //归还布草后布草的状态变为已回收
+                int rows = bucao_roomMapper.delete(wrapper);
+                System.out.println(roomId + "," + rfid + rfno + "该记录删除成功");
+                return Result.success();
+            }
         }catch (Exception e){
             return Result.error("-1","后台出错啦，请联系开发人员");
         }
@@ -142,18 +171,20 @@ public class Bucao_roomController {
                               @RequestParam(defaultValue = "") String search)
     //参数：pageNum：当前页，pageSize:每页多少条 search:查询关键字
     {
-        //Page<Object> page= new Page<>(pageNum,pageSize);//分页对象
 
-        //LambdaQueryWrapper<RFid_kinds> qw = Wrappers.<User>lambdaQuery().like(User::getName, "张").and(u -> u.lt(User::getAge, 40).or().isNotNull(User::getEmail));
-
-        //LambdaQueryWrapper<Bucao_room> wrapper = Wrappers.<Bucao_room>lambdaQuery();
+        if(pageNum<1){
+            return Result.error("-1","pageNum不能小于1");
+        }
+        if(pageSize<1){
+            return Result.error("-1","pageSize不能小于1");
+        }
 
         QueryWrapper<Bucao_room> wrapper=new QueryWrapper<>();
 
         if(StrUtil.isNotBlank(search))//不为null,则进行模糊匹配
         {
 
-            wrapper.like("rfid",search).or().like("rfno",search).or().like("roomId",search);//eq(a,b)<=>a=b
+            wrapper.like("rfid",search).or().like("rfno",search).or().like("room_id",search).or().like("bucao_Section",search).or().like("room_Section",search);//eq(a,b)<=>a=b
         }
         Page<Bucao_room> Bucao_room_page=bucao_roomMapper.selectPage(new Page<>(pageNum,pageSize), wrapper);
         System.out.println(bucao_roomMapper.selectList(wrapper));
@@ -167,17 +198,25 @@ public class Bucao_roomController {
      */
 
     @PostMapping("/deleteBatch")
-    @ApiOperation(value = "批量删除接口",notes="批量删除")
+    @ApiOperation(value = "批量删除接口",notes="根据复合id批量删除：ids=[rfno,rfid,roomId],返回删除成功的数据个数")
     public Result<?> deleteBatch(@RequestBody List<List<String>> ids) {
-
-        for(List<String> id:ids)
+        Integer success=0;
+        try {
+            for (List<String> id : ids) {
+                QueryWrapper<Bucao_room> wrapper = new QueryWrapper<>();
+                bucao_userMapper.updatebucao(id.get(0), id.get(1), "已回收"); //归还布草后布草的状态变为已回收
+                wrapper.eq("rfno", id.get(0)).eq("rfid", id.get(1)).eq("room_id", id.get(2));
+                if (bucao_roomMapper.selectOne(wrapper) != null) {
+                    bucao_roomMapper.delete(wrapper);
+                    success++;
+                }
+            }
+        }catch (Exception e)
         {
-            QueryWrapper<Bucao_room> wrapper = new QueryWrapper<>();
-            bucao_userMapper.updatebucao(id.get(0),id.get(1),"已回收"); //归还布草后布草的状态变为已回收
-            wrapper.eq("rfno", id.get(0)).eq("rfid", id.get(1)).eq("room_id",id.get(2));
-            bucao_roomMapper.delete(wrapper);
+            System.out.println(e.toString());
         }
-        return Result.success();
+        System.out.println("一共成功删除"+success.toString()+"条记录");
+        return Result.success(success);
     }
 
     /**
@@ -196,7 +235,7 @@ public class Bucao_roomController {
         for (Bucao_room Bucao_room : all) {
             Map<String, Object> row1 = new LinkedHashMap<>();
             row1.put("病房号", Bucao_room.getRoomId());
-            row1.put("布草RFID编号", Bucao_room.getRfno()+Bucao_room.getRoomId());
+            row1.put("布草RFID编号", Bucao_room.getRfno()+Bucao_room.getRfid());
 
             list.add(row1);
         }
@@ -226,29 +265,41 @@ public class Bucao_roomController {
     @ApiOperation(value = "excel导入接口",notes="excel导入接口")
     public Result<?> upload(@ApiParam(value = "选择excel文件") @Valid @RequestPart(value = "file") MultipartFile file) throws IOException {
         Integer num = 0;//统计导入成功的记录条数
-        try {
+        excelconfig ex = new excelconfig();
+//        System.out.println("+++++++"+(double)file.getSize());
+//        if((double)file.getSize()>=1048576 )
+//        {
+//            return Result.error("-1", "文件不能超过1M");
+//        }
+        if (ex.getFileType(file.getOriginalFilename())==false) {
+            return Result.error("-1", "请导入excel文件");
+        } else {
+            try {
 
-            InputStream inputStream = file.getInputStream();
-            List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
-            List<Bucao_room> saveList = new ArrayList<>();
-            for (List<Object> row : lists) {
-                Bucao_room Bucao_room = new Bucao_room();
-                Bucao_room.setRfno(row.get(0).toString());
-                Bucao_room.setRfid(row.get(1).toString());
-
-                saveList.add(Bucao_room);
-            }
-            for (Bucao_room Bucao_room : saveList) {
-                System.out.println(Bucao_room);
-                if (Bucao_room.getRfid() != null && Bucao_room.getRfno() != null) {
-                    bucao_roomMapper.insert(Bucao_room);
-                    num=num+1;//统计导入成功的记录条数
+                InputStream inputStream = file.getInputStream();
+                List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
+                List<Bucao_room> saveList = new ArrayList<>();
+                for (List<Object> row : lists) {
+                    Bucao_room Bucao_room = new Bucao_room();
+                    Bucao_room.setRfno(row.get(0).toString());
+                    Bucao_room.setBucaoSection(RFid_kindsMapper.selectById(Bucao_room.getRfno()).getSection());
+                    Bucao_room.setRfid(row.get(1).toString());
+                    Bucao_room.setRoomId(row.get(2).toString());
+                    Bucao_room.setRoomSection(Room_infoMapper.selectById(Bucao_room.getRoomId()).getSection());
+                    saveList.add(Bucao_room);
                 }
+                for (Bucao_room bucao_room : saveList) {
+                    Bucao_room br=bucao_roomMapper.selectOne(Wrappers.<Bucao_room>lambdaQuery().eq(Bucao_room::getRoomId,bucao_room.getRoomId()).eq(Bucao_room::getRfid,bucao_room.getRfid()).eq(Bucao_room::getRfno,bucao_room.getRfno()));
+                    if (br==null&&bucao_room.getRfid() != null && bucao_room.getRfno() != null && bucao_room.getRoomId()!=null) {
+                        bucao_roomMapper.insert(bucao_room);
+                        num = num + 1;//统计导入成功的记录条数
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println(e.toString());
             }
-        }catch (Exception e){
-            System.out.println(e.toString());
+            return Result.success(num);
         }
-        return Result.success(num);
     }
 
 }

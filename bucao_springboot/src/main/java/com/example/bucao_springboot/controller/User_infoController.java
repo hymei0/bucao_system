@@ -9,6 +9,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
+import com.example.bucao_springboot.common.excelconfig;
+import com.example.bucao_springboot.entity.Section;
 import com.example.bucao_springboot.entity.User_info;
 import com.example.bucao_springboot.mapper.User_infoMapper;
 import io.swagger.annotations.*;
@@ -51,7 +53,7 @@ public class User_infoController {
         User_info res=user_infoMapper.selectOne(Wrappers.<User_info>lambdaQuery().eq(User_info::getID,user_info.getID()).eq(User_info::getPsd,user_info.getPsd()));
         if(res == null)
         {
-            return Result.error("-1","用户名或密码错误");
+            return Result.error("-1","账号或密码错误");
         }
         System.out.println("User_info已登录到"+user_info.getID()+"的账户");
         return Result.success(res);
@@ -74,7 +76,7 @@ public class User_infoController {
                 return Result.success();
             }
             else{
-                return Result.error("-1","该账号/或该电话已存在");
+                return Result.error("-1","该账号已存在");
             }
         }catch (Exception e){
             System.out.println(e.toString());
@@ -101,11 +103,15 @@ public class User_infoController {
      */
     @PostMapping
     @ApiOperation(value = "添加用户接口",notes="添加用户")
-    public Result<?> save(@RequestBody User_info user_info)
+    public Result<?> save(@RequestBody  @Valid User_info user_info)
     {
         try {
             User_info user=user_infoMapper.selectOne(Wrappers.<User_info>lambdaQuery().eq(User_info::getID,user_info.getID()).or().eq(User_info::getTelephone,user_info.getTelephone()));
             if(user==null) {
+                if(!user_info.getSex().equals("男") && !user_info.getSex().equals("女"))
+                {
+                    return Result.error("-1", "性别只能为男或者女");
+                }
                 user_info.setPsd(user_info.getID());
                 user_infoMapper.insert(user_info);
                 System.out.println("User_info已添加用户"+user_info.getID()+"信息：");
@@ -129,7 +135,7 @@ public class User_infoController {
      */
     @PutMapping
     @ApiOperation(value = "用户信息更新接口",notes="更新用户信息")
-    public Result<?> update(@RequestBody User_info user_info)
+    public Result<?> update(@RequestBody @Valid User_info user_info)
     {
         User_info user=user_infoMapper.selectOne(Wrappers.<User_info>lambdaQuery().eq(User_info::getID,user_info.getID()));
         if(user==null)
@@ -138,6 +144,11 @@ public class User_infoController {
         }
         else {
             try {
+                if(!user_info.getSex().equals("男") && !user_info.getSex().equals("女"))
+                {
+                    return Result.error("-1", "性别只能为男或者女");
+                }
+
                 user_infoMapper.updateById(user_info);
                 System.out.println("User_info已更新用户" + user_info.getID() + "的信息：");
                 return Result.success();
@@ -157,13 +168,19 @@ public class User_infoController {
     @ApiOperation(value = "删除用户信息接口",notes="根据用户id删除用户信息")
     public Result<?> delete(@PathVariable String id)
     {
-        try {
-            user_infoMapper.deleteById(id);
-            System.out.println("User_info已删除用户" + id + "的信息：");
-            return Result.success();
-        }catch (Exception e){
-            System.out.println(e.toString());
-            return  Result.error("-1","请先删除布草-用户、住院信息表中的相关记录");
+        User_info user=user_infoMapper.selectById(id);
+        if(user==null)
+        {
+            return  Result.error("-1","该用户不存在");
+        }else {
+            try {
+                user_infoMapper.deleteById(id);
+                System.out.println("User_info已删除用户" + id + "的信息：");
+                return Result.success();
+            } catch (Exception e) {
+                System.out.println(e.toString());
+                return Result.error("-1", "请先删除布草-用户、住院信息表中的相关记录");
+            }
         }
     }
 
@@ -222,7 +239,7 @@ public class User_infoController {
     }
 
 
-    /**批量删除接口:复合主键
+    /**批量删除接口
      *
      * @param ids
      * @return
@@ -230,9 +247,18 @@ public class User_infoController {
     @ApiOperation(value = "批量删除接口",notes="通过用户的id集合删除用户信息")
     @PostMapping("/deleteBatch")
     public Result<?> deleteBatch(@RequestBody List<String> ids) {
-
-       user_infoMapper.deleteBatchIds(ids);
-       return Result.success();
+        Integer suncess=0;
+        try {
+            for (int i = 0; i < ids.size(); i++) {
+                if (user_infoMapper.selectById(ids.get(i)) != null&&user_infoMapper.selectUniqueuser(ids.get(i)).size()>0) {
+                    user_infoMapper.deleteById(ids.get(i));
+                    suncess++;
+                }
+            }
+        }catch (Exception e){
+            System.out.println(e.toString());
+        }
+        return Result.success(suncess);
     }
 
     /**
@@ -290,35 +316,38 @@ public class User_infoController {
     @ApiOperation(value = "excel文件导入接口",notes="excel文件导入")
     public Result<?> upload(@ApiParam(value = "选择excel文件") @Valid @RequestPart(value = "file") MultipartFile file) throws IOException {
         Integer success=0;;//统计导入成功的记录条数
-        try {
-            InputStream inputStream = file.getInputStream();
-            List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
-            System.out.println(lists);
-            List<User_info> saveList = new ArrayList<>();
-            for (List<Object> row : lists) {
-                User_info user_info = new User_info();
-                user_info.setID(row.get(0).toString());
-                user_info.setUname(row.get(1).toString());
-                user_info.setSex(row.get(2).toString());
-                user_info.setPortrait(row.get(3).toString());
-                user_info.setTelephone(row.get(4).toString());
-                user_info.setAddress(row.get(5).toString());
-                user_info.setPsd(row.get(0).toString());
-                user_info.setRoles("user");
-                //user_info.setExpenses(Double.parseDouble(row.get(7).toString()));
+        excelconfig ex = new excelconfig();
+        if (ex.getFileType(file.getOriginalFilename())==false) {
+            return Result.error("-1", "请导入excel文件");
+        } else {
+            try {
+                InputStream inputStream = file.getInputStream();
+                List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
+                System.out.println(lists);
+                List<User_info> saveList = new ArrayList<>();
+                for (List<Object> row : lists) {
+                    User_info user_info = new User_info();
+                    user_info.setID(row.get(0).toString());
+                    user_info.setUname(row.get(1).toString());
+                    user_info.setSex(row.get(2).toString());
+                    user_info.setPortrait(row.get(3).toString());
+                    user_info.setTelephone(row.get(4).toString());
+                    user_info.setAddress(row.get(5).toString());
+                    user_info.setPsd(row.get(0).toString());
+                    //user_info.setExpenses(Double.parseDouble(row.get(7).toString()));
 
-                saveList.add(user_info);
-            }
-            for (User_info user_info : saveList) {
-
-                if (user_info.getID() != null) {
-                    user_infoMapper.insert(user_info);
-                    success = success + 1;
+                    saveList.add(user_info);
                 }
+                for (User_info user_info : saveList) {
+                    User_info user=user_infoMapper.selectById(user_info.getID());
+                    if (user_info.getID() != null&&user==null) {
+                        user_infoMapper.insert(user_info);
+                        success = success + 1;
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println(e.toString());
             }
-        }catch (Exception e)
-        {
-            System.out.println(e.toString());
         }
         return Result.success(success);
     }

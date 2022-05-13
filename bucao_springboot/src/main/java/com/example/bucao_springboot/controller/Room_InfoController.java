@@ -10,9 +10,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.bucao_springboot.common.Result;
+import com.example.bucao_springboot.common.excelconfig;
 import com.example.bucao_springboot.entity.Bucao_info;
 import com.example.bucao_springboot.entity.Room_info;
 import com.example.bucao_springboot.entity.Room_info;
+import com.example.bucao_springboot.entity.Section;
 import com.example.bucao_springboot.mapper.Room_infoMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -50,8 +52,8 @@ public class Room_InfoController {
     public Result<?> save(@RequestBody Room_info room_info)
     {
         try {
-            Room_info user=room_infoMapper.selectOne(Wrappers.<Room_info>lambdaQuery().eq(Room_info::getId,room_info.getId()));
-            if(user==null) {
+            Room_info result=room_infoMapper.selectOne(Wrappers.<Room_info>lambdaQuery().eq(Room_info::getId,room_info.getId()));
+            if(result==null) {
                 room_infoMapper.insert(room_info);
                 System.out.println("Room_info已添加病房"+room_info.getId()+"信息：");
                 return Result.success();
@@ -62,6 +64,7 @@ public class Room_InfoController {
             }
         }catch (Exception e)
         {
+            System.out.println(e.toString());
             return Result.error("-1","系统后台出错啦，请联系开发人员");
         }
     }
@@ -75,6 +78,11 @@ public class Room_InfoController {
     @ApiOperation(value = "更新接口",notes="参数：病房实体类")
     public Result<?> update(@RequestBody Room_info Room_info)
     {
+        Room_info room=room_infoMapper.selectById(Room_info.getId());
+        if(room==null)
+        {
+            return Result.error("-1","该病房不存在");
+        }
         try {
             room_infoMapper.updateById(Room_info);
             System.out.println("Room_info已更新病房" + Room_info.getId() + "的信息：");
@@ -95,6 +103,11 @@ public class Room_InfoController {
     @ApiOperation(value = "删除接口",notes="根据id删除")
     public Result<?> delete(@PathVariable String id)
     {
+        Room_info room=room_infoMapper.selectById(id);
+        if(room==null)
+        {
+            return Result.error("-1","该病房不存在");
+        }
         try {
             room_infoMapper.deleteById(id);
             System.out.println("Room_info已删除病房" + id + "的信息：");
@@ -123,7 +136,12 @@ public class Room_InfoController {
         // Page<Object> page= new Page<>(pageNum,pageSize);//分页对象
 
         // LambdaQueryWrapper<RFid_kinds> qw = Wrappers.<User>lambdaQuery().like(User::getName, "张").and(u -> u.lt(User::getAge, 40).or().isNotNull(User::getEmail));
-
+        if(pageNum<1){
+            return Result.error("-1","pageNum不能小于1");
+        }
+        if(pageSize<1){
+            return Result.error("-1","pageSize不能小于1");
+        }
         LambdaQueryWrapper<Room_info> wrapper = Wrappers.<Room_info>lambdaQuery();
         if(StrUtil.isNotBlank(search))//不为null,则进行模糊匹配
         {
@@ -151,11 +169,15 @@ public class Room_InfoController {
      * @return
      */
     @GetMapping("/{id}")
-    @ApiOperation(value = "查询病房信息接口",notes="根据病房id查询")
+    @ApiOperation(value = "通过id查询病房信息接口",notes="根据病房id查询")
     public Result<?> SelectRoom_Info(@PathVariable String id)
     {
 
          Room_info room= room_infoMapper.selectById(id);
+        if(room==null)
+        {
+            return Result.error("-1","该病房不存在");
+        }
         System.out.println("Room_info已查询到病房"+id+"的信息：");
         return Result.success(room);
     }
@@ -194,9 +216,19 @@ public class Room_InfoController {
     @PostMapping("/deleteBatch")
 
     public Result<?> deleteBatch(@RequestBody List<String> ids) {
-
-        room_infoMapper.deleteBatchIds(ids);
-        return Result.success();
+        Integer suncess=0;
+        try {
+            for (int i = 0; i < ids.size(); i++) {
+                if (room_infoMapper.selectById(ids.get(i)) != null) {
+                    room_infoMapper.deleteById(ids.get(i));
+                    suncess++;
+                }
+            }
+        }catch (Exception e)
+        {
+            System.out.println(e.toString());
+        }
+        return Result.success(suncess);
     }
 
     /**
@@ -244,26 +276,31 @@ public class Room_InfoController {
     @ApiOperation(value = "excel文件导入接口",notes="excel文件导入")
     public Result<?> upload(@ApiParam(value = "选择excel文件") @Valid @RequestPart(value = "file") MultipartFile file) throws IOException {
         Integer num = 0;//统计导入成功的记录条数
-        try {
-            InputStream inputStream = file.getInputStream();
-            List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
-            System.out.println(lists);
-            List<Room_info> saveList = new ArrayList<>();
-            for (List<Object> row : lists) {
-                Room_info Room_info = new Room_info();
-                Room_info.setId(row.get(0).toString());
-                Room_info.setSection(row.get(1).toString());
-                saveList.add(Room_info);
-            }
-            for (Room_info Room_info : saveList) {
-                if (Room_info.getId() != null) {
-                    room_infoMapper.insert(Room_info);
-                    num = num + 1;
+        excelconfig ex = new excelconfig();
+        if (ex.getFileType(file.getOriginalFilename())==false) {
+            return Result.error("-1", "请导入excel文件");
+        } else {
+            try {
+                InputStream inputStream = file.getInputStream();
+                List<List<Object>> lists = ExcelUtil.getReader(inputStream).read(1);
+                System.out.println(lists);
+                List<Room_info> saveList = new ArrayList<>();
+                for (List<Object> row : lists) {
+                    Room_info Room_info = new Room_info();
+                    Room_info.setId(row.get(0).toString());
+                    Room_info.setSection(row.get(1).toString());
+                    saveList.add(Room_info);
                 }
+                for (Room_info Room_info : saveList) {
+                    Room_info room=room_infoMapper.selectById(Room_info.getId());
+                    if (Room_info.getId() != null&&room==null) {
+                        room_infoMapper.insert(Room_info);
+                        num = num + 1;
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println(e.toString());
             }
-        }catch (Exception e)
-        {
-            System.out.println(e.toString());
         }
         return Result.success(num);
     }

@@ -21,7 +21,7 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
-// http:/y7zhhi.natappfree.cc/alipay/notyfy
+// http://6dmtdf.natappfree.cc/alipay/notify
 @RestController
 @RequestMapping("/alipay")
 @Api(tags = "支付宝支付接口")
@@ -47,17 +47,7 @@ public class AliPayController {
         try {
             //  发起API调用（以创建当面付收款二维码为例）
             response = Factory.Payment.Page()
-                    .pay(aliPay.getSubject(), aliPay.getTraceNo(), aliPay.getTotalAmount(), "http://localhost:9090/alipay/pay/notify");
-              Order order=orderMapper.selectOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderno,aliPay.getTraceNo()));
-              order.setState("已支付");
-
-              SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-             String date=sdf.format(System.currentTimeMillis()).toString();
-
-            order.setPaytime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date));
-
-
-            orderMapper.updateById(order);
+                    .pay(aliPay.getSubject(), aliPay.getTraceNo(), aliPay.getTotalAmount(), "");
         } catch (Exception e) {
             System.err.println("调用遭遇异常，原因：" + e.getMessage());
             throw new RuntimeException(e.getMessage(), e);
@@ -74,6 +64,7 @@ public class AliPayController {
     @PostMapping("/notify")  // 注意这里必须是POST接口
     @ApiOperation(value = "支付宝异步回调函数",notes="支付宝异步回调函数")
     public String payNotify(HttpServletRequest request) throws Exception {
+        System.out.println("支付宝回调函数--");
         if (request.getParameter("trade_status").equals("TRADE_SUCCESS")) {
             System.out.println("=========支付宝异步回调========");
 
@@ -81,7 +72,7 @@ public class AliPayController {
             Map<String, String[]> requestParams = request.getParameterMap();
             for (String name : requestParams.keySet()) {
                 params.put(name, request.getParameter(name));
-                // System.out.println(name + " = " + request.getParameter(name));
+                System.out.println(name + " = " + request.getParameter(name));
             }
 
             String tradeNo = params.get("out_trade_no");
@@ -100,7 +91,14 @@ public class AliPayController {
                 System.out.println("买家付款金额: " + params.get("buyer_pay_amount"));
 
                 // 更新订单未已支付
-                // orderMapper.updateState(tradeNo, 1, gmtPayment);
+                Order order=orderMapper.selectOne(Wrappers.<Order>lambdaQuery().eq(Order::getOrderno,params.get("out_trade_no")));
+                order.setState("已支付");
+
+                SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String date=sdf.format(System.currentTimeMillis()).toString();
+
+                order.setPaytime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date));
+                orderMapper.updateById(order);
             }
         }
         return "success";
