@@ -237,7 +237,7 @@ public class rfid_kindsController {
         Integer suncess=0;
         try {
             for (int i = 0; i < ids.size(); i++) {
-                if (rfid_kindsMapper.selectById(ids.get(i)) != null) {
+                if (rfid_kindsMapper.selectById(ids.get(i)) != null&&rfid_kindsMapper.selectUniqueRFID(ids.get(i)).size()>0) {
                     rfid_kindsMapper.deleteById(ids.get(i));
                     suncess++;
                 }

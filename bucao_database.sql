@@ -66,12 +66,11 @@ portrait varcharacter(2048) COMMENT'病人头像',            -- 头像
 psd varchar(20) NOT NULL COMMENT'密码',
 telephone CHAR(20) COMMENT'电话',
 address varchar(30) COMMENT'地址',
-sex char(2)  check (sex in('男','女')) COMMENT'性别',
-roles varcharacter(15) not null check (roles in('user','manager')) COMMENT'角色'
+sex char(2)  check (sex in('男','女')) COMMENT'性别'
 );
 insert into user_info values
-('0311','何元梅','https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg','0311','17826103075','贵州毕节','女','user'),
-('6666','张怀旭','https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg','6666','17826103075','江苏无锡','男','user');
+('0311','何元梅','https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg','0311','17826103075','贵州毕节','女'),
+('6666','张怀旭','https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg','6666','17826103075','江苏无锡','男');
 
  -- 4.Manager_info:管理员信息表
  CREATE TABLE Manager_info(

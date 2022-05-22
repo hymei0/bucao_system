@@ -245,7 +245,7 @@ export default {
       }
       request.post("/Bucao_user/deleteBatch", this.ids).then(res => {
         if (res.code === '1') {
-          this.$message.success("批量删除成功")
+          this.$message.success("批量删除成功，一共成功删除了"+res.data+"条记录")
           this.load()
         } else {
           this.$message.error(res.msg)

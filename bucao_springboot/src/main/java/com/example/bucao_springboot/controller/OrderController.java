@@ -352,7 +352,7 @@ public class OrderController {
                     User_room user_room=User_roomMapper.selectOne(Wrappers.<User_room>lambdaQuery().eq(User_room::getUserid,Order.getUserId()).eq(User_room::getRoomid,Order.getRoomId()).eq(User_room::getExpenses,Order.getExpenses()).gt(User_room::getExpenses,0));
                     Order order=OrderMapper.selectById(Order.getOrderno());
                     if (Order.getOrderno() != null&& user_room!=null&&order==null) {
-                        OrderMapper.insert(Order);
+                        save(Order);
                         num = num + 1;
                     }
                 }

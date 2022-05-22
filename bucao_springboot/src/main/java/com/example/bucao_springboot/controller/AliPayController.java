@@ -64,7 +64,6 @@ public class AliPayController {
     @PostMapping("/notify")  // 注意这里必须是POST接口
     @ApiOperation(value = "支付宝异步回调函数",notes="支付宝异步回调函数")
     public String payNotify(HttpServletRequest request) throws Exception {
-        System.out.println("支付宝回调函数--");
         if (request.getParameter("trade_status").equals("TRADE_SUCCESS")) {
             System.out.println("=========支付宝异步回调========");
 

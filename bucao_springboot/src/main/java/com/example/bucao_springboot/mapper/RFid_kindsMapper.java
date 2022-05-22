@@ -17,4 +17,13 @@ public interface RFid_kindsMapper extends BaseMapper<RFid_kinds> {
     List<Kinds_stocks> STOCKS();
     @Select("select sum(stock) as stocks ,section from RFID_kinds group by section;")
     List<kinds_Section> STOCKS_setion();
+
+    /**
+     * 查找到没有关联其他表的病房编号
+     * @return
+     */
+    @Select("select RFNO from RFID_KINDS where RFNO not in \n" +
+            "(select distinct RFNO from bucao_info)\n" +
+            "and RFNO=#{id};")
+    List<String> selectUniqueRFID(String id);
 }

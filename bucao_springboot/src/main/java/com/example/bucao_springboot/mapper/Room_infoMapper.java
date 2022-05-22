@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -18,4 +19,13 @@ public interface Room_infoMapper extends BaseMapper<Room_info> {
      */
     @Select("select * from room_info where id not in (select roomid from user_room where out_time IS NOT TRUE  group by roomid having count(roomid)>=4);")
     List<Map<String, Object>> selectforbucao();
+
+    /**
+     * 查找到没有关联其他表的病房编号
+     * @return
+     */
+    @Select("select id from room_info where id not in \n" +
+            "(select distinct roomid from user_room)\n" +
+            "and id not in (select distinct room_id from bucao_room) and id=#{id};")
+    List<String> selectUniqueRoom(String id);
 }

@@ -219,7 +219,7 @@ public class Room_InfoController {
         Integer suncess=0;
         try {
             for (int i = 0; i < ids.size(); i++) {
-                if (room_infoMapper.selectById(ids.get(i)) != null) {
+                if (room_infoMapper.selectById(ids.get(i)) != null&&room_infoMapper.selectUniqueRoom(ids.get(i)).size()>0) {
                     room_infoMapper.deleteById(ids.get(i));
                     suncess++;
                 }
