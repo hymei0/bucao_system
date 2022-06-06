@@ -37,7 +37,6 @@ public class TokenUtils {
      * @return
      */
     public static String genToken(User_info User_info) {
-        System.out.println("我可以生成token");
         return JWT.create().withExpiresAt(DateUtil.offsetDay(new Date(), 1)).withAudience(User_info.getID().toString())
                 .sign(Algorithm.HMAC256(User_info.getPsd()));
     }

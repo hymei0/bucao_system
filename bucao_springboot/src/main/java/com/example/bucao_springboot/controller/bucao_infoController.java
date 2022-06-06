@@ -35,7 +35,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/Bucao_info")
-@Api(tags = "布草信息管理")
+@Api(tags = "布草信息管理接口")
 public class bucao_infoController {
     //将Bucao_infoMapper引入到bucao_infoController中,不太规范，一般是写service类，controller引入service,service引入mapper
     @Resource
@@ -123,7 +123,6 @@ public class bucao_infoController {
                             @RequestParam String rfid)
     {
         try {
-            // Bucao_info bucao=bucao_infoMapper.selectOne(Wrappers.<Bucao_info>lambdaQuery().eq(Bucao_info::getRfno,bucao_info.getRfno()).eq(Bucao_info::getRfid,bucao_info.getRfid()));
             QueryWrapper<Bucao_info> wrapper = new QueryWrapper<>();
             wrapper.eq("rfno", rfno).eq("rfid", rfid);
             if(bucao_infoMapper.selectOne(wrapper)==null)
@@ -256,14 +255,12 @@ public class bucao_infoController {
         Integer success=0;
         try {
             for (List<String> id : ids) {
-
                 QueryWrapper<Bucao_info> wrapper = new QueryWrapper<>();
                 wrapper.eq("rfno", id.get(0)).eq("rfid", id.get(1));
                 if (bucao_infoMapper.selectOne(wrapper) != null) {
                     bucao_infoMapper.delete(wrapper);
                     success++;
                 }
-
             }
         }catch (Exception e)
         {
@@ -284,7 +281,6 @@ public class bucao_infoController {
     public void export(HttpServletResponse response) throws IOException {
 
         List<Map<String, Object>> list = CollUtil.newArrayList();
-
         List<Bucao_info> all = bucao_infoMapper.selectList(null);
         for (Bucao_info bucao_info : all) {
             Map<String, Object> row1 = new LinkedHashMap<>();
@@ -294,7 +290,6 @@ public class bucao_infoController {
             row1.put("洗涤次数", bucao_info.getWashtimes());
             row1.put("入库时间", DateUtil.format(bucao_info.getIndate(),"yyyy-MM-dd"));
             row1.put("报废时间", DateUtil.format(bucao_info.getOutdate(),"yyyy-MM-dd"));
-
             list.add(row1);
         }
         // 2. 写excel
@@ -304,7 +299,6 @@ public class bucao_infoController {
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
         String fileName = URLEncoder.encode("布草信息数据表", "UTF-8");
         response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
-
         ServletOutputStream out = response.getOutputStream();
         writer.flush(out, true);
         writer.close();
@@ -351,7 +345,6 @@ public class bucao_infoController {
                         }
                         saveList.add(bucao_info);
                     }
-
                     for (Bucao_info bucao_info : saveList) {
                         Bucao_info bucao=bucao_infoMapper.selectOne(Wrappers.<Bucao_info>lambdaQuery().eq(Bucao_info::getRfid,bucao_info.getRfid()).eq(Bucao_info::getRfno,bucao_info.getRfno()));
                         if (bucao==null&&bucao_infoMapper.isValid(bucao_info.getRfno(), bucao_info.getRfid()) != null && bucao_info.getRfid() != null) {

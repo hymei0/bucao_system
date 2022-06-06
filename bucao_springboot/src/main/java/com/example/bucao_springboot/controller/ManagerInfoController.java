@@ -34,7 +34,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/ManagerInfo")
-@Api(tags = "管理员信息管理")
+@Api(tags = "管理员信息管理接口")
 public class ManagerInfoController {
     @Resource
     ManagerInfoMapper ManagerInfoMapper;

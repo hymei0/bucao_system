@@ -35,7 +35,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/User_room")
-@Api(tags = "住院信息管理")
+@Api(tags = "住院信息管理接口")
 public class User_roomController {
     @Resource
     User_roomMapper User_roomMapper;
@@ -118,11 +118,8 @@ public class User_roomController {
         try {
 
             // Bucao_user bucao=Bucao_userMapper.selectOne(Wrappers.<Bucao_user>lambdaQuery().eq(Bucao_user::getRfno,Bucao_user.getRfno()).eq(Bucao_user::getRfid,Bucao_user.getRfid()));
-
             QueryWrapper<User_room> wrapper = new QueryWrapper<>();
-
             wrapper.eq("userid", userid);
-
             List<User_room> ur=User_roomMapper.selectList(wrapper);
             if(ur.size()>0)
             {
@@ -131,7 +128,6 @@ public class User_roomController {
             else{
                 return Result.error("-1","未查询到该用户相关的住院信息");
             }
-
         }catch (Exception e){
             System.out.println(e.toString());
             return Result.error("-1","后台出错啦，请联系开发人员");

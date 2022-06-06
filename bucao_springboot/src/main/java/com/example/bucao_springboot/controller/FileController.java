@@ -19,7 +19,7 @@ import java.net.URLEncoder;
 import java.util.List;
 
 @RestController
-@Api(tags = "文件上传和下载")
+@Api(tags = "文件上传和下载接口")
 @RequestMapping("/files")
 public class FileController{
     //获取端口号
@@ -42,7 +42,6 @@ public class FileController{
         {
             return Result.error("-1","请上传文件");
         }
-
         // 定义文件的唯一标识（前缀）
         String flag = IdUtil.fastSimpleUUID();
         //获取项目路径
@@ -50,7 +49,6 @@ public class FileController{
         String rootFilePath = projectLocation  + "/bucao_springboot/src/main/resources/files/" + flag + "_" + originalFilename;  // 获取上传的路径
         //工具类：hutool
         FileUtil.writeBytes(file.getBytes(), rootFilePath);  // 把文件写入到上传的路径
-
         return Result.success( ip + ":" + port + "/files/" + flag);  // 返回结果 url
     }
     /**
@@ -62,10 +60,9 @@ public class FileController{
     @ApiOperation(value = "文件下载接口",notes="文件下载")
     public Result<?> getFiles(@PathVariable String flag, HttpServletResponse response) {
         OutputStream os;  // 新建一个输出流对象
-        String basePath = System.getProperty("user.dir") + "/bucao_springboot/src/main/resources/files/";  // 定于文件上传的根路径
+        String basePath = System.getProperty("user.dir") + "/bucao_springboot/src/main/resources/files/";  // 定义文件上传的根路径
         List<String> fileNames = FileUtil.listFileNames(basePath);  // 获取所有的文件名称
         String fileName = fileNames.stream().filter(name -> name.contains(flag)).findAny().orElse("");  // 找到跟参数一致的文件
-
         try {
             if (StrUtil.isNotEmpty(fileName)) {
                 response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));

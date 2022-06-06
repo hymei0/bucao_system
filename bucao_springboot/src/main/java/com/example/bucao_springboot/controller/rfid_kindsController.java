@@ -36,7 +36,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/rfid_kinds")
-@Api(tags = "RFID标签分类信息管理")
+@Api(tags = "RFID标签分类信息管理接口")
 public class rfid_kindsController {
     @Resource   //将rfid_kindsMapper引入到bucao_infoController中
     RFid_kindsMapper rfid_kindsMapper;

@@ -36,7 +36,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/Room_info")
-@Api(tags = "病房信息管理")
+@Api(tags = "病房信息管理接口")
 public class Room_InfoController {
     //将xxxx_infoMapper引入到xxxx_infoController中,不太规范，一般是写service类，controller引入service,service引入mapper
     @Resource

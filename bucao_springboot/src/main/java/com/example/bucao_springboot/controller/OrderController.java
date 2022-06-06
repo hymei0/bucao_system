@@ -41,7 +41,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/Order")
-@Api(tags = "订单信息管理")
+@Api(tags = "订单信息管理接口")
 public class OrderController {
     @Resource
     OrderMapper OrderMapper;

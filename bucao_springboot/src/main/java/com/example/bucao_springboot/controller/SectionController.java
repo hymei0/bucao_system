@@ -35,7 +35,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/Section")
-@Api(tags = "部门信息管理")
+@Api(tags = "部门信息管理接口")
 public class SectionController {
     @Resource
     SectionMapper sectionMapper;

@@ -33,7 +33,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/Bucao_user")
-@Api(tags = "布草-用户管理")
+@Api(tags = "为用户分配布草管理接口")
 public class Bucao_userController {
     //将xxx_infoMapper引入到xxx_infoController中,不太规范，一般是写service类，controller引入service,service引入mapper
     @Resource

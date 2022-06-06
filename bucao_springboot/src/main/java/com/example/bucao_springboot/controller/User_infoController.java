@@ -13,6 +13,7 @@ import com.example.bucao_springboot.common.excelconfig;
 import com.example.bucao_springboot.entity.Section;
 import com.example.bucao_springboot.entity.User_info;
 import com.example.bucao_springboot.mapper.User_infoMapper;
+import com.example.bucao_springboot.utils.TokenUtils;
 import io.swagger.annotations.*;
 
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,7 @@ import java.util.Map;
 @RestController
 
 @RequestMapping("/User_info")
-@Api(tags = "用户信息管理")
+@Api(tags = "用户信息管理接口")
 public class User_infoController {
     @Resource
     User_infoMapper user_infoMapper;
@@ -56,6 +57,9 @@ public class User_infoController {
             return Result.error("-1","账号或密码错误");
         }
         System.out.println("User_info已登录到"+user_info.getID()+"的账户");
+        // 生成token
+        String token = TokenUtils.genToken(res);
+        res.setToken(token);
         return Result.success(res);
     }
 
@@ -148,7 +152,6 @@ public class User_infoController {
                 {
                     return Result.error("-1", "性别只能为男或者女");
                 }
-
                 user_infoMapper.updateById(user_info);
                 System.out.println("User_info已更新用户" + user_info.getID() + "的信息：");
                 return Result.success();

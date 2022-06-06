@@ -12,7 +12,7 @@ import java.util.Map;
 @Mapper
 public interface Bucao_roomMapper extends BaseMapper<Bucao_room> {
     /**
-     * 查询出没有分配充足的布草的房间
+     * 查询出没有没有住满的房间
      * @return
      */
     @Select("select * from room_info where id not in (select room_id from bucao_room group by room_id having count(room_id)>=4)")
